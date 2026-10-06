@@ -8,7 +8,7 @@ Eleven procedural 3D creatures, drawn entirely in code with [three.js](https://t
 npm install
 npm run dev        # the sheet, at http://localhost:5173, and the battle preview at /battle.html
 npm run build      # a static build in dist/
-npm run stats      # what each creature costs, with no browser
+npm run stats      # what each creature costs, and whether it fits its battle size class, with no browser
 npm run render     # a PNG of every creature in renders/ (needs a browser, see below)
 npm run render -- --battle   # the battle preview as PNGs in renders/battle/
 ```
@@ -41,7 +41,8 @@ Cost is measured by `npm run stats` at three r158. Descriptions of each are in [
 index.html               the sheet's page
 src/showcase/            the sheet: cards, camera, lights, turntable (main.js, scene.js, style.css)
 battle.html              the battle preview's page
-src/preview/             the battle preview: stadium.js (renderer, field, stands, side camera), main.js (formation, silhouette, size boxes, sliders)
+src/arena/               shared by the preview and the battle to come: layout.js (formation, camera, size classes), stadium.js (field, stands, lights)
+src/preview/             the battle preview: main.js (teams, silhouette, size boxes, sliders), style.css
 src/creatures/           one file per creature, and index.js, which lists them with their notes
 src/kit/                 the building blocks every creature uses
   math.js                colours, mixing, smooth steps, a seeded random number generator
@@ -49,7 +50,7 @@ src/kit/                 the building blocks every creature uses
   materials.js           shared materials and the glow texture
   parts.js               part, seg, shard, lock, feather, wingKit, band, plateGeo, finish...
 scripts/render.mjs       PNGs of every creature, from a headless browser
-scripts/stats.mjs        parts, triangles and build time per creature
+scripts/stats.mjs        parts, triangles, build time and size-class fit per creature
 reference/               the single-file page this code came from, as last published
 docs/creatures.md        the catalogue
 docs/roadmap.md          the plan for the whole game, phase by phase

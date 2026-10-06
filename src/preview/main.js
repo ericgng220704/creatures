@@ -1,14 +1,12 @@
 // The battle preview: creatures at true battle size, from the fixed side camera, in a 6 v 6 formation.
-// Silhouette mode, size-class boxes and layout sliders are for judging art (CLAUDE.md rule 1) and for fixing
-// the formation and camera (roadmap 0.2). Every setting is mirrored in the URL, so a view can be shared or rendered.
+// Silhouette mode and size-class boxes are for judging art (CLAUDE.md rule 1). The layout comes from
+// src/arena/layout.js; the sliders only try other layouts out. Every setting is mirrored in the URL.
 import './style.css';
 import * as T from 'three';
 import { INFO, ORDER } from '../creatures/index.js';
 import { RADIAL } from '../kit/materials.js';
-import { makeStage } from './stadium.js';
-
-// size classes: the solid body's length (x) and height (top above the ground); flyers also have a wingspan (z)
-export var CLASSES = { S: { len: 3.5, h: 3.5 }, M: { len: 4.5, h: 3.5 }, L: { len: 6.5, h: 4.0 }, F: { len: 4.5, h: 4.5, span: 6.0 } };
+import { makeStage } from '../arena/stadium.js';
+import { CLASSES, FORMATION, checkFit, faceSlot, placeCamera, slotPosition } from '../arena/layout.js';
 // slot order in a team: front row far, middle, near; then back row far, middle, near
 var DEFAULT_P = ['wardshell', 'emberwolf', 'stonemaul', 'thornstag', 'eagle', 'owl'];
 var DEFAULT_E = ['elephant', 'lion', 'tidefang', 'panda', 'pyrewing', 'emberwolf'];
@@ -26,9 +24,8 @@ var opt = {
   sil: q.get('sil') === '1', boxes: q.get('boxes') === '1', turn: q.get('enemy') === 'turn',
   still: q.get('still') === '1', lights: q.get('lights') !== '0', t: num('t', 0), pick: INFO[q.get('pick')] ? q.get('pick') : 'emberwolf'
 };
-var DEFAULT_L = { elev: 30, fov: 26, aim: 3, front: 4.5, rowGap: 6.5, colGap: 6, zoom: 1 };   // provisional until roadmap 0.2
 var L = {};
-LAYOUT_KEYS.forEach(function (k) { L[k] = num(k, DEFAULT_L[k]); });
+LAYOUT_KEYS.forEach(function (k) { L[k] = num(k, FORMATION[k]); });
 var teams = { p: team('p', DEFAULT_P), e: team('e', DEFAULT_E) };
 
 var frame = document.getElementById('frame'), labels = document.getElementById('labels'), status = document.getElementById('status');
@@ -46,10 +43,9 @@ var slots = [];
 });
 function placeSlots() {
   slots.forEach(function (sl) {
-    var sx = sl.side === 'p' ? -1 : 1;
-    sl.g.position.set(sx * (L.front + sl.row * L.rowGap), 0, (sl.col - 1) * L.colGap);
-    sl.g.rotation.y = 0; sl.g.scale.set(1, 1, 1);
-    if (sl.side === 'e') { if (opt.turn) sl.g.rotation.y = Math.PI; else sl.g.scale.x = -1; }
+    sl.g.position.copy(slotPosition(sl.side, sl.row, sl.col, L));
+    faceSlot(sl.g, sl.side);
+    if (sl.side === 'e' && opt.turn) { sl.g.scale.x = 1; sl.g.rotation.y = Math.PI; }   // to look at the far flank
   });
 }
 
@@ -76,10 +72,7 @@ function build(id) {
   a.solid = solid;
   a.size = solid.getSize(new T.Vector3());
   a.cls = INFO[id].size || 'M';
-  var c = CLASSES[a.cls], over = [];
-  if (a.size.x > c.len) over.push('length ' + a.size.x.toFixed(1) + ' > ' + c.len);
-  if (solid.max.y > c.h) over.push('height ' + solid.max.y.toFixed(1) + ' > ' + c.h);
-  if (c.span && a.size.z > c.span) over.push('span ' + a.size.z.toFixed(1) + ' > ' + c.span);
+  var c = CLASSES[a.cls], over = checkFit(solid, a.cls);
   a.over = over;
   // what silhouette mode hides: sprites, faint glow, and noFit auras and rings
   a.soft = []; a.lights = [];
@@ -92,8 +85,8 @@ function build(id) {
     new T.MeshBasicMaterial({ map: RADIAL, color: 0x000000, transparent: true, opacity: flyer ? .2 : .34, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = .012; a.shadow = shadow;
   a.boxes = new T.Group();
-  a.boxes.add(lineBox(c.len, c.h, c.span || L.colGap * .9, over.length ? 0xff4a4a : 0x5dff8a, .9));
-  var real = lineBox(a.size.x, solid.max.y, a.size.z, 0xffffff, .45); a.boxes.add(real);
+  a.boxes.add(lineBox(c.len, c.h, c.span || c.dep, over.length ? 0xff4a4a : 0x5dff8a, .9));
+  var real = lineBox(a.size.x, solid.max.y - solid.min.y, a.size.z, 0xffffff, .45); real.position.y += solid.min.y; a.boxes.add(real);
   return a;
 }
 function fill() {
@@ -119,12 +112,7 @@ function fill() {
 function fitCamera() {
   var w = frame.clientWidth, h = frame.clientHeight; if (!w || !h) return;
   st.r.setSize(w, h, false);
-  var cam = st.cam; cam.aspect = w / h; cam.fov = L.fov; cam.updateProjectionMatrix();
-  // wide enough for both back rows and a large creature, with a margin
-  var half = L.front + L.rowGap + 3.6, hf = Math.atan(Math.tan(L.fov * Math.PI / 360) * cam.aspect);
-  var d = half / Math.tan(hf) / L.zoom, e = L.elev * Math.PI / 180, look = L.aim;
-  cam.position.set(0, look + d * Math.sin(e), d * Math.cos(e));
-  cam.lookAt(0, look, 0);
+  placeCamera(st.cam, w / h, L);
 }
 function refresh() {
   placeSlots(); fitCamera();
@@ -142,19 +130,17 @@ function refresh() {
   placeLabels();
   syncUrl(); syncControls();
 }
-// labels over each creature: name, class, height on screen in pixels at 720p, and what does not fit
+// labels over each creature: name, class, standing height on screen (ground to top at the slot, px at 720p),
+// and what does not fit
 function placeLabels() {
   var w = frame.clientWidth, h = frame.clientHeight, v = new T.Vector3();
   labels.classList.toggle('on', opt.boxes);
   slots.forEach(function (sl) {
     if (!sl.a || !opt.boxes) { sl.lab.style.display = 'none'; return; }
-    var b = sl.a.solid, minY = 1e9, maxY = -1e9;
-    for (var k = 0; k < 8; k++) {
-      v.set(k & 1 ? b.max.x : b.min.x, k & 2 ? b.max.y : b.min.y, k & 4 ? b.max.z : b.min.z).applyMatrix4(sl.g.matrixWorld).project(st.cam);
-      var y = (1 - v.y) / 2 * h; minY = Math.min(minY, y); maxY = Math.max(maxY, y);
-    }
-    var px = Math.round((maxY - minY) * 720 / h);
+    var b = sl.a.solid;
+    var y0 = v.set(0, 0, 0).applyMatrix4(sl.g.matrixWorld).project(st.cam).y;
     v.set(0, b.max.y, 0).applyMatrix4(sl.g.matrixWorld).project(st.cam);
+    var px = Math.round((v.y - y0) / 2 * 720);
     sl.lab.style.display = '';
     sl.lab.style.left = ((v.x + 1) / 2 * w) + 'px'; sl.lab.style.top = ((1 - v.y) / 2 * h) + 'px';
     sl.lab.className = 'lab' + (sl.a.over.length ? ' bad' : '');
@@ -212,7 +198,7 @@ ui.addEventListener('click', function (ev) {
   if (act === 'all') { teams.p = none.map(function () { return opt.pick; }); teams.e = teams.p.slice(); }
   if (act === 'roster') { teams.p = DEFAULT_P.slice(); teams.e = DEFAULT_E.slice(); }
   if (act === 'swap') { var x = teams.p; teams.p = teams.e; teams.e = x; }
-  if (act === 'reset') { L = Object.assign({}, DEFAULT_L); refresh(); return; }
+  if (act === 'reset') { L = Object.assign({}, FORMATION); refresh(); return; }
   if (act === 'copy') { navigator.clipboard && navigator.clipboard.writeText(location.href); b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy link'; }, 1200); return; }
   fill();
 });

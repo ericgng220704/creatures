@@ -28,7 +28,7 @@ Do not build game systems ahead of the design decisions listed under "Decisions"
 npm install
 npm run dev                 # the creature sheet at http://localhost:5173, the battle preview at /battle.html
 npm run build               # static build in dist/
-npm run stats               # parts, triangles, build ms per creature (Node, no browser)
+npm run stats               # parts, triangles, build ms per creature, and whether it fits its size class (Node, no browser)
 npm run render              # PNG of every creature in renders/ (headless Chromium)
 npm run render -- --head    # plus a face close-up of each
 npm run render -- owl lion  # only these ids
@@ -50,8 +50,10 @@ src/kit/         math.js (C, mix, sstep, rng), geometry.js (blob, ttube, lathe, 
                  place, plateGeo, wingKit, beatWing, onLimb, band, finish, flameCluster)
 src/creatures/   one file per creature + index.js (INFO, ORDER)
 src/showcase/    the creature sheet (one WebGL context per card; not how the game should render)
-src/preview/     the battle preview (battle.html): one scene, the stadium, the side camera, a 6 v 6 formation,
-                 silhouette mode, size-class boxes with on-screen heights, layout sliders; settings live in the URL
+src/arena/       what the battle preview and the future battle scene share: layout.js (FORMATION, CLASSES, slotPosition,
+                 faceSlot, placeCamera, checkFit) and stadium.js (renderer, field, stands, lights)
+src/preview/     the battle preview (battle.html): a 6 v 6 formation, silhouette mode, size-class boxes with on-screen
+                 heights, sliders to try other layouts; settings live in the URL
 scripts/         render.mjs (PNGs), stats.mjs (cost table)
 reference/       the original single-file sheet, frozen. Do not edit.
 docs/            creatures.md, the catalogue
@@ -144,12 +146,12 @@ A player should be able to tell a creature's role from its outline before readin
 
 **MUST**
 
-1. **Read at battle size first.** Design the silhouette for the battle camera, then add detail. In the battle preview at 1280 x 720 a creature stands about **130 to 200 px** tall (the size-box labels show the number). If it is not recognisable in the preview's **Silhouette** mode at that size, it is not done. Close-up detail is a bonus, never the point.
+1. **Read at battle size first.** Design the silhouette for the battle camera, then add detail. In the battle preview at 1280 x 720 a creature stands about **100 to 150 px** tall, ground to top (the size-box labels show the number); under about 80 px it is too small to read (Tidefang today: 54). If it is not recognisable in the preview's **Silhouette** mode at that size, it is not done. Close-up detail is a bonus, never the point.
 2. **One element, one accent hue.** The body stays natural and muted; the element owns the only saturated, glowing colour. No second competing glow colour (a pale core of the same hue is fine).
 3. **Counter-shade the body.** Darker on top, paler underneath, via a colour function on `n.y`. No flat single-colour bodies.
 4. **Eyes glow and blink.** Unlit `glow` eye + `halo` + blink in `update`. Eyes must be big enough to read at battle size (see weakness 9 below).
 5. **Neutral battle stance as the build pose.** Standing, facing `+x`, weight on all feet, ready. Attacks, strikes and punches are animation, not the build pose.
-6. **Fit the footprint.** The solid body (no FX) fits its size class (see table). Battle formation slots are fixed; a creature that does not fit overlaps its neighbour.
+6. **Fit the footprint.** The solid body (no FX) fits its size class (see table; `npm run stats` and the preview's Size boxes check it). Battle formation slots are fixed; a creature that does not fit overlaps its neighbour.
 7. **FX live in their own group.** Auras, orbiting shields, rocks, rings, moons, perches, wind ribbons and particles go in an `fx` group (marked `userData.noFit`) that the game can scale, shorten or switch off. Nothing in `fx` may reach more than 1.5 x the body's half-length from its centre.
 8. **No scenery.** Branches, moons and ground rings are scene props, not creature parts. A creature must stand on the plain field.
 9. **No textures, no imported models.** Everything is kit geometry + colour functions + `finish()`.
@@ -163,29 +165,33 @@ A player should be able to tell a creature's role from its outline before readin
 - Overlap blobs at joints (shoulder blob over the top of the limb `seg`) so limbs grow out of the body rather than plugging into it.
 - Gold or iron trim at most in two places. It is a rank marker, not decoration.
 - Triangle budget: aim for 60k; over 120k needs a reason. Mark small parts `noOcc`. The game runs on a laptop (P1), so detail may win over thrift, but twelve creatures share one frame.
+- Put asymmetric detail (a scar, a moss patch, a raised paw) on the **+z flank**. It is the show side: the battle camera only ever sees +z, on both teams, because enemies are mirrored.
+- Fill the class. A creature far below its class height (Tidefang, Wardshell) reads as small and weak on the field.
 - Glow colours from the element's ramp (see "Element colour keys" once decided); eyes may stay warm amber as the house signature.
 
 ### The battle camera
 
-Battles are seen **from the side** (player left, enemy right), from slightly above. Design and judge every creature in that view: profile silhouette first, then three-quarter. The turntable on the sheet is for close-up checking only.
+Battles are seen **from the side** (player left, enemy right), from above. Design and judge every creature in that view: profile silhouette first, then three-quarter. The turntable on the sheet is for close-up checking only.
 
-**Size classes** (solid body, in scene units; current creatures shown for scale). Each creature's class is `size` in `src/creatures/index.js`; the battle preview's **Size boxes** check it (green fits, red names what does not).
+**Formation and camera (locked, roadmap 0.2; `FORMATION` in `src/arena/layout.js`).** Each team stands in two rows of three. The front row is 4.5 from the centre line, the back row 6.5 behind it, and the three columns are 6 apart across the field. The camera looks from the +z side, 30° above level, with a 26° field of view, aimed at height 3, and pulled back until both back rows fit across a 16:9 screen. Enemies are **mirrored** (`scale.x = -1`), not turned round, so both teams show the camera their +z flank.
 
-| Class | Length x height | Today |
-| --- | --- | --- |
-| S | up to 3.5 x 3.5 | Duskseer 3.2 x 3.5, Ironpaw 3.3 x 4.2 (too tall) |
-| M | up to 4.5 x 3.5 | Emberwolf 4.4 x 2.9, Thornstag 3.5 x 4.4 (antlers too tall) |
-| L | up to 6.5 x 4.0 | Grandtusk 6.4 x 3.8, Sunmane 5.4 x 3.4, Stonemaul 6.4 x 2.8, Tidefang 6.6 (tail) |
-| Flyers | wingspan up to 6.0, hover base about 2.0 | Stormtalon 10.6 span (too wide), Pyrewing 7.2 |
+**Size classes (firm; `CLASSES` in `src/arena/layout.js`).** Measured on the solid body: lit parts only, no glow, no `noFit` FX, at `t = 0`. Each creature's class is `size` in `src/creatures/index.js`.
 
-These numbers are provisional until the formation slots and the battle camera are fixed (roadmap, phase 0).
+| Class | Length (x) | Height (top) | Depth (z) | Why |
+| --- | --- | --- | --- | --- |
+| S | 3.5 | 3.5 | 3.0 | |
+| M | 4.5 | 3.75 | 3.5 | |
+| L | 6.5 | 4.0 | 4.0 | Length: the row gap is 6.5, so two L creatures in line just touch nose to tail. Height: above 4.0 a creature in a near column hides the feet of the one behind it (9 px at 4.25, 20 px at 4.5). Depth: columns are 6 apart, so 4.0 leaves 2 between neighbours. |
+| F (flyers) | 4.5 | 4.25 | wingspan 6.0 | Wings may fill the whole lane. The lowest point must be at least **0.8** above the ground, so it reads as flying. |
+
+On screen, from front-middle at 720p, a top of 3.5 stands about 128 px tall, 4.0 about 148 px; the near column adds about 10 %, the far column takes off about 9 %.
 
 ### Known weaknesses (from the renders; fix these before making more)
 
 1. **Mixed vibes.** Only Emberwolf fully has the benchmark look. The rest need reworking to it (decided: the owner wants every creature to feel like the wolf).
 2. **Balloon limbs.** Elephant, Sunmane and Ironpaw limbs read as stacked sausages with visible seams at the joints. Needs overlap, tapering and joint blobs.
 3. **Sunmane's mane reads as spikes**, like a hedgehog, not fur. The locks are too stiff, pointed and evenly spaced; it needs fewer, broader, curved locks in clumps.
-4. **Sizes are all over the place.** Six of eleven fail their class in the battle preview: Thornstag (height 4.4 > 3.5), Ironpaw (height 4.0 > 3.5), Wardshell (length 6.9 > 6.5, its shields), Tidefang (length 6.6 > 6.5), Stormtalon (length 4.7 > 4.5, span 10.6 > 6) and Pyrewing (length 6.2 > 4.5, span 7.2 > 6).
+4. **Sizes are all over the place.** Six of eleven fail their class (`npm run stats`): Thornstag (height 4.41 > 3.75), Ironpaw (height 4.01 > 3.5, depth 3.19 > 3), Wardshell (length 6.91 > 6.5, depth 4.71 > 4, its shields), Tidefang (length 6.63 > 6.5), Stormtalon (length 4.7 > 4.5, span 10.61 > 6, lift 0.71 < 0.8) and Pyrewing (length 6.24 > 4.5, span 7.16 > 6, lift 0.36 < 0.8). Tidefang (54 px) and Wardshell (72 px) also stand far too low for their class.
 5. **Action poses are baked in.** Sunmane is mid-swipe, Ironpaw mid-punch, Stormtalon mid-dive. They need neutral idles; the action becomes an attack animation.
 6. **FX and scenery bleed out.** Wardshell's shields orbit 6.9 units wide, Stonemaul's rocks and rings, Duskseer's moon, branch and ring, Stormtalon's wind ribbons. They will cover the neighbours in formation.
 7. **One PointLight per creature.** Twelve coloured dynamic lights in one scene spill colour onto the neighbours and cost every pixel. In battle, element light should be baked or faked (halo plus emissive). The preview's **Creature lights** toggle shows the difference.
@@ -201,7 +207,7 @@ These numbers are provisional until the formation slots and the battle camera ar
 - [ ] Role readable from the outline.
 - [ ] Body counter-shaded, one element accent, eyes glow and blink.
 - [ ] Neutral battle stance, faces `+x`, feet on `y = 0` (or hover base for flyers).
-- [ ] Solid body inside its size class; FX inside the `fx` group and within reach.
+- [ ] `npm run stats` says it fits its size class; FX inside the `fx` group and within reach.
 - [ ] Joint groups exposed for animation (`head`, `jaw`, `tail`, `wings`, limbs as needed).
 - [ ] `npm run stats`: about 60k triangles, never over 120k without a reason.
 - [ ] `npm run render -- <id> --head` looked at, beside two neighbours.
@@ -213,7 +219,7 @@ These numbers are provisional until the formation slots and the battle camera ar
 
 What *Pocket Incoming* does, which is what we are copying unless a decision says otherwise:
 
-- **6 v 6**, each side in two rows of three (front and back), player on the left facing right, enemy on the right facing left. Our creatures face `+x`; the enemy side is mirrored (`scale.x = -1` on a parent, or `rotation.y = PI`).
+- **6 v 6**, each side in two rows of three (front and back), player on the left facing right, enemy on the right facing left. Our creatures face `+x`; the enemy side is mirrored (`scale.x = -1` on a parent; `faceSlot` in `src/arena/layout.js`).
 - **Fixed camera**, side-on from an elevated three-quarter angle, over a stadium field with a centre circle.
 - **Auto battle.** Pause and speed (x1 / x2) buttons; turn limit shown as `01 / 10 turn`. The player does nothing during a fight.
 - **Turn order bar** on the right edge: portraits stacked in speed order, the next actor at the bottom, highlighted.

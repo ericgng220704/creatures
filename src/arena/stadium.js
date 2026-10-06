@@ -1,4 +1,4 @@
-// The battle stage: one renderer, one scene, the stadium field, the lights and the side camera.
+// The battle stage: one renderer, one scene, the stadium field and the lights. The camera is placed by layout.js.
 import * as T from 'three';
 import { RADIAL } from '../kit/materials.js';
 import { envFor } from '../showcase/scene.js';
