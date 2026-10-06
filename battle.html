@@ -22,11 +22,13 @@
         <button class="tog" data-opt="sil" aria-pressed="false">Silhouette</button>
         <button class="tog" data-opt="boxes" aria-pressed="false">Size boxes</button>
         <button class="tog" data-opt="turn" aria-pressed="false" title="Enemies turned round instead of mirrored">Enemy turned</button>
-        <button class="tog" data-opt="lights" aria-pressed="true">Creature lights</button>
+        <button id="light" data-act="light" title="The creatures' own coloured lights: baked into their parts, live lights, or off">Creature light: baked</button>
+        <button class="tog" data-opt="merge" aria-pressed="true" title="Merge every part that never moves on its own">Merge</button>
         <button class="tog" data-opt="still" aria-pressed="false">Freeze</button>
         <button class="tog" data-opt="joints" aria-pressed="false" title="Show every rig joint and bone">Joints</button>
         <button class="tog" data-opt="flex" aria-pressed="false" title="Swing every joint, to check what each one carries">Flex</button>
       </div>
+      <p id="perf" class="soft"></p>
     </div>
     <div class="group">
       <h2>Play <span class="soft">(the picked creature, or player front middle, against the enemy facing it)</span></h2>

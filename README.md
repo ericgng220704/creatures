@@ -108,6 +108,16 @@ Attacks, hits and the rest are **clips** (`src/kit/anim.js`): keyframe tracks ov
 
 In the battle preview, **Play** runs them: Attack and Ultimate send the picked creature (or the player's front middle) at the enemy facing it, which plays Hit at the impact; Hit, Faint and Victory play on everyone; Exchange keeps the two trading blows.
 
+### Drawing many at once
+
+A built creature is hundreds of small meshes, and each is a draw call. `src/kit/compact.js` makes it cheap without changing how it looks:
+
+- `bakeLights(creature)` bakes the creature's own `PointLight`s into its parts as a per-vertex glow (a `glowLight` attribute that the shared materials add to their emitted light), then takes the lights out. The creature looks the same, and no longer lights its neighbours.
+- `merge(creature)` merges every part that never moves on its own into one mesh per material per joint. It finds what moves by running `update(t)` at a few moments and watching transforms, material values and geometry: eyes, flames, embers, shields and crystals stay separate, as do rig joints and sprites. Glow parts of different colours merge through vertex colours.
+- `optimize(creature)` does both. For all eleven: 2,208 meshes become 682, and the shadow pass 1,718 casters become 267. Renders before and after match (bar a few hundred pixels of transparent sparks sorting differently).
+
+The battle preview always draws creatures this way; its **Merge** and **Creature light** (baked, live, off) buttons switch it, and it shows frames a second, draw calls and triangles. `npm run stats` lists meshes as built and after merging.
+
 ### Adding a creature
 
 1. Copy the closest creature in `src/creatures/` to a new file and change it.

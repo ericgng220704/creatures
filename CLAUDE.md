@@ -28,7 +28,7 @@ Do not build game systems ahead of the design decisions listed under "Decisions"
 npm install
 npm run dev                 # the creature sheet at http://localhost:5173, the battle preview at /battle.html
 npm run build               # static build in dist/
-npm run stats               # parts, triangles, build ms per creature, and whether it fits its size class (Node, no browser)
+npm run stats               # parts, merged meshes, triangles, build ms per creature, and whether it fits its size class
 npm run render              # PNG of every creature in renders/ (headless Chromium)
 npm run render -- --head    # plus a face close-up of each
 npm run render -- owl lion  # only these ids
@@ -49,7 +49,8 @@ src/kit/         math.js (C, mix, sstep, rng), geometry.js (blob, ttube, lathe, 
                  materials.js (MAT, glowMat, crystalMat, halo, RADIAL), parts.js (part, glow, seg, shard, lock, feather,
                  place, plateGeo, wingKit, beatWing, onLimb, band, finish, flameCluster),
                  rig.js (limb, chain, hang, bind, makeRig, eachJoint, restPose),
-                 anim.js (the shared clips; sample, clipFor, applyClip, clipWeight)
+                 anim.js (the shared clips; sample, clipFor, applyClip, clipWeight),
+                 compact.js (bakeLights, merge, optimize, drawCalls)
 src/creatures/   one file per creature + index.js (INFO, ORDER)
 src/showcase/    the creature sheet (one WebGL context per card; not how the game should render)
 src/arena/       what the battle preview and the future battle scene share: layout.js (FORMATION, CLASSES, slotPosition,
@@ -175,6 +176,7 @@ A player should be able to tell a creature's role from its outline before readin
 - Keep the kit's vocabulary (`blob`, `seg`, `lock`, `feather`, `shard`, `band`). Add a new kit helper only when two or more creatures need it.
 - Overlap blobs at joints (shoulder blob over the top of the limb `seg`) so limbs grow out of the body rather than plugging into it.
 - Gold or iron trim at most in two places. It is a rank marker, not decoration.
+- Anything that moves on its own after `finish()` must be moved by `update(t)` or be a rig joint, or `merge()` will not know to keep it separate. Mark a part `userData.noMerge` if something else moves it.
 - Triangle budget: aim for 60k; over 120k needs a reason. Mark small parts `noOcc`. The game runs on a laptop (P1), so detail may win over thrift, but twelve creatures share one frame.
 - Put asymmetric detail (a scar, a moss patch, a raised paw) on the **+z flank**. It is the show side: the battle camera only ever sees +z, on both teams, because enemies are mirrored.
 - Fill the class. A creature far below its class height (Tidefang, Wardshell) reads as small and weak on the field.
@@ -202,10 +204,10 @@ On screen, from front-middle at 720p, a top of 3.5 stands about 128 px tall, 4.0
 1. **Mixed vibes.** Only Emberwolf fully has the benchmark look. The rest need reworking to it (decided: the owner wants every creature to feel like the wolf).
 2. **Balloon limbs.** Elephant, Sunmane and Ironpaw limbs read as stacked sausages with visible seams at the joints. Needs overlap, tapering and joint blobs.
 3. **Sunmane's mane reads as spikes**, like a hedgehog, not fur. The locks are too stiff, pointed and evenly spaced; it needs fewer, broader, curved locks in clumps.
-4. **Sizes are all over the place.** Six of eleven fail their class (`npm run stats`): Thornstag (height 4.41 > 3.75), Ironpaw (height 4.01 > 3.5, depth 3.19 > 3), Wardshell (length 6.91 > 6.5, depth 4.71 > 4, its shields), Tidefang (length 6.63 > 6.5), Stormtalon (length 4.7 > 4.5, span 10.61 > 6, lift 0.71 < 0.8) and Pyrewing (length 6.24 > 4.5, span 7.16 > 6, lift 0.36 < 0.8). Tidefang (54 px) and Wardshell (72 px) also stand far too low for their class.
+4. **Sizes are all over the place.** Six of eleven fail their class (`npm run stats`, exact vertex bounds): Thornstag (height 4.4 > 3.75), Ironpaw (height 4.0 > 3.5), Wardshell (length 6.91 > 6.5, depth 4.71 > 4, its shields), Tidefang (length 6.6 > 6.5), Stormtalon (length 4.67 > 4.5, span 10.41 > 6, lift 0.71 < 0.8) and Pyrewing (length 6.01 > 4.5, span 6.83 > 6, lift 0.36 < 0.8). Tidefang (54 px) and Wardshell (72 px) also stand far too low for their class.
 5. **Action poses are baked in.** Sunmane is mid-swipe, Ironpaw mid-punch, Stormtalon mid-dive. They need neutral idles; the action becomes an attack animation.
 6. **FX and scenery bleed out.** Wardshell's shields orbit 6.9 units wide, Stonemaul's rocks and rings, Duskseer's moon, branch and ring, Stormtalon's wind ribbons. They will cover the neighbours in formation.
-7. **One PointLight per creature.** Twelve coloured dynamic lights in one scene spill colour onto the neighbours and cost every pixel. In battle, element light should be baked or faked (halo plus emissive). The preview's **Creature lights** toggle shows the difference.
+7. ~~One PointLight per creature.~~ Solved in 0.5: `bakeLights()` bakes each creature's light into its own parts, so it no longer spills onto neighbours. Keep giving creatures a `PointLight` for their element glow; it is baked away in battle.
 8. **Weak value contrast.** Sunmane, Grandtusk, Wardshell and Thornstag have mid-value bodies, so their element glow does not pop the way Emberwolf's does. Darken or deepen the body before brightening the glow.
 9. **Small faces.** Grandtusk's and Stonemaul's eyes vanish at battle size; Tidefang's and Stormtalon's heads are tiny relative to the body. Faces carry personality and must read.
 10. **Thin or flat silhouettes.** Thornstag is mostly antler on a slim body; Tidefang is long and low, nearly invisible from an elevated camera.
