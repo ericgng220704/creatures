@@ -5,7 +5,8 @@ import './style.css';
 import * as T from 'three';
 import { INFO, ORDER } from '../creatures/index.js';
 import { RADIAL } from '../kit/materials.js';
-import { eachJoint } from '../kit/rig.js';
+import { eachJoint, restPose } from '../kit/rig.js';
+import { applyClip, clipFor, clipWeight, sample } from '../kit/anim.js';
 import { makeStage } from '../arena/stadium.js';
 import { CLASSES, FORMATION, checkFit, faceSlot, placeCamera, slotPosition } from '../arena/layout.js';
 // slot order in a team: front row far, middle, near; then back row far, middle, near
@@ -23,7 +24,8 @@ function team(key, def) {
 function num(key, def) { var v = parseFloat(q.get(key)); return isNaN(v) ? def : v; }
 var opt = {
   sil: q.get('sil') === '1', boxes: q.get('boxes') === '1', turn: q.get('enemy') === 'turn',
-  still: q.get('still') === '1', lights: q.get('lights') !== '0', joints: q.get('joints') === '1', flex: q.get('flex') === '1', t: num('t', 0), pick: INFO[q.get('pick')] ? q.get('pick') : 'emberwolf'
+  still: q.get('still') === '1', lights: q.get('lights') !== '0', joints: q.get('joints') === '1', flex: q.get('flex') === '1', loop: false,
+  frame: q.get('clip') ? { name: q.get('clip'), k: num('k', 0) } : null, t: num('t', 0), pick: INFO[q.get('pick')] ? q.get('pick') : 'emberwolf'
 };
 var L = {};
 LAYOUT_KEYS.forEach(function (k) { L[k] = num(k, FORMATION[k]); });
@@ -39,12 +41,13 @@ var slots = [];
   for (var i = 0; i < 6; i++) {
     var g = new T.Group(); st.s.add(g);
     var lab = document.createElement('div'); lab.className = 'lab'; labels.appendChild(lab);
-    slots.push({ side: side, i: i, row: i < 3 ? 0 : 1, col: i % 3, g: g, id: null, a: null, lab: lab });
+    slots.push({ side: side, i: i, row: i < 3 ? 0 : 1, col: i % 3, g: g, id: null, a: null, lab: lab, home: new T.Vector3(), act: null });
   }
 });
 function placeSlots() {
   slots.forEach(function (sl) {
-    sl.g.position.copy(slotPosition(sl.side, sl.row, sl.col, L));
+    sl.home.copy(slotPosition(sl.side, sl.row, sl.col, L));
+    sl.g.position.copy(sl.home);
     faceSlot(sl.g, sl.side);
     if (sl.side === 'e' && opt.turn) { sl.g.scale.x = 1; sl.g.rotation.y = Math.PI; }   // to look at the far flank
   });
@@ -117,6 +120,65 @@ function flex(a, t) {
     g.quaternion.copy(g.userData.rest.q).multiply(_q.setFromAxisAngle(ZAX, Math.sin(t * 2.4 + i * .8) * .4)); i++;
   });
 }
+// ---------- clips ----------
+// the actor: the picked creature on the player side (front middle first), or front middle, or anyone;
+// its target: the enemy in the same slot, or the enemy front middle, or anyone
+function pair() {
+  var P = slots.filter(function (sl) { return sl.side === 'p' && sl.a; }), E = slots.filter(function (sl) { return sl.side === 'e' && sl.a; });
+  var actor = P.filter(function (sl) { return sl.id === opt.pick; }).sort(function (x, y) { return (x.i !== 1) - (y.i !== 1); })[0] || P.filter(function (sl) { return sl.i === 1; })[0] || P[0];
+  if (!actor) { actor = E.filter(function (sl) { return sl.id === opt.pick; })[0] || E[0]; P = E; E = []; }
+  var target = actor && (E.filter(function (sl) { return sl.i === actor.i; })[0] || E.filter(function (sl) { return sl.i === 1; })[0] || E[0]);
+  return { actor: actor, target: target };
+}
+// where an attacker stops: nose to the target's front (a little under half of both lengths), or 6 ahead if no target
+function strikePoint(sl, target) {
+  if (!target) return sl.home.clone().add(new T.Vector3(sl.side === 'p' ? 6 : -6, 0, 0));
+  var dir = target.home.clone().sub(sl.home).normalize(), gap = (sl.a.size.x + target.a.size.x) * .47;
+  return target.home.clone().addScaledVector(dir, -gap);
+}
+var ctime = 0;
+function play(sl, name, target) {
+  if (!sl || !sl.a) return;
+  sl.act = { clip: clipFor(sl.a, name), t0: ctime, target: target || null, dest: strikePoint(sl, target), hit: false };
+}
+function playAll(name) { slots.forEach(function (sl) { if (sl.a) play(sl, name); }); }
+function stopAll() { slots.forEach(function (sl) { sl.act = null; sl.g.position.copy(sl.home); }); }
+// lay a slot's clip over its idle; k is forced for still frames, else it runs on the clip clock
+function runClip(sl, t, forcedK) {
+  var act = sl.act, c = act.clip, k = forcedK != null ? forcedK : (ctime - act.t0) / c.dur;
+  if (k >= 1 && !c.hold && forcedK == null) { sl.act = null; sl.g.position.copy(sl.home); return; }
+  k = Math.min(1, Math.max(0, k));
+  applyClip(sl.a, c, k, clipWeight(c, k), k * c.dur);
+  sl.g.position.copy(sl.home).lerp(act.dest, sample(c.travel, k));
+  if (c.impact != null && k >= c.impact && !act.hit && act.target && forcedK == null) { act.hit = true; play(act.target, 'hit'); }
+}
+// a still frame for renders: attack and ultimate play on the actor (its target reacts after the impact); the others on everyone
+function forcedFrame() {
+  var f = opt.frame, n = f.name, done = [];
+  if (n === 'attack' || n === 'ultimate') {
+    var pr = pair(); if (!pr.actor) return done;
+    pr.actor.act = { clip: clipFor(pr.actor.a, n), t0: 0, target: pr.target, dest: strikePoint(pr.actor, pr.target), hit: true };
+    runClip(pr.actor, 0, f.k); done.push(pr.actor);
+    if (pr.target && f.k >= pr.actor.act.clip.impact) {
+      var h = clipFor(pr.target.a, 'hit'), hk = (f.k - pr.actor.act.clip.impact) * pr.actor.act.clip.dur / h.dur;
+      if (hk < 1) { pr.target.act = { clip: h, t0: 0, dest: pr.target.home.clone(), hit: true }; runClip(pr.target, 0, hk); done.push(pr.target); }
+    }
+  } else slots.forEach(function (sl) {
+    if (!sl.a) return;
+    sl.act = { clip: clipFor(sl.a, n), t0: 0, dest: sl.home.clone(), hit: true }; runClip(sl, 0, f.k); done.push(sl);
+  });
+  return done;
+}
+// the exchange loop: the actor attacks, then its target answers, over and over
+var nextSwing = 0, swingSide = 0;
+function exchange() {
+  if (!opt.loop || ctime < nextSwing || slots.some(function (sl) { return sl.act; })) return;
+  var pr = pair(); if (!pr.actor) return;
+  var who = swingSide % 3 === 2 ? 'ultimate' : 'attack';
+  if (swingSide % 2 && pr.target) play(pr.target, who, pr.actor); else play(pr.actor, who, pr.target);
+  swingSide++; nextSwing = ctime + .5;
+}
+
 function fill() {
   var todo = slots.filter(function (sl) { return sl.id !== teams[sl.side][sl.i]; });
   if (!todo.length) { refresh(); settle = 3; return; }
@@ -125,6 +187,7 @@ function fill() {
   setTimeout(function () {
     todo.forEach(function (sl) {
       if (sl.a) { sl.g.clear(); dispose(sl.a.root); sl.a = null; }
+      sl.act = null; sl.g.position.copy(sl.home);
       sl.id = teams[sl.side][sl.i];
       if (!sl.id) return;
       sl.a = build(sl.id);
@@ -186,6 +249,7 @@ function syncUrl() {
   if (opt.boxes) p.set('boxes', '1');
   if (opt.turn) p.set('enemy', 'turn');
   if (!opt.lights) p.set('lights', '0');
+  if (opt.frame) { p.set('clip', opt.frame.name); p.set('k', opt.frame.k); }
   if (opt.joints) p.set('joints', '1');
   if (opt.flex) p.set('flex', '1');
   if (opt.still) { p.set('still', '1'); p.set('t', opt.t); }
@@ -196,6 +260,7 @@ function syncUrl() {
 var ui = document.getElementById('ui');
 function syncControls() {
   ui.querySelectorAll('[data-opt]').forEach(function (b) { b.setAttribute('aria-pressed', !!opt[b.getAttribute('data-opt')]); });
+  ui.querySelectorAll('[data-opt-show]').forEach(function (b) { b.setAttribute('aria-pressed', !!opt[b.getAttribute('data-opt-show')]); });
   ui.querySelectorAll('[data-slot]').forEach(function (s) { var k = s.getAttribute('data-slot').split(':'); s.value = teams[k[0]][+k[1]] || ''; });
   LAYOUT_KEYS.forEach(function (k) { var el = document.getElementById('r-' + k); el.value = L[k]; document.getElementById('v-' + k).textContent = L[k]; });
   document.getElementById('pick').value = opt.pick;
@@ -229,6 +294,16 @@ ui.addEventListener('click', function (ev) {
   if (act === 'all') { teams.p = none.map(function () { return opt.pick; }); teams.e = teams.p.slice(); }
   if (act === 'roster') { teams.p = DEFAULT_P.slice(); teams.e = DEFAULT_E.slice(); }
   if (act === 'swap') { var x = teams.p; teams.p = teams.e; teams.e = x; }
+  var clip = b.getAttribute('data-clip');
+  if (clip) {
+    opt.frame = null;
+    if (clip === 'stop') { opt.loop = false; stopAll(); refresh(); return; }
+    if (clip === 'loop') { opt.loop = !opt.loop; nextSwing = ctime; refresh(); return; }
+    if (clip === 'attack' || clip === 'ultimate') { var pr = pair(); play(pr.actor, clip, pr.target); }
+    else if (clip === 'allattack') slots.forEach(function (sl) { if (sl.a && sl.side === 'p') play(sl, 'attack', slots.filter(function (x) { return x.side === 'e' && x.a && x.i === sl.i; })[0]); });
+    else playAll(clip);
+    return;
+  }
   if (act === 'reset') { L = Object.assign({}, FORMATION); refresh(); return; }
   if (act === 'copy') { navigator.clipboard && navigator.clipboard.writeText(location.href); b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy link'; }, 1200); return; }
   fill();
@@ -240,14 +315,20 @@ var clock = new T.Clock(), time = opt.t, ready = false, settle = 0;
 function loop() {
   var dt = Math.min(.05, clock.getDelta());
   if (!opt.still) time += dt;
+  ctime += dt;
+  exchange();
+  var forced = opt.frame ? null : [];
+  // every frame starts from rest, so joints the idle does not drive (legs) come home when a clip ends
+  slots.forEach(function (sl, i) { if (sl.a) { restPose(sl.a.rig); sl.a.update(opt.still ? opt.t : time + i * 1.3); } });
+  if (opt.frame) forced = forcedFrame();
   slots.forEach(function (sl, i) {
-    if (!sl.a) return;
-    var t = opt.still ? opt.t : time + i * 1.3;
-    sl.a.update(t);
-    if (opt.flex) flex(sl.a, t);
+    if (!sl.a || forced.indexOf(sl) >= 0) return;
+    if (sl.act) runClip(sl, time);
+    else if (opt.flex) flex(sl.a, opt.still ? opt.t : time + i * 1.3);
   });
   st.r.render(st.s, st.cam);
-  // the render script waits for this: everything built and a few frames drawn
+  // the render script waits for this: everything built and a few frames drawn. __frame poses a still for it
+  window.__frame = function (name, k) { opt.frame = name ? { name: name, k: k } : null; if (!name) stopAll(); };
   if (settle > 0 && --settle === 0) { ready = true; window.__ready = true; }
   if (!ready) window.__ready = false;
   requestAnimationFrame(loop);

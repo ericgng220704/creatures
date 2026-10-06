@@ -68,6 +68,7 @@ Each file in `src/creatures/` exports one function that builds a creature and re
   name,        // the id
   update(t),   // pose the creature for time t, in seconds
   rig,         // its joints by name, from makeRig() in src/kit/rig.js (see "Rigs" below)
+  clips,       // optional: its own tracks for any animation clip, laid over the shared ones (see "Clips")
   headView,    // optional { span, up, look }: how the close-up is framed
   fitPad,      // optional { up }: extra headroom, for wings that rise above the build pose
   initYaw      // optional: the angle the turntable starts at
@@ -95,6 +96,17 @@ Animation drives creatures through their **rig**: named joints, each a `Group` t
 - `eachJoint(rig, fn)` visits every joint with a name (`legs.fr.1`, `tail3`, `extra.trunk.5`); `restPose(rig)` puts them all back.
 
 Because the colours are baked once in the build pose, a rig changes nothing about how the creature looks until a joint turns. Emberwolf is fully rigged (four leg chains and a five-joint tail); the others return the joints they already had, and get legs as they are reworked. The battle preview's **Joints** and **Flex** toggles show and swing every joint.
+
+### Clips
+
+Attacks, hits and the rest are **clips** (`src/kit/anim.js`): keyframe tracks over normalised time `k` from 0 to 1, a duration, an `impact` moment (when the blow lands) and a `travel` track (0 at home, 1 at the target) that the battle uses to move the creature's slot. A track is a number or `[[k, value, ease], ...]`. Channels are offsets from the rest pose: `body.x/y/pitch/roll`, `head.pitch/turn`, `neck.pitch`, `jaw.open`, `ears.back`, `tail.curl/side`, `front.x/y` and `back.x/y` (foot targets), `arms.r.swing/stretch`, `wings.lift/beat/rate`, `trunk.curl`, `shake`.
+
+- The clips are `attack`, `ultimate`, `hit`, `faint` (holds its last pose) and `victory`, shared by plan: every plan has the body, head, jaw, ears and tail tracks; quadrupeds add feet, bipeds arms, flyers wings. The idle is not a clip: it is the creature's own `update(t)`.
+- `clipFor(creature, name)` gives the clip a creature plays: the shared one, with the creature's own `clips[name].tracks` (and `dur`, `impact`, `travel`) laid over it. Unique ultimates (decision A8) will be written this way.
+- `applyClip(creature, clip, k, weight, seconds)` poses it after `update(t)`, blending in and out. The body turns about its pivot; legs built with `limb()` and standing outside the body keep their feet planted by solving each leg as a two-bone chain (a three-segment hind leg keeps its hock-to-foot slope), unless the clip moves the feet.
+- Start each frame from `restPose(rig)` before `update(t)`, so joints the idle does not drive come home after a clip.
+
+In the battle preview, **Play** runs them: Attack and Ultimate send the picked creature (or the player's front middle) at the enemy facing it, which plays Hit at the impact; Hit, Faint and Victory play on everyone; Exchange keeps the two trading blows.
 
 ### Adding a creature
 

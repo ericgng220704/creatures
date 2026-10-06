@@ -48,7 +48,8 @@ There are no tests and no linter. "Done" for art means: rendered, looked at, and
 src/kit/         math.js (C, mix, sstep, rng), geometry.js (blob, ttube, lathe, flameGeo, leafGeo, lumpGeo, crystalGeo),
                  materials.js (MAT, glowMat, crystalMat, halo, RADIAL), parts.js (part, glow, seg, shard, lock, feather,
                  place, plateGeo, wingKit, beatWing, onLimb, band, finish, flameCluster),
-                 rig.js (limb, chain, hang, bind, makeRig, eachJoint, restPose)
+                 rig.js (limb, chain, hang, bind, makeRig, eachJoint, restPose),
+                 anim.js (the shared clips; sample, clipFor, applyClip, clipWeight)
 src/creatures/   one file per creature + index.js (INFO, ORDER)
 src/showcase/    the creature sheet (one WebGL context per card; not how the game should render)
 src/arena/       what the battle preview and the future battle scene share: layout.js (FORMATION, CLASSES, slotPosition,
@@ -83,6 +84,8 @@ The builder returns `{ root, head, name, update(t), rig, headView?, fitPad?, ini
 - Quadruped legs: front leg shoulder > elbow > wrist (end), hind leg hip > knee > hock > foot (end). Put the leg chains in a `legs` group outside `body`, so the body can bob and lunge while the feet stay planted.
 - Rigging must not change the look: render the creature at rest before and after, and the pictures must match.
 - Check with the battle preview's **Joints** (dots and bones) and **Flex** (swings every joint): nothing may stay behind or come loose.
+
+**Clips (roadmap 0.4).** `attack`, `ultimate`, `hit`, `faint` and `victory` are shared per `plan` in `src/kit/anim.js`, as keyframe tracks over k = 0 to 1 with an `impact` moment and a `travel` track. A creature changes how it fights by returning `clips: { attack: { tracks: {...} } }`, overriding single tracks; never copy a whole shared clip. Unique ultimates (A8) are written that way. The idle stays `update(t)`. Check every clip in the preview's **Play** row, against a target, before calling a creature done.
 
 When you add or rename a creature, update all of: `src/creatures/index.js` (`INFO`, `ORDER`), `docs/creatures.md` (edited by hand: no export script exists despite its header), and the table in `README.md` (numbers from `npm run stats`).
 
@@ -217,6 +220,7 @@ On screen, from front-middle at 720p, a top of 3.5 stands about 128 px tall, 4.0
 - [ ] Neutral battle stance, faces `+x`, feet on `y = 0` (or hover base for flyers).
 - [ ] `npm run stats` says it fits its size class; FX inside the `fx` group and within reach.
 - [ ] Rigged: returns `rig`, legs and tail built with `limb()`, and the preview's **Flex** leaves nothing behind.
+- [ ] Every clip in the preview's **Play** row reads well against a target: feet planted, nothing sinks into the field or comes loose.
 - [ ] `npm run stats`: about 60k triangles, never over 120k without a reason.
 - [ ] `npm run render -- <id> --head` looked at, beside two neighbours.
 - [ ] `index.js`, `docs/creatures.md` and the README table updated.

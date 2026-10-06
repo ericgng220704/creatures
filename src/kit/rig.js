@@ -20,7 +20,9 @@ export function limb(parent, pts, radii, look, e) {
     var a = pts[i], b = pts[i + 1];
     seg(joints[i], [0, 0, 0], [b[0] - a[0], b[1] - a[1], b[2] - a[2]], radii[i][0], radii[i][1], look, e);
   }
-  return chain(joints);
+  var ch = chain(joints);
+  ch.pts = pts; ch.ik = true;   // a planar chain built at rest: animation can solve its joints to plant its end
+  return ch;
 }
 
 // a chain from Groups a creature already has (wing arm, forearm, hand; trunk joints...)
@@ -60,12 +62,20 @@ export function hang(joint, objs) { (Array.isArray(objs) ? objs : [objs]).forEac
 //   extra    any other chains by name (trunk, antlers, sash tails...)
 // Left and right are the creature's own: it faces +x, so its right side is +z, the side the battle camera sees.
 // The build pose of every joint is saved as its rest pose (userData.rest), so animation can work as offsets.
+// pivot (the body's centre, where it pitches and rolls) and scale (its height against Emberwolf's 3) are measured
+// here too; makeRig is called after finish(), in the build pose.
 export function makeRig(o) {
   var r = {
     plan: o.plan || 'quadruped', body: o.body, neck: o.neck || null, head: o.head || null, jaw: o.jaw || null,
     ears: o.ears || [], tail: o.tail || [], legs: o.legs || {}, arms: o.arms || {}, wings: o.wings || {}, extra: o.extra || {}
   };
   eachJoint(r, function (g) { g.userData.rest = { p: g.position.clone(), q: g.quaternion.clone(), s: g.scale.clone() }; });
+  var par = r.body.parent, box = new T.Box3();
+  par.updateWorldMatrix(true, true);
+  r.body.traverse(function (m) { if (m.isMesh && m.userData.look) box.union(new T.Box3().setFromObject(m)); });
+  var inv = new T.Matrix4().copy(par.matrixWorld).invert();
+  r.pivot = box.getCenter(new T.Vector3()).applyMatrix4(inv);
+  r.scale = Math.max(.4, box.max.clone().applyMatrix4(inv).y / 3);
   return r;
 }
 
