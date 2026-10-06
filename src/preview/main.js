@@ -25,7 +25,7 @@ function team(key, def) {
 function num(key, def) { var v = parseFloat(q.get(key)); return isNaN(v) ? def : v; }
 var opt = {
   sil: q.get('sil') === '1', boxes: q.get('boxes') === '1', turn: q.get('enemy') === 'turn',
-  still: q.get('still') === '1', light: ['baked', 'live', 'off'].indexOf(q.get('light')) >= 0 ? q.get('light') : 'baked', merge: q.get('merge') !== '0', joints: q.get('joints') === '1', flex: q.get('flex') === '1', loop: false,
+  still: q.get('still') === '1', light: ['baked', 'live', 'off'].indexOf(q.get('light')) >= 0 ? q.get('light') : 'baked', merge: q.get('merge') !== '0', bloom: q.get('bloom') !== '0', joints: q.get('joints') === '1', flex: q.get('flex') === '1', loop: false,
   frame: q.get('clip') ? { name: q.get('clip'), k: num('k', 0) } : null, t: num('t', 0), pick: INFO[q.get('pick')] ? q.get('pick') : 'emberwolf'
 };
 var L = {};
@@ -213,6 +213,7 @@ function fitCamera() {
   var w = frame.clientWidth, h = frame.clientHeight; if (!w || !h) return;
   st.r.setSize(w, h, false);
   placeCamera(st.cam, w / h, L);
+  st.bloom.setSize(w, h);
 }
 function refresh() {
   placeSlots(); fitCamera();
@@ -259,6 +260,7 @@ function syncUrl() {
   if (opt.turn) p.set('enemy', 'turn');
   if (opt.light !== 'baked') p.set('light', opt.light);
   if (!opt.merge) p.set('merge', '0');
+  if (!opt.bloom) p.set('bloom', '0');
   if (opt.frame) { p.set('clip', opt.frame.name); p.set('k', opt.frame.k); }
   if (opt.joints) p.set('joints', '1');
   if (opt.flex) p.set('flex', '1');
@@ -351,6 +353,8 @@ function loop() {
     else if (opt.flex) flex(sl.a, opt.still ? opt.t : time + i * 1.3);
   });
   st.r.render(st.s, st.cam);
+  st.bloom.on = opt.bloom && !opt.sil;
+  st.bloom.render();
   perf(dt);
   // the render script waits for this: everything built and a few frames drawn. __frame poses a still for it
   window.__frame = function (name, k) { opt.frame = name ? { name: name, k: k } : null; if (!name) stopAll(); };

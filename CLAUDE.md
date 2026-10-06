@@ -54,7 +54,8 @@ src/kit/         math.js (C, mix, sstep, rng), geometry.js (blob, ttube, lathe, 
 src/creatures/   one file per creature + index.js (INFO, ORDER)
 src/showcase/    the creature sheet (one WebGL context per card; not how the game should render)
 src/arena/       what the battle preview and the future battle scene share: layout.js (FORMATION, CLASSES, slotPosition,
-                 faceSlot, placeCamera, checkFit) and stadium.js (renderer, field, stands, lights)
+                 faceSlot, placeCamera, checkFit), stadium.js (renderer, field, stands, the battle light) and
+                 glow.js (selective bloom on glowing parts)
 src/preview/     the battle preview (battle.html): a 6 v 6 formation, silhouette mode, size-class boxes with on-screen
                  heights, joint markers and a flex test, sliders to try other layouts; settings live in the URL
 scripts/         render.mjs (PNGs), stats.mjs (cost table)
@@ -196,6 +197,8 @@ Battles are seen **from the side** (player left, enemy right), from above. Desig
 | M | 4.5 | 3.75 | 3.5 | |
 | L | 6.5 | 4.0 | 4.0 | Length: the row gap is 6.5, so two L creatures in line just touch nose to tail. Height: above 4.0 a creature in a near column hides the feet of the one behind it (9 px at 4.25, 20 px at 4.5). Depth: columns are 6 apart, so 4.0 leaves 2 between neighbours. |
 | F (flyers) | 4.5 | 4.25 | wingspan 6.0 | Wings may fill the whole lane. The lowest point must be at least **0.8** above the ground, so it reads as flying. |
+
+**Battle light (locked, roadmap 0.6; `src/arena/stadium.js`).** The same for both teams: a key light high over the camera's side of the centre line (so player and enemy faces are lit alike), a cool rim from straight behind on every top line, a sky fill, one 4096 shadow map fitted to the formation, and soft contact shadows. A **selective bloom** (`glow.js`) haloes only unlit glow parts (flames, eyes, runes, crystals); bodies are drawn exactly as without it. Judge creatures under this light: glow that does not pop here does not pop in battle. Mark a glow part `userData.noBloom` to keep it out of the bloom.
 
 On screen, from front-middle at 720p, a top of 3.5 stands about 128 px tall, 4.0 about 148 px; the near column adds about 10 %, the far column takes off about 9 %.
 

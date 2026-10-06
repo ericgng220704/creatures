@@ -118,6 +118,10 @@ A built creature is hundreds of small meshes, and each is a draw call. `src/kit/
 
 The battle preview always draws creatures this way; its **Merge** and **Creature light** (baked, live, off) buttons switch it, and it shows frames a second, draw calls and triangles. `npm run stats` lists meshes as built and after merging.
 
+### The battle light
+
+`src/arena/stadium.js` lights the battle the same for both teams: a key light high over the camera's side, a rim light from behind, a sky fill and one shadow fitted to the formation. `src/arena/glow.js` adds a selective bloom: the scene is drawn as usual, then drawn again with every surface black except unlit glow parts, blurred, and added on top, so flames, eyes and runes halo while bodies keep their colours. The preview's **Bloom** button switches it.
+
 ### Adding a creature
 
 1. Copy the closest creature in `src/creatures/` to a new file and change it.
