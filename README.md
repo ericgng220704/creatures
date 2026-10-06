@@ -23,7 +23,7 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 
 | Creature | Id | Element | Parts | Triangles | Build (ms) |
 | --- | --- | --- | ---: | ---: | ---: |
-| Emberwolf | `emberwolf` | Fire | 244 | 77,598 | 343 |
+| Emberwolf | `emberwolf` | Fire | 227 | 77,258 | 343 |
 | Tidefang | `tidefang` | Water | 341 | 87,714 | 164 |
 | Thornstag | `thornstag` | Plant | 242 | 110,228 | 261 |
 | Stonemaul | `stonemaul` | Earth | 300 | 89,460 | 174 |
@@ -97,7 +97,7 @@ Animation drives creatures through their **rig**: named joints, each a `Group` t
 - `makeRig({ plan, body, neck, head, jaw, ears, tail, legs, arms, wings, extra })` makes the standard rig and saves every joint's build pose as its rest pose. `plan` is `quadruped`, `biped`, `flyer` or `perched`. Legs are `fl, fr, bl, br` (or `l, r`), arms and wings `l, r`, `extra` any other named chain. Left and right are the creature's own: it faces `+x`, so `+z` is its right, the side the battle camera sees.
 - `eachJoint(rig, fn)` visits every joint with a name (`legs.fr.1`, `tail3`, `extra.trunk.5`); `restPose(rig)` puts them all back.
 
-Because the colours are baked once in the build pose, a rig changes nothing about how the creature looks until a joint turns. Emberwolf is fully rigged (four leg chains and a five-joint tail); the others return the joints they already had, and get legs as they are reworked. The battle preview's **Joints** and **Flex** toggles show and swing every joint.
+Because the colours are baked once in the build pose, a rig changes nothing about how the creature looks until a joint turns. Emberwolf is fully rigged (a neck joint carrying the head, ruff and crown of the mane, four leg chains and a five-joint tail); the others return the joints they already had, and get legs as they are reworked. The battle preview's **Joints** and **Flex** toggles show and swing every joint.
 
 ### Clips
 
@@ -105,6 +105,7 @@ Attacks, hits and the rest are **clips** (`src/kit/anim.js`): keyframe tracks ov
 
 - The clips are `attack`, `ultimate`, `hit`, `faint` (holds its last pose) and `victory`, shared by plan: every plan has the body, head, jaw, ears and tail tracks; quadrupeds add feet, bipeds arms, flyers wings. The idle is not a clip: it is the creature's own `update(t)`.
 - `clipFor(creature, name)` gives the clip a creature plays: the shared one, with the creature's own `clips[name].tracks` (and `dur`, `impact`, `travel`) laid over it. Unique ultimates (decision A8) will be written this way.
+- With a `neck` joint, `head.pitch` and `head.turn` are shared half and half between neck and head, so the head arcs on the neck instead of tipping at the skull; `neck.pitch` moves the neck alone.
 - `applyClip(creature, clip, k, weight, seconds)` poses it after `update(t)`, blending in and out. The body turns about its pivot; legs built with `limb()` and standing outside the body keep their feet planted by solving each leg as a two-bone chain (a three-segment hind leg keeps its hock-to-foot slope), unless the clip moves the feet.
 - Start each frame from `restPose(rig)` before `update(t)`, so joints the idle does not drive come home after a clip.
 
@@ -116,7 +117,9 @@ A built creature is hundreds of small meshes, and each is a draw call. `src/kit/
 
 - `bakeLights(creature)` bakes the creature's own `PointLight`s into its parts as a per-vertex glow (a `glowLight` attribute that the shared materials add to their emitted light), then takes the lights out. The creature looks the same, and no longer lights its neighbours.
 - `merge(creature)` merges every part that never moves on its own into one mesh per material per joint. It finds what moves by running `update(t)` at a few moments and watching transforms, material values and geometry: eyes, flames, embers, shields and crystals stay separate, as do rig joints and sprites. Glow parts of different colours merge through vertex colours.
-- `optimize(creature)` does both. For all eleven: 2,208 meshes become 682, and the shadow pass 1,718 casters become 267. Renders before and after match (bar a few hundred pixels of transparent sparks sorting differently).
+- Inside a group that moves on its own (a flickering flame), glow layers of different opacities merge too, their opacity carried in a per-vertex alpha: solid layers first, then see-through ones in the order they were made. Drawn apart, three.js sorted those layers by a camera depth they nearly share, so they flipped order now and then; merged, they hold the order they had most of the time.
+- `merge()` leaves an `InstancedMesh` alone. Swarms of particles (embers, sparks, motes) should be one `InstancedMesh` whose instances `update(t)` moves, not one mesh each: Emberwolf's 18 embers are one draw.
+- `optimize(creature)` does both. For all eleven: 2,191 meshes become 576, and the shadow pass 1,718 casters become 268. Twelve Emberwolves on the field: 4,727 draw calls a frame as built, 1,062 optimised (1,730 with bloom, which draws the scene a second time).
 
 The battle preview always draws creatures this way; its **Merge** and **Creature light** (baked, live, off) buttons switch it, and it shows frames a second, draw calls and triangles. `npm run stats` lists meshes as built and after merging.
 

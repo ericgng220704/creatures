@@ -13,7 +13,9 @@ A heavy-shouldered wolf whose fire lives in its coat.
 - **Face.** Heavy brow, glowing slit eyes that blink, a jaw that breathes open on fangs and a tongue.
 - **Fire.** A mane of layered flame from crown to back, a burning tail, ember veins, rising sparks and firelight on its own fur.
 
-Cost: 244 parts, 77,598 triangles, built in about 343 ms.
+- **Rig.** The pilot for every creature (roadmap 0.8): a neck joint carrying the head, the outer ruff and the crown of the mane; four legs as joint chains with planted feet; a five-joint tail. Attacks with a crouch, a leap and a bite; its embers are one instanced mesh.
+
+Cost: 227 parts, 77,258 triangles, built in about 343 ms; 57 meshes once merged.
 
 ## Tidefang
 

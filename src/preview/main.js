@@ -162,7 +162,18 @@ function runClip(sl, t, forcedK) {
 // a still frame for renders: attack and ultimate play on the actor (its target reacts after the impact); the others on everyone
 function forcedFrame() {
   var f = opt.frame, n = f.name, done = [];
-  if (n === 'attack' || n === 'ultimate') {
+  if (n === 'allattack') {
+    slots.forEach(function (sl) {
+      var tg = slots.filter(function (x) { return x.side === 'e' && x.a && x.i === sl.i; })[0];
+      if (!sl.a || sl.side !== 'p') return;
+      sl.act = { clip: clipFor(sl.a, 'attack'), t0: 0, target: tg, dest: strikePoint(sl, tg), hit: true };
+      runClip(sl, 0, f.k); done.push(sl);
+      if (tg && f.k >= sl.act.clip.impact) {
+        var h = clipFor(tg.a, 'hit'), hk = (f.k - sl.act.clip.impact) * sl.act.clip.dur / h.dur;
+        if (hk < 1) { tg.act = { clip: h, t0: 0, dest: tg.home.clone(), hit: true }; runClip(tg, 0, hk); done.push(tg); }
+      }
+    });
+  } else if (n === 'attack' || n === 'ultimate') {
     var pr = pair(); if (!pr.actor) return done;
     pr.actor.act = { clip: clipFor(pr.actor.a, n), t0: 0, target: pr.target, dest: strikePoint(pr.actor, pr.target), hit: true };
     runClip(pr.actor, 0, f.k); done.push(pr.actor);
@@ -326,14 +337,19 @@ ui.addEventListener('click', function (ev) {
 new ResizeObserver(function () { fitCamera(); placeLabels(); }).observe(frame);
 
 // ---------- performance readout: frames a second, draw calls, triangles, and what merging saved ----------
-var pf = { n: 0, t: 0 }, perfEl = document.getElementById('perf');
-function perf(dt) {
-  pf.n++; pf.t += dt;
-  if (pf.t < .5) return;
-  var raw = 0, now = 0, info = st.r.info.render;
+// the renderer's counters run over the whole frame (shadow map, scene, bloom), so they are reset by hand each frame
+st.r.info.autoReset = false;
+var pf = { n: 0, t0: performance.now() }, perfEl = document.getElementById('perf');
+function perf() {
+  var info = st.r.info.render;
+  window.__frameInfo = { calls: info.calls, triangles: info.triangles };
+  pf.n++;
+  var el = (performance.now() - pf.t0) / 1000;
+  if (el < .5) return;
+  var raw = 0, now = 0;
   slots.forEach(function (sl) { if (sl.a) { raw += sl.a.raw.draws; now += sl.a.draws.draws; } });
-  perfEl.textContent = Math.round(pf.n / pf.t) + ' fps · ' + info.calls + ' draw calls a frame (shadows included) · ' + Math.round(info.triangles / 1000) + 'k triangles · creatures ' + now + ' meshes' + (opt.merge ? ' (were ' + raw + ')' : '');
-  pf.n = 0; pf.t = 0;
+  perfEl.textContent = Math.round(pf.n / el) + ' fps · ' + info.calls + ' draw calls a frame (shadows included) · ' + Math.round(info.triangles / 1000) + 'k triangles · creatures ' + now + ' meshes' + (opt.merge ? ' (were ' + raw + ')' : '');
+  pf.n = 0; pf.t0 = performance.now();
 }
 
 // ---------- loop ----------
@@ -352,10 +368,11 @@ function loop() {
     if (sl.act) runClip(sl, time);
     else if (opt.flex) flex(sl.a, opt.still ? opt.t : time + i * 1.3);
   });
+  st.r.info.reset();
   st.r.render(st.s, st.cam);
   st.bloom.on = opt.bloom && !opt.sil;
   st.bloom.render();
-  perf(dt);
+  perf();
   // the render script waits for this: everything built and a few frames drawn. __frame poses a still for it
   window.__frame = function (name, k) { opt.frame = name ? { name: name, k: k } : null; if (!name) stopAll(); };
   if (settle > 0 && --settle === 0) { ready = true; window.__ready = true; }

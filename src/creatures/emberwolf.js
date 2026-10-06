@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
-import { halo } from '../kit/materials.js';
+import { glowMat, halo } from '../kit/materials.js';
 import { finish, flameCluster, glow, lock, part, shard } from '../kit/parts.js';
 import { bind, hang, limb, makeRig } from '../kit/rig.js';
 
@@ -37,14 +37,16 @@ export function emberwolf() {
     part(body, blob(.56, .78, .4, .85), FUR, .62, 1.12, z, 0, 0, -.1);
     part(body, blob(.66, .82, .44, .85), FUR, -.66, 1.2, z, 0, 0, .15);
   });
-  // neck and a ruff of soft locks, three layers deep, lying back over the shoulders
-  part(body, blob(.72, 1.0, .8, .85, function (x, y, z, W, H) { var t = (y / H + 1) / 2; return [x, y, z * (1.08 - .2 * t)]; }), FUR, 1.0, 1.72, 0, 0, 0, -.62);
+  // neck and a ruff of soft locks, three layers deep, lying back over the shoulders; the neck and the two outer
+  // rings ride on a neck joint (added below) so the head can rise and strike without tearing the throat open
+  var onNeck = [part(body, blob(.72, 1.0, .8, .85, function (x, y, z, W, H) { var t = (y / H + 1) / 2; return [x, y, z * (1.08 - .2 * t)]; }), FUR, 1.0, 1.72, 0, 0, 0, -.62)];
   var r = rng(11);
   [[1.12, .44, 15, .22], [.92, .5, 16, .18], [.7, .55, 16, .14]].forEach(function (ring, k) {
     for (var i = 0; i < ring[2]; i++) {
       var a = -Math.PI * .95 + (i / (ring[2] - 1)) * Math.PI * 1.9 + (r() - .5) * .1, cy = Math.cos(a), cz = Math.sin(a);
       var bx = ring[0] + (r() - .5) * .06, by = 1.7 + (k === 0 ? .18 : k === 1 ? .05 : -.08) + cy * ring[1] * .8, bz = cz * ring[1];
-      lock(body, cy < -.3 ? LOCKL : LOCK, [bx, by, bz], [-1.5, cy * .3 + .02 - (cy < -.3 ? .3 : 0), cz * .28], [0, cy, cz], .22 + ring[3] + r() * .1, .26 + r() * .06, .1, .06 + r() * .04);
+      var lk = lock(body, cy < -.3 ? LOCKL : LOCK, [bx, by, bz], [-1.5, cy * .3 + .02 - (cy < -.3 ? .3 : 0), cz * .28], [0, cy, cz], .22 + ring[3] + r() * .1, .26 + r() * .06, .1, .06 + r() * .04);
+      if (k < 2) onNeck.push(lk);
     }
   });
   // a fringe hanging from the chest
@@ -112,7 +114,8 @@ export function emberwolf() {
   [[1.36, 2.34, .76, .9], [1.12, 2.18, .9, .95], [.88, 2.0, .92, 1], [.62, 1.86, .82, 1], [.36, 1.78, .7, 1], [.1, 1.74, .58, 1], [-.16, 1.7, .46, 1]].forEach(function (f, i) {
     var g = flameCluster(body, flames, f[0], f[1], 0, f[2], f[3], P);
     g.rotation.z = .5;
-    if (i < 5) { [.16, -.16].forEach(function (z) { var s = flameCluster(body, flames, f[0] - .08, f[1] - .08, z, f[2] * .55, .9, P); s.rotation.set(z > 0 ? -.4 : .4, 0, .5); }); }
+    if (i < 2) onNeck.push(g);   // the crown of the mane rides on the neck
+    if (i < 5) { [.16, -.16].forEach(function (z) { var s = flameCluster(body, flames, f[0] - .08, f[1] - .08, z, f[2] * .55, .9, P); s.rotation.set(z > 0 ? -.4 : .4, 0, .5); if (i < 2) onNeck.push(s); }); }
   });
   halo(body, P.ember, 2.4, .6, 2.1, 0, .25);
   var light = new T.PointLight(0xff7a2a, 4, 3.2, 1.6); light.position.set(.6, 2.3, 0); body.add(light);
@@ -123,20 +126,32 @@ export function emberwolf() {
     [[1.12, 1.95, .38], [1.0, 1.78, .44], [1.04, 1.6, .44]],
     [[.2, 1.6, .52], [.12, 1.4, .56], [.22, 1.2, .54]]
   ];
-  VEINS.forEach(function (v) {
-    [1, -1].forEach(function (s) { glow(body, ttube(v.map(function (a) { return [a[0], a[1], a[2] * s]; }), .022, .008, 6, 14), P.vein); });
+  VEINS.forEach(function (v, vi) {
+    [1, -1].forEach(function (s) { var vm = glow(body, ttube(v.map(function (a) { return [a[0], a[1], a[2] * s]; }), .022, .008, 6, 14), P.vein); if (vi === 2) onNeck.push(vm); });
   });
-  // embers rising off the mane
+  // embers rising off the mane: one instanced mesh, each ember an instance, so eighteen sparks cost one draw
+  var sparks = new T.InstancedMesh(new T.IcosahedronGeometry(.028, 0), glowMat('#ffffff'), 18), emt = new T.Object3D();
+  sparks.frustumCulled = false; body.add(sparks);
   for (var ei = 0; ei < 18; ei++) {
-    var m = glow(body, new T.IcosahedronGeometry(.028, 0), ei % 3 ? P.emberMid : P.emberCore);
-    var em = { m: m, x: .9 - (ei % 7) * .18, z: ((ei * 37) % 9 - 4) * .05, ph: (ei * .137) % 1, sp: .35 + (ei % 5) * .07 };
-    m.position.set(em.x - em.ph * .7, 1.95 + em.ph * 1.2, em.z); m.scale.setScalar(1 - em.ph);
-    embers.push(em);
+    embers.push({ x: .9 - (ei % 7) * .18, z: ((ei * 37) % 9 - 4) * .05, ph: (ei * .137) % 1, sp: .35 + (ei % 5) * .07 });
+    sparks.setColorAt(ei, new T.Color(ei % 3 ? P.emberMid : P.emberCore));
   }
+  function placeEmbers(t) {
+    embers.forEach(function (e, i) {
+      var k = (t * e.sp + e.ph) % 1;
+      emt.position.set(e.x - k * .7, 1.95 + k * 1.2, e.z + Math.sin(t * 3 + e.ph * 9) * .06); emt.scale.setScalar(Math.max(.01, 1 - k)); emt.updateMatrix();
+      sparks.setMatrixAt(i, emt.matrix);
+    });
+    sparks.instanceMatrix.needsUpdate = true;
+  }
+  placeEmbers(0);
+  // the neck joint, where the neck meets the shoulders: it carries the head and everything gathered above
+  var neck = new T.Group(); neck.position.set(.8, 1.78, 0); body.add(neck);
+  hang(neck, onNeck.concat([head]));
   finish(root, 2.6);
   return {
     root: root, head: head, name: 'emberwolf',
-    rig: makeRig({ plan: 'quadruped', body: body, head: head, jaw: jaw, ears: ears, tail: tailC.joints, legs: LEGS }),
+    rig: makeRig({ plan: 'quadruped', body: body, neck: neck, head: head, jaw: jaw, ears: ears, tail: tailC.joints, legs: LEGS }),
     update: function (t) {
       var br = Math.sin(t * 2.1);
       body.position.y = br * .015; body.scale.set(1, 1 + br * .008, 1 + br * .01);
@@ -145,11 +160,7 @@ export function emberwolf() {
       tail.rotation.y = Math.sin(t * 2.3) * .28; tail.rotation.z = Math.sin(t * 1.6) * .06;
       flames.forEach(function (f, i) { var w = Math.sin(t * 13 + i * 1.9) * .5 + Math.sin(t * 7.1 + i * 2.3) * .5; f.scale.set(1 - w * .07, 1 + w * .15, 1 - w * .07); });
       light.intensity = 4 + Math.sin(t * 17) * .6 + Math.sin(t * 9.3) * .5;
-      embers.forEach(function (e) {
-        var k = (t * e.sp + e.ph) % 1;
-        e.m.position.set(e.x - k * .7, 1.95 + k * 1.2, e.z + Math.sin(t * 3 + e.ph * 9) * .06);
-        e.m.scale.setScalar(Math.max(.01, 1 - k));
-      });
+      placeEmbers(t);
       var blink = (t % 4.7) < .12 ? .15 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
     }
   };

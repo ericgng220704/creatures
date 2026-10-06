@@ -5,7 +5,7 @@
 // target) that the battle uses to move the creature's slot. Channels are offsets from the rig's rest pose:
 //
 //   body.x, body.y      the body's shift (scaled to the creature's size); body.pitch (+ nose up), body.roll
-//   head.pitch, head.turn, neck.pitch, jaw.open, ears.back, tail.curl (+ tip up), tail.side
+//   head.pitch, head.turn (shared half and half with the neck when there is one), neck.pitch (the neck alone), jaw.open, ears.back, tail.curl (+ tip up), tail.side
 //   front.x, front.y, back.x, back.y    foot targets for the front and hind pairs (+x forward, +y up);
 //                                       fl.x, fr.y... add to one leg. Feet stay planted unless moved.
 //   arms.r.swing, arms.l.swing (+ forward and up), arms.r.stretch, arms.l.stretch (1 + this along the arm)
@@ -173,8 +173,10 @@ export function applyClip(a, clip, k, w, time) {
   b.quaternion.copy(b.userData.rest.q).premultiply(_q);
   _v.copy(b.userData.rest.p).sub(P.pivot).applyQuaternion(_q).add(P.pivot);
   b.position.set(_v.x + ch('body.x') * s + Math.sin(time * 70) * shake, _v.y + ch('body.y') * s, _v.z + Math.sin(time * 53) * shake * .6);
-  if (r.neck) turn(r.neck, 0, 0, ch('neck.pitch'));
-  if (r.head) turn(r.head, 0, ch('head.turn'), ch('head.pitch'));
+  // with a neck joint, the neck takes half of every head pitch and turn, so the head arcs instead of tipping
+  var hp = ch('head.pitch'), ht = ch('head.turn'), nk = r.neck ? .5 : 0;
+  if (r.neck) turn(r.neck, 0, ht * nk, ch('neck.pitch') + hp * nk);
+  if (r.head) turn(r.head, 0, ht * (1 - nk), hp * (1 - nk));
   if (r.jaw) turn(r.jaw, 0, 0, -ch('jaw.open'));
   r.ears.forEach(function (g) { turn(g, 0, 0, ch('ears.back')); });
   var nt = r.tail.length, curl = ch('tail.curl'), side = ch('tail.side');

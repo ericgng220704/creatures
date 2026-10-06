@@ -88,10 +88,14 @@ function liveSet(a) {
 }
 
 // ---------- merging ----------
-function matKey(m) {
-  if (m.isMeshBasicMaterial && !m.map && !m.vertexColors) return 'glow|' + (m.transparent ? m.opacity : 1) + '|' + m.side + '|' + m.depthWrite + '|' + m.depthTest + '|' + m.toneMapped;
+// glow parts of any colour merge (colour goes to the vertices); inside a moving group (a flickering flame) they
+// merge across opacities too, the opacity going to the vertices' alpha
+function matKey(m, mixOpacity) {
+  var op = m.transparent ? m.opacity : 1;
+  if (m.isMeshBasicMaterial && !m.map && !m.vertexColors) return 'glow|' + (mixOpacity ? 'any' : op + '|' + m.depthWrite) + '|' + m.side + '|' + m.depthTest + '|' + m.toneMapped;
   return 'mat|' + m.uuid;
 }
+function opacityOf(m) { return m.transparent ? m.opacity : 1; }
 export function merge(a) {
   var live = liveSet(a), hosts = new Set([a.root]);
   if (a.rig) eachJoint(a.rig, function (g) { hosts.add(g); });
@@ -99,9 +103,9 @@ export function merge(a) {
   a.root.updateMatrixWorld(true);
   var buckets = {};
   a.root.traverse(function (m) {
-    if (!m.isMesh || live.has(m) || m.userData.noMerge) return;
+    if (!m.isMesh || m.isInstancedMesh || live.has(m) || m.userData.noMerge) return;
     var host = m.parent; while (!hosts.has(host)) host = host.parent;
-    var key = host.uuid + '|' + matKey(m.material) + '|' + (m.userData.noFit ? 1 : 0) + '|' + (m.castShadow ? 1 : 0) + '|' + m.renderOrder;
+    var key = host.uuid + '|' + matKey(m.material, live.has(host)) + '|' + (m.userData.noFit ? 1 : 0) + '|' + (m.castShadow ? 1 : 0) + '|' + m.renderOrder;
     (buckets[key] = buckets[key] || { host: host, list: [] }).list.push(m);
   });
   var made = 0;
@@ -109,6 +113,11 @@ export function merge(a) {
     var bk = buckets[k], list = bk.list;
     if (list.length < 2) return;
     var inv = new T.Matrix4().copy(bk.host.matrixWorld).invert(), glow = matKey(list[0].material).indexOf('glow') === 0;
+    var mixed = glow && list.some(function (m) { return opacityOf(m.material) !== opacityOf(list[0].material); });
+    // mixed opacities draw as one see-through mesh: solid layers first, then the see-through ones in the order they
+    // were made. Drawn apart, three.js sorted a flame's layers by a camera depth they nearly share, so their order
+    // flipped now and then; this is the order it used most of the time, now kept steady
+    if (mixed) list = list.filter(function (m) { return opacityOf(m.material) === 1; }).concat(list.filter(function (m) { return opacityOf(m.material) < 1; }));
     var lit = !!list[0].userData.look, names = glow ? ['position', 'color'] : lit ? ['position', 'normal', 'color'] : ['position', 'normal'];
     if (lit && list.every(function (m) { return m.geometry.attributes.glowLight; })) names.push('glowLight');
     var arrays = {}, index = [], base = 0;
@@ -120,7 +129,7 @@ export function merge(a) {
       var cnt = g.attributes.position.count;
       names.forEach(function (nme) {
         var at = g.attributes[nme];
-        if (nme === 'color' && glow) { var c = m.material.color; for (var i = 0; i < cnt; i++) arrays.color.push(c.r, c.g, c.b); return; }
+        if (nme === 'color' && glow) { var c = m.material.color, op = opacityOf(m.material); for (var i = 0; i < cnt; i++) { arrays.color.push(c.r, c.g, c.b); if (mixed) arrays.color.push(op); } return; }
         for (var j = 0; j < cnt; j++) for (var q = 0; q < at.itemSize; q++) arrays[nme].push(at.array[j * at.itemSize + q]);
       });
       if (g.index) for (var x = 0; x < g.index.count; x++) index.push(g.index.getX(x) + base);
@@ -128,10 +137,11 @@ export function merge(a) {
       base += cnt;
     });
     var geo = new T.BufferGeometry();
-    names.forEach(function (nme) { geo.setAttribute(nme, new T.Float32BufferAttribute(arrays[nme], nme === 'position' || nme === 'normal' || nme === 'color' || nme === 'glowLight' ? 3 : 1)); });
+    names.forEach(function (nme) { geo.setAttribute(nme, new T.Float32BufferAttribute(arrays[nme], nme === 'color' && mixed ? 4 : 3)); });
     geo.setIndex(index);
     var mat = list[0].material;
     if (glow) { mat = list[0].material.clone(); mat.color.set(0xffffff); mat.vertexColors = true; }
+    if (mixed) { mat.transparent = true; mat.opacity = 1; mat.depthWrite = false; }
     var out = new T.Mesh(geo, mat);
     out.castShadow = list[0].castShadow; out.receiveShadow = list[0].receiveShadow; out.renderOrder = list[0].renderOrder;
     out.userData = { look: list[0].userData.look, noFit: list[0].userData.noFit, merged: list.length };

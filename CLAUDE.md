@@ -84,6 +84,7 @@ The builder returns `{ root, head, name, update(t), rig, headView?, fitPad?, ini
 **The rig (roadmap 0.3).** Every builder returns `rig: makeRig({...})` (`src/kit/rig.js`), naming its joints so animation can drive any creature: `plan`, `body`, `neck`, `head`, `jaw`, `ears`, `tail` (root to tip), `legs` (`fl, fr, bl, br`, or `l, r`), `arms`, `wings` (`l, r`) and `extra` chains. Left and right are the creature's own; `+z` is its right. Rules for rigging:
 
 - Build legs, arms, necks and tails with `limb()`, never loose `seg`s, so each bends at its joints. Hang paws, hooves and claws on `leg.end` with `hang()`; spread tufts along a tail with `bind()`.
+- Give the head a `neck` joint where the neck meets the shoulders, carrying the head and whatever should follow it (the outer ruff, a crown, a crest). Clips share head pitch half and half with it, so the head arcs instead of tipping and the throat does not open. Emberwolf shows how (`hang(neck, [...])`, before `finish()`).
 - Quadruped legs: front leg shoulder > elbow > wrist (end), hind leg hip > knee > hock > foot (end). Put the leg chains in a `legs` group outside `body`, so the body can bob and lunge while the feet stay planted.
 - Rigging must not change the look: render the creature at rest before and after, and the pictures must match.
 - Check with the battle preview's **Joints** (dots and bones) and **Flex** (swings every joint): nothing may stay behind or come loose.
@@ -144,7 +145,7 @@ A player should be able to tell a creature's role from its outline before readin
 
 | Creature | Element | Body | Element glow | Eye |
 | --- | --- | --- | --- | --- |
-| Emberwolf | Fire | charcoal violet `#544c5c` / `#36313b` | ember `#ff4510` > `#ff8d1c` > `#ffe885` | `#ffb72e` |
+| Emberwolf (the pilot, fully rigged) | Fire | charcoal violet `#544c5c` / `#36313b` | ember `#ff4510` > `#ff8d1c` > `#ffe885` | `#ffb72e` |
 | Tidefang | Water | deep teal `#1f4e60` / `#3a8197`, pale belly | crystal `#3fd2ff`, `#0099ff` | `#b4fdff` |
 | Thornstag | Plant | warm brown `#a4794c`, cream | leaf `#78c255`, rune `#a6ff70` | `#c4ff86` |
 | Stonemaul | Earth | brown `#6a4a36`, stone `#7b7f8c`, iron | amber rune `#ffb347` | `#ffad33` |
@@ -178,6 +179,7 @@ A player should be able to tell a creature's role from its outline before readin
 - Keep the kit's vocabulary (`blob`, `seg`, `lock`, `feather`, `shard`, `band`). Add a new kit helper only when two or more creatures need it.
 - Overlap blobs at joints (shoulder blob over the top of the limb `seg`) so limbs grow out of the body rather than plugging into it.
 - Gold or iron trim at most in two places. It is a rank marker, not decoration.
+- Swarms of particles (embers, sparks, motes) are one `InstancedMesh` whose instances `update(t)` places, not one mesh per particle (Emberwolf's embers show how).
 - Anything that moves on its own after `finish()` must be moved by `update(t)` or be a rig joint, or `merge()` will not know to keep it separate. Mark a part `userData.noMerge` if something else moves it.
 - Triangle budget: aim for 60k; over 120k needs a reason. Mark small parts `noOcc`. The game runs on a laptop (P1), so detail may win over thrift, but twelve creatures share one frame.
 - Put asymmetric detail (a scar, a moss patch, a raised paw) on the **+z flank**. It is the show side: the battle camera only ever sees +z, on both teams, because enemies are mirrored.
