@@ -6,13 +6,16 @@ Eleven procedural 3D creatures, drawn entirely in code with [three.js](https://t
 
 ```bash
 npm install
-npm run dev        # the sheet, at http://localhost:5173
+npm run dev        # the sheet, at http://localhost:5173, and the battle preview at /battle.html
 npm run build      # a static build in dist/
 npm run stats      # what each creature costs, with no browser
 npm run render     # a PNG of every creature in renders/ (needs a browser, see below)
+npm run render -- --battle   # the battle preview as PNGs in renders/battle/
 ```
 
 The sheet shows each creature on a turntable. Drag to turn it, **Head** shows the face close up, **Spin** stops the turning. A creature is built when its card nears the screen and drawn only while it is visible.
+
+The **battle preview** (`battle.html`) shows creatures as the game will: at true size, from the fixed side camera, in a 6 v 6 formation on the stadium field, all in one scene. **Silhouette** turns them into black shapes on white, **Size boxes** checks each against its size class and shows how tall it stands on screen, and the sliders move the camera and the formation. Every setting is kept in the URL, so a view can be shared or rendered.
 
 ## The creatures
 
@@ -37,6 +40,8 @@ Cost is measured by `npm run stats` at three r158. Descriptions of each are in [
 ```
 index.html               the sheet's page
 src/showcase/            the sheet: cards, camera, lights, turntable (main.js, scene.js, style.css)
+battle.html              the battle preview's page
+src/preview/             the battle preview: stadium.js (renderer, field, stands, side camera), main.js (formation, silhouette, size boxes, sliders)
 src/creatures/           one file per creature, and index.js, which lists them with their notes
 src/kit/                 the building blocks every creature uses
   math.js                colours, mixing, smooth steps, a seeded random number generator

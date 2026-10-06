@@ -24,16 +24,16 @@ Later    Evolution, PvP, publishing
 
 | # | Deliverable | Size |
 | --- | --- | --- |
-| 0.1 | **Battle preview page** (`battle.html`). A phone-landscape frame (1280 x 720) with the fixed side camera and the stadium floor. One creature or a full 6 v 6 formation, toggles for **silhouette** (solid black), **size-class boxes** and **mirror** (the enemy side). `npm run render -- --battle` writes PNGs of it. This becomes the main way art is judged (rule 1). | M |
-| 0.2 | **Formation and camera, fixed.** Slot positions for two rows of three per side, camera height, angle and field of view. Final size classes follow from these (the provisional table in CLAUDE.md becomes firm). | S |
+| 0.1 | ✅ **Battle preview page** (`battle.html`, `src/preview/`). A 16:9 stage (1280 x 720 in renders) with the side camera, the stadium, and a 6 v 6 formation you set slot by slot (or Solo, All of it, Roster mix). Toggles for **Silhouette**, **Size boxes** (class box green or red, the real body box, and each creature's height on screen in px at 720p), **Enemy turned** (instead of mirrored), **Creature lights** and **Freeze**. Sliders for the camera and formation; every setting is in the URL. `npm run render -- --battle` writes the PNGs. | M |
+| 0.2 | **Formation and camera, fixed.** You play with the preview's sliders and pick; the values go into `DEFAULT_L` in `src/preview/main.js`. Provisional now: camera angle 30°, field of view 26°, aim 3, front row 4.5 from the centre line, row gap 6.5, column gap 6. Final size classes follow (the provisional table in CLAUDE.md becomes firm). | S |
 | 0.3 | **Rig convention in the kit.** A `limb()` helper that builds a leg as a chain of joint groups (upper, lower, foot) instead of loose `seg`s, and a standard `rig` object every builder returns: `body, neck, head, jaw, tail[], legs {fl, fr, bl, br}, wings[]` (whichever exist). Baking still happens once, in the build pose. | M |
 | 0.4 | **Animation clips.** Poses driven by state instead of only `update(t)`: `idle` (loop), `attack` (anticipate, lunge, strike, recover), `hit`, `ultimate` (wind-up and release), `faint`, `victory`. A clip is a function `(rig, k)` of normalised time, so the battle can time it. Shared clips per body plan (quadruped, biped, flyer), with per-creature overrides. | M |
-| 0.5 | **Performance pipeline** (P2: 60 fps, 12 creatures). After `finish()`, merge every rigid group's parts into **one mesh per material** (today Emberwolf is 244 meshes plus 4 sprites; target is 30 or fewer draw calls per creature). Remove per-creature `PointLight`s; instead `finish()` bakes element light into the vertex colours near glow sources. Particles from one shared pool. `npm run stats` reports draw calls. | M |
+| 0.5 | **Performance pipeline** (P2: 60 fps on a laptop, 12 creatures; less urgent now that phones are out). After `finish()`, merge every rigid group's parts into **one mesh per material** (today Emberwolf is 244 meshes plus 4 sprites; target is 30 or fewer draw calls per creature). Remove per-creature `PointLight`s; instead `finish()` bakes element light into the vertex colours near glow sources. Particles from one shared pool. `npm run stats` reports draw calls. | M |
 | 0.6 | **Battle lighting, locked.** One shared rig for the stadium: key, rim and hemisphere light, one shadow or fake blob shadows. Tuned so dark bodies still read against the field and the glow pops. | S |
-| 0.7 | **Phone test link.** Publish the built preview (GitHub Pages: the Vite config already uses `base: './'`) so you can open it on your phone and check frame rate and readability for real. Needs Pages switched on in the repo settings. | S |
-| 0.8 | **Emberwolf, the pilot.** Rigged, merged, relit, all six clips, checked in the battle view and on the phone. Small art fixes only; the look is already the target. | M |
+| 0.7 | **A link instead of `npm run dev`** (optional). Publish the built sheet and preview (GitHub Pages: the Vite config already builds both pages with `base: './'`) so you can open them in any browser without installing anything. Needs Pages switched on in the repo settings. | S |
+| 0.8 | **Emberwolf, the pilot.** Rigged, merged, relit, all six clips, checked in the battle view. Small art fixes only; the look is already the target. | M |
 
-**Done when:** a 6 v 6 of twelve Emberwolves (or a mix of rigged and not-yet-rigged creatures) runs the attack clip in the battle preview at 60 fps on your phone, and the wolf still looks like the wolf.
+**Done when:** a 6 v 6 of twelve Emberwolves (or a mix of rigged and not-yet-rigged creatures) runs the attack clip in the battle preview at 60 fps on your laptop, and the wolf still looks like the wolf.
 
 ---
 
@@ -96,9 +96,9 @@ A starting proposal for 2.1, to argue with rather than to adopt:
 | 3.2 | **Playback.** Reads the simulator's log and plays it: the attacker lunges to its target, strikes, returns; the target plays `hit`; KOs play `faint`; the winner plays `victory`. x1 / x2 speed and pause. | M |
 | 3.3 | **HUD.** Level badge, HP and energy bars over each creature, the turn-order bar on the right, floating damage numbers with multiplier and "Extremely Effective" / "Low Effective", total damage, round counter `01 / 10`, trainer portraits. | M |
 | 3.4 | **Placeholder hit effects** per element, so attacks read before skill art exists. | S |
-| 3.5 | **Phone pass.** 60 fps with twelve creatures on your phone, landscape, full screen. | S |
+| 3.5 | **Performance pass.** 60 fps with twelve creatures on your laptop, full screen. | S |
 
-**Done when:** you can watch a full 6 v 6 fight on your phone, start to finish, and it feels like the reference.
+**Done when:** you can watch a full 6 v 6 fight in your browser, start to finish, and it feels like the reference.
 
 ---
 

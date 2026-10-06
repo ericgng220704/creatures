@@ -4,7 +4,7 @@ Guidance for Claude (and people) working in this repo. Read it before touching a
 
 ## What this project is
 
-Procedural 3D creatures drawn entirely in code with three.js r158 (no models, no textures, no art files), growing into an **auto-battle, turn-based creature game** modelled closely on *Pocket Incoming* (6 v 6 on a stadium field, fixed side camera, speed-ordered turns, type multipliers, a turn limit; see "Battle target" below). A hobby project, PvE only, played in a phone browser in landscape. Copying the reference game closely is fine; it will not be published.
+Procedural 3D creatures drawn entirely in code with three.js r158 (no models, no textures, no art files), growing into an **auto-battle, turn-based creature game** modelled closely on *Pocket Incoming* (6 v 6 on a stadium field, fixed side camera, speed-ordered turns, type multipliers, a turn limit; see "Battle target" below). A hobby project, PvE only, played mostly in a laptop browser. Copying the reference game closely is fine; it will not be published.
 
 The phased plan for the whole game is in [docs/roadmap.md](docs/roadmap.md). Check it for the current phase before starting work.
 
@@ -26,12 +26,14 @@ Do not build game systems ahead of the design decisions listed under "Decisions"
 
 ```bash
 npm install
-npm run dev                 # the creature sheet at http://localhost:5173
+npm run dev                 # the creature sheet at http://localhost:5173, the battle preview at /battle.html
 npm run build               # static build in dist/
 npm run stats               # parts, triangles, build ms per creature (Node, no browser)
 npm run render              # PNG of every creature in renders/ (headless Chromium)
 npm run render -- --head    # plus a face close-up of each
 npm run render -- owl lion  # only these ids
+npm run render -- --battle  # battle preview PNGs in renders/battle/: the 6 v 6 as is, as silhouettes, with size boxes,
+                            # then each creature alone at true battle size (boxes + silhouette); add ids to limit it
 ```
 
 In the cloud container, point the renderer at the pre-installed browser:
@@ -48,6 +50,8 @@ src/kit/         math.js (C, mix, sstep, rng), geometry.js (blob, ttube, lathe, 
                  place, plateGeo, wingKit, beatWing, onLimb, band, finish, flameCluster)
 src/creatures/   one file per creature + index.js (INFO, ORDER)
 src/showcase/    the creature sheet (one WebGL context per card; not how the game should render)
+src/preview/     the battle preview (battle.html): one scene, the stadium, the side camera, a 6 v 6 formation,
+                 silhouette mode, size-class boxes with on-screen heights, layout sliders; settings live in the URL
 scripts/         render.mjs (PNGs), stats.mjs (cost table)
 reference/       the original single-file sheet, frozen. Do not edit.
 docs/            creatures.md, the catalogue
@@ -140,7 +144,7 @@ A player should be able to tell a creature's role from its outline before readin
 
 **MUST**
 
-1. **Read at battle size first.** Design the silhouette for the battle camera (about 150 to 250 px tall on a phone), then add detail. If it is not recognisable as a black silhouette at that size, it is not done. Close-up detail is a bonus, never the point.
+1. **Read at battle size first.** Design the silhouette for the battle camera, then add detail. In the battle preview at 1280 x 720 a creature stands about **130 to 200 px** tall (the size-box labels show the number). If it is not recognisable in the preview's **Silhouette** mode at that size, it is not done. Close-up detail is a bonus, never the point.
 2. **One element, one accent hue.** The body stays natural and muted; the element owns the only saturated, glowing colour. No second competing glow colour (a pale core of the same hue is fine).
 3. **Counter-shade the body.** Darker on top, paler underneath, via a colour function on `n.y`. No flat single-colour bodies.
 4. **Eyes glow and blink.** Unlit `glow` eye + `halo` + blink in `update`. Eyes must be big enough to read at battle size (see weakness 9 below).
@@ -158,14 +162,14 @@ A player should be able to tell a creature's role from its outline before readin
 - Keep the kit's vocabulary (`blob`, `seg`, `lock`, `feather`, `shard`, `band`). Add a new kit helper only when two or more creatures need it.
 - Overlap blobs at joints (shoulder blob over the top of the limb `seg`) so limbs grow out of the body rather than plugging into it.
 - Gold or iron trim at most in two places. It is a rank marker, not decoration.
-- Triangle budget: aim for 40k and stay under 60k. Mark small parts `noOcc`. (Thornstag at 110k and Tidefang at 88k are over.)
+- Triangle budget: aim for 60k; over 120k needs a reason. Mark small parts `noOcc`. The game runs on a laptop (P1), so detail may win over thrift, but twelve creatures share one frame.
 - Glow colours from the element's ramp (see "Element colour keys" once decided); eyes may stay warm amber as the house signature.
 
 ### The battle camera
 
 Battles are seen **from the side** (player left, enemy right), from slightly above. Design and judge every creature in that view: profile silhouette first, then three-quarter. The turntable on the sheet is for close-up checking only.
 
-**Size classes** (solid body, metres in scene units; current creatures shown for scale)
+**Size classes** (solid body, in scene units; current creatures shown for scale). Each creature's class is `size` in `src/creatures/index.js`; the battle preview's **Size boxes** check it (green fits, red names what does not).
 
 | Class | Length x height | Today |
 | --- | --- | --- |
@@ -181,10 +185,10 @@ These numbers are provisional until the formation slots and the battle camera ar
 1. **Mixed vibes.** Only Emberwolf fully has the benchmark look. The rest need reworking to it (decided: the owner wants every creature to feel like the wolf).
 2. **Balloon limbs.** Elephant, Sunmane and Ironpaw limbs read as stacked sausages with visible seams at the joints. Needs overlap, tapering and joint blobs.
 3. **Sunmane's mane reads as spikes**, like a hedgehog, not fur. The locks are too stiff, pointed and evenly spaced; it needs fewer, broader, curved locks in clumps.
-4. **Sizes are all over the place.** Solid length runs 3.2 to 6.9, height 1.6 to 4.4, Stormtalon's wingspan is 10.6. In a 6 v 6 field this will not fit.
+4. **Sizes are all over the place.** Six of eleven fail their class in the battle preview: Thornstag (height 4.4 > 3.5), Ironpaw (height 4.0 > 3.5), Wardshell (length 6.9 > 6.5, its shields), Tidefang (length 6.6 > 6.5), Stormtalon (length 4.7 > 4.5, span 10.6 > 6) and Pyrewing (length 6.2 > 4.5, span 7.2 > 6).
 5. **Action poses are baked in.** Sunmane is mid-swipe, Ironpaw mid-punch, Stormtalon mid-dive. They need neutral idles; the action becomes an attack animation.
 6. **FX and scenery bleed out.** Wardshell's shields orbit 6.9 units wide, Stonemaul's rocks and rings, Duskseer's moon, branch and ring, Stormtalon's wind ribbons. They will cover the neighbours in formation.
-7. **One PointLight per creature.** Twelve coloured dynamic lights in one scene is expensive and spills colour onto neighbours. In battle, element light should be baked or faked (halo plus emissive), not real lights.
+7. **One PointLight per creature.** Twelve coloured dynamic lights in one scene spill colour onto the neighbours and cost every pixel. In battle, element light should be baked or faked (halo plus emissive). The preview's **Creature lights** toggle shows the difference.
 8. **Weak value contrast.** Sunmane, Grandtusk, Wardshell and Thornstag have mid-value bodies, so their element glow does not pop the way Emberwolf's does. Darken or deepen the body before brightening the glow.
 9. **Small faces.** Grandtusk's and Stonemaul's eyes vanish at battle size; Tidefang's and Stormtalon's heads are tiny relative to the body. Faces carry personality and must read.
 10. **Thin or flat silhouettes.** Thornstag is mostly antler on a slim body; Tidefang is long and low, nearly invisible from an elevated camera.
@@ -192,14 +196,14 @@ These numbers are provisional until the formation slots and the battle camera ar
 
 ### Checklist before you call a creature done
 
-- [ ] Silhouette recognisable as a black shape at about 200 px tall, **from the side**.
+- [ ] Silhouette recognisable in the battle preview's Silhouette mode, **from the side**, at true size (`npm run render -- --battle <id>`).
 - [ ] Passes the Emberwolf test: dark quiet body, brow over glowing eyes, element growing from the body, element shape on the top line, weapon on show.
 - [ ] Role readable from the outline.
 - [ ] Body counter-shaded, one element accent, eyes glow and blink.
 - [ ] Neutral battle stance, faces `+x`, feet on `y = 0` (or hover base for flyers).
 - [ ] Solid body inside its size class; FX inside the `fx` group and within reach.
 - [ ] Joint groups exposed for animation (`head`, `jaw`, `tail`, `wings`, limbs as needed).
-- [ ] `npm run stats`: under 60k triangles.
+- [ ] `npm run stats`: about 60k triangles, never over 120k without a reason.
 - [ ] `npm run render -- <id> --head` looked at, beside two neighbours.
 - [ ] `index.js`, `docs/creatures.md` and the README table updated.
 
@@ -259,8 +263,8 @@ Made by the owner, October 2026. Treat them as rules.
 
 | # | Decision |
 | --- | --- |
-| P1 | **Phone, landscape, in the browser** (three.js). |
-| P2 | **Target 60 fps** with 12 creatures on screen. This makes draw calls, triangle counts and per-creature lights hard limits, not suggestions. |
+| P1 | **Laptop browser** (three.js), 16:9 landscape. Mostly played on a laptop; phones are not a target. |
+| P2 | **Target 60 fps on a laptop** with 12 creatures on screen. Budgets are generous ("go wild"), but draw calls still add up across twelve creatures. |
 | P3 | **PvE only**, hobby project. May change if it is ever published. |
 
 ### Still open (ask; do not assume)

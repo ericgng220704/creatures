@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Battle Preview</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;800&display=swap">
+</head>
+<body>
+<main>
+  <div id="frame" class="frame">
+    <div id="labels" class="labels"></div>
+    <div id="status" class="status" role="status"></div>
+  </div>
+  <section id="ui" class="ui" aria-label="Preview controls">
+    <div class="group">
+      <h2>View</h2>
+      <div class="row">
+        <button class="tog" data-opt="sil" aria-pressed="false">Silhouette</button>
+        <button class="tog" data-opt="boxes" aria-pressed="false">Size boxes</button>
+        <button class="tog" data-opt="turn" aria-pressed="false" title="Enemies turned round instead of mirrored">Enemy turned</button>
+        <button class="tog" data-opt="lights" aria-pressed="true">Creature lights</button>
+        <button class="tog" data-opt="still" aria-pressed="false">Freeze</button>
+      </div>
+    </div>
+    <div class="group">
+      <h2>Teams</h2>
+      <div class="teams">
+        <div><span class="cap">Player &middot; back | front</span><div id="grid-p" class="grid"></div></div>
+        <div><span class="cap">Enemy &middot; front | back</span><div id="grid-e" class="grid"></div></div>
+      </div>
+      <div class="row">
+        <select id="pick" aria-label="Creature for Solo and All"></select>
+        <button data-act="solo">Solo</button>
+        <button data-act="all">All of it</button>
+        <button data-act="roster">Roster mix</button>
+        <button data-act="swap">Swap sides</button>
+      </div>
+    </div>
+    <div class="group">
+      <h2>Formation and camera <span class="soft">(roadmap 0.2)</span></h2>
+      <div class="sliders">
+        <label>Camera angle <input id="r-elev" data-layout="elev" type="range" min="0" max="60" step="1"><output id="v-elev"></output>&deg;</label>
+        <label>Field of view <input id="r-fov" data-layout="fov" type="range" min="12" max="60" step="1"><output id="v-fov"></output>&deg;</label>
+        <label>Aim height <input id="r-aim" data-layout="aim" type="range" min="0" max="6" step=".1"><output id="v-aim"></output></label>
+        <label>Front row from centre <input id="r-front" data-layout="front" type="range" min="2" max="10" step=".1"><output id="v-front"></output></label>
+        <label>Row gap <input id="r-rowGap" data-layout="rowGap" type="range" min="3" max="12" step=".1"><output id="v-rowGap"></output></label>
+        <label>Column gap <input id="r-colGap" data-layout="colGap" type="range" min="2" max="9" step=".1"><output id="v-colGap"></output></label>
+        <label>Zoom <input id="r-zoom" data-layout="zoom" type="range" min=".5" max="3" step=".05"><output id="v-zoom"></output></label>
+      </div>
+      <div class="row">
+        <button data-act="reset">Reset layout</button>
+        <button data-act="copy">Copy link</button>
+        <code id="layout"></code>
+      </div>
+    </div>
+  </section>
+</main>
+<script type="module" src="/src/preview/main.js"></script>
+</body>
+</html>

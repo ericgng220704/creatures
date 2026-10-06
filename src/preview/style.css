@@ -1,0 +1,43 @@
+/* The battle preview: a 16:9 stage on top, controls below. A tool, so it stays plain and dark like an arena at night. */
+:root {
+  --bg: #10131b; --panel: #191d28; --ink: #eef0f6; --ink-soft: #a2a7b8; --line: #2c3242;
+  --accent: #ffb72e; --good: #5dff8a; --bad: #ff5a5a;
+  --font-display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 14px; line-height: 1.45; padding: 16px; }
+main { max-width: 1280px; margin-inline: auto; display: grid; gap: 14px; }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin: 0 0 8px; }
+.soft { color: var(--ink-soft); font-weight: 500; font-size: 13px; }
+
+.frame { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden;
+  background: radial-gradient(120% 90% at 50% 18%, #2a4f86 0%, #172a4d 45%, #0c1426 100%); }
+.frame.sil { background: #ffffff; }
+.frame canvas { display: block; width: 100%; height: 100%; }
+.labels { position: absolute; inset: 0; pointer-events: none; display: none; }
+.labels.on { display: block; }
+.lab { position: absolute; transform: translate(-50%, calc(-100% - 6px)); white-space: nowrap; font-size: 11px; font-weight: 800; line-height: 1.25;
+  color: #0c1426; background: var(--good); padding: 2px 6px; border-radius: 6px; text-align: center; }
+.lab.bad { background: var(--bad); color: #fff; }
+.lab b { font-weight: 800; }
+.status { position: absolute; left: 14px; top: 12px; font-weight: 800; color: #fff; text-shadow: 0 1px 3px #000; }
+.frame.sil .status { color: #000; text-shadow: none; }
+
+.ui { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.group { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 10px; align-content: start; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+button, select { font: inherit; font-weight: 800; color: var(--ink); background: #232838; border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+button:hover, select:hover { border-color: var(--ink-soft); }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.tog[aria-pressed="true"] { background: var(--accent); color: #1a1205; border-color: var(--accent); }
+.teams { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cap { display: block; font-size: 12px; color: var(--ink-soft); font-weight: 800; margin-bottom: 4px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.grid select { width: 100%; min-width: 0; padding: 4px 6px; font-size: 12px; }
+.sliders { display: grid; gap: 6px; }
+.sliders label { display: grid; grid-template-columns: 140px 1fr 40px 10px; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+.sliders output { color: var(--ink); font-weight: 800; text-align: right; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+code { font-size: 11px; color: var(--ink-soft); word-break: break-all; }
