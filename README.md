@@ -47,6 +47,8 @@ scripts/render.mjs       PNGs of every creature, from a headless browser
 scripts/stats.mjs        parts, triangles and build time per creature
 reference/               the single-file page this code came from, as last published
 docs/creatures.md        the catalogue
+docs/roadmap.md          the plan for the whole game, phase by phase
+CLAUDE.md                house art style, rules and design decisions: read before changing a creature
 ```
 
 ## What a creature is
