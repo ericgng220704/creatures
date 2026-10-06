@@ -13,6 +13,8 @@
 //   shake               a fast tremble of the body, for wind-ups
 //
 // The idle is not a clip: it is the creature's own update(t), which also runs every flame, mote and blink.
+// A creature may also return clipFx(name, k): called after each clip pose, it flashes the creature's own effects
+// (a slash, a burst) at the right moment. Parts it changes need userData.noMerge, or merge() will fold them in.
 // A clip is laid over it after update(t), blending in and out so nothing pops.
 import * as T from 'three';
 import { eachJoint } from './rig.js';
@@ -218,6 +220,7 @@ export function applyClip(a, clip, k, w, time) {
     var g = sn[0];
     g.position.lerpVectors(sn[1], g.position, w); g.quaternion.slerpQuaternions(sn[2], g.quaternion.clone(), w); g.scale.lerpVectors(sn[3], g.scale, w);
   });
+  if (a.clipFx) a.clipFx(clip.name, k, clip);
 }
 
 // a clip's weight at k: it blends in over the first few percent, and out over the last unless it holds

@@ -1,118 +1,172 @@
 import * as T from 'three';
 import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
-import { halo } from '../kit/materials.js';
-import { finish, glow, lock, part, seg, shard } from '../kit/parts.js';
-import { chain, makeRig } from '../kit/rig.js';
+import { glowMat, halo } from '../kit/materials.js';
+import { finish, glow, lock, part, shard } from '../kit/parts.js';
+import { bind, hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
-// SUNMANE: a lion mid-strike, one paw raised with its claws out, a great mane burning gold at the tips
+// SUNMANE: a lion braced to pounce, its mane a corona of sunfire, claws out and roaring
 // =====================================================================
 export function lion() {
   var P = {
-    coat: C('#c99a54'), coatDark: C('#a67a3c'), cream: C('#ecd8b0'), mane: C('#6e3f1a'), maneTip: C('#f0b24a'), nose: C('#2a1a16'),
-    claw: C('#f2ead6'), gum: C('#5a1f22'), tongue: C('#c25f66'), tooth: C('#f4efe0'), eye: '#ffc13a', gold: '#ffcf5a'
+    coat: C('#7a5432'), coatDark: C('#44291a'), cream: C('#a88c62'), maneRoot: C('#2a170b'), maneMid: C('#6b3c18'), maneTip: C('#e9a640'),
+    nose: C('#1c120d'), brow: C('#4a3019'), claw: C('#f2ead6'), gum: C('#4a171a'), tongue: C('#b8505a'), tooth: C('#f4efe0'),
+    eye: '#ffc13a', sun: '#ffcf5a', sunDeep: '#ffb02e', sunCore: '#fff6d0'
   };
   var root = new T.Group(), legs = new T.Group(), body = new T.Group(); root.add(legs, body);
   function gauss(x, c, w) { var d = (x - c) / w; return Math.exp(-d * d); }
-  function coat(p, n) { var c = mix(P.coat, P.coatDark, sstep(.3, .9, n.y) * .6); return mix(c, P.cream, sstep(-.1, -.6, n.y)); }
-  var FUR = { c: coat }, LOCK = { c: P.mane, tip: P.maneTip, tipAmt: .9, aoK: .35, noOcc: true };
+  // coat: dark umber along the back, warm bronze on the flanks, a muted cream belly and throat
+  function coat(p, n) { var c = mix(P.coat, P.coatDark, sstep(.15, .85, n.y) * .85); return mix(c, P.cream, sstep(-.15, -.7, n.y) * .8); }
+  var FUR = { c: coat }, PAW = { c: function (p, n) { return mix(P.coat, P.coatDark, .35); } };
+  var LOCK = { c: P.maneRoot, tip: P.maneTip, tipAmt: .7, aoK: .35, noOcc: true }, LOCKM = { c: P.maneMid, tip: P.maneTip, tipAmt: .75, aoK: .35, noOcc: true };
   var CLAW = { c: P.claw, m: 'gloss', noAO: true, noOcc: true }, TOOTH = { c: P.tooth, m: 'gloss', noAO: true, noOcc: true };
   function taper(x, y, z, W, H) { var k = .55 + .45 * ((y / H + 1) / 2); return [x * k, y, z * k]; }
 
-  // body: a deep chest, a tucked waist, heavy shoulders and haunches
-  part(body, blob(2.2, 1.15, .98, .85, function (x, y, z, W) { var xn = x / W; if (y < 0) y *= 1 - .25 * gauss(xn, -.2, .4); return [x, y, z * (.9 + .1 * (xn + 1) / 2)]; }), FUR, 0, 1.5, 0);
-  part(body, blob(1.0, 1.35, 1.05, .85), FUR, .78, 1.45, 0, 0, 0, -.1);
-  part(body, blob(.95, 1.1, .98, .85), FUR, -.85, 1.42, 0);
-  [1, -1].forEach(function (s) { part(body, blob(.6, .9, .45, .85, taper), FUR, .72, 1.5, s * .44, 0, 0, -.1); });
-
-  // the raised right paw: a limb hung from the shoulder that swings, claws long and curved
-  var swipe = new T.Group(); swipe.position.set(.75, 1.4, .46); swipe.rotation.z = 1.25; body.add(swipe);
-  seg(swipe, [0, 0, 0], [.12, -.62, .03], .27, .21, FUR);
-  part(swipe, blob(.42, .42, .42, .9), FUR, .12, -.62, .03);
-  seg(swipe, [.12, -.62, .03], [.2, -1.2, .04], .21, .17, FUR);
-  part(swipe, blob(.5, .3, .46, .8), FUR, .24, -1.28, .04);
-  [-.15, -.05, .05, .15].forEach(function (dz) {
-    part(swipe, blob(.14, .12, .13, .85), FUR, .3, -1.4, .04 + dz);
-    part(swipe, ttube([[.3, -1.42, .04 + dz], [.34, -1.66, .04 + dz], [.44, -1.84, .04 + dz]], .05, .006, 6, 10), CLAW);
-  });
-  // a golden slash that flares as the paw comes through
-  var slashes = [];
-  [[1.25, 1.34, -1.25, 1.2], [1.45, 1.55, -1.05, 1.1], [1.65, 1.72, -.9, .95]].forEach(function (a) {
-    var m = glow(body, new T.RingGeometry(a[0], a[1], 28, 1, a[2], a[3]), P.gold, .75, 1.4, .56, 0, 0, 0, .5);
-    m.material.side = T.DoubleSide; slashes.push(m);
-  });
-
-  // the planted front leg and the hind legs, with big paws
-  seg(legs, [.75, 1.4, -.46], [.7, .8, -.5], .27, .21, FUR);
-  seg(legs, [.7, .8, -.5], [.85, .3, -.5], .21, .17, FUR);
-  part(legs, blob(.6, .28, .5, .8), FUR, .96, .14, -.5);
-  [-.15, -.05, .05, .15].forEach(function (dz) { part(legs, blob(.14, .12, .12, .85), FUR, 1.22, .09, -.5 + dz); shard(legs, .03, .15, 5, CLAW, [1.28, .07, -.5 + dz], [1, -.3, 0]); });
+  // body: a deep chest pushed forward, heavy shoulders, a tucked waist and strong haunches
+  part(body, blob(2.2, 1.15, .98, .85, function (x, y, z, W) { var xn = x / W; if (y < 0) y *= 1 - .28 * gauss(xn, -.2, .4); return [x, y, z * (.9 + .1 * (xn + 1) / 2)]; }), FUR, 0, 1.5, 0);
+  part(body, blob(1.08, 1.45, 1.12, .85), FUR, .8, 1.44, 0, 0, 0, -.12);
+  part(body, blob(1.0, 1.12, 1.0, .85), FUR, -.85, 1.42, 0);
   [1, -1].forEach(function (s) {
-    var hip = [-.85, 1.4, s * .46], knee = [-.5, .85, s * .52], hock = [-.95, .4, s * .5];
-    seg(legs, hip, knee, .42, .26, FUR);
-    seg(legs, knee, hock, .26, .17, FUR);
-    seg(legs, hock, [-.85, .13, s * .5], .17, .15, FUR);
-    part(legs, blob(.7, .22, .46, .8), FUR, -.62, .11, s * .5);
-    [-.15, -.05, .05, .15].forEach(function (dz) { part(legs, blob(.14, .11, .11, .85), FUR, -.3, .08, s * .5 + dz); shard(legs, .028, .13, 5, CLAW, [-.24, .06, s * .5 + dz], [1, -.3, 0]); });
+    part(body, blob(.66, .95, .48, .85, taper), FUR, .74, 1.48, s * .46, 0, 0, -.1);
+    part(body, blob(.8, .85, .42, .85), FUR, -.82, 1.3, s * .42, 0, 0, .12);
   });
 
-  // head: heavy, roaring, a short broad muzzle, fangs and a furrowed brow
-  var head = new T.Group(); head.position.set(1.62, 2.05, 0); head.rotation.z = -.1; body.add(head);
-  part(head, blob(.88, .8, .85, .85), FUR, 0, 0, 0);
-  part(head, blob(.58, .44, .54, .8, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y * (1 - .15 * t), z * (1 - .2 * t)]; }), { c: function (p, n) { return mix(P.coat, P.cream, sstep(-.1, -.6, n.y) + sstep(.3, .8, n.x) * .3); } }, .52, -.14, 0);
-  part(head, blob(.22, .15, .28, .75), { c: P.nose, m: 'gloss' }, .84, -.02, 0);
+  // legs: chains of joints with muscle at the top and a knob at each joint, so they bend without seams;
+  // big paws with long claws out on the front feet
+  var FRONT = [[.74, 1.38], [.68, .8], [.84, .3]], BACK = [[-.85, 1.38], [-.5, .85], [-.95, .4], [-.85, .13]], LEGS = {};
+  function at(pts, z) { return pts.map(function (q) { return [q[0], q[1], z]; }); }
+  [.48, -.48].forEach(function (z) {
+    var front = limb(legs, at(FRONT, z), [[.3, .2], [.2, .16]], FUR), back = limb(legs, at(BACK, z), [[.42, .26], [.25, .16], [.16, .14]], FUR);
+    hang(front.joints[1], part(legs, blob(.36, .36, .36, .9), FUR, FRONT[1][0], FRONT[1][1], z));
+    hang(back.joints[1], part(legs, blob(.4, .4, .4, .9), FUR, BACK[1][0], BACK[1][1], z));
+    hang(back.joints[2], part(legs, blob(.26, .26, .26, .9), FUR, BACK[2][0], BACK[2][1], z));
+    var fp = [part(legs, blob(.62, .28, .52, .8), PAW, .98, .14, z)], bp = [part(legs, blob(.7, .22, .46, .8), PAW, -.62, .11, z)];
+    [-.16, -.055, .055, .16].forEach(function (dz) {
+      fp.push(part(legs, blob(.15, .13, .13, .85), PAW, 1.24, .09, z + dz), shard(legs, .036, .22, 5, CLAW, [1.3, .08, z + dz], [1, -.35, 0]));
+      bp.push(part(legs, blob(.14, .11, .11, .85), PAW, -.3, .08, z + dz), shard(legs, .028, .13, 5, CLAW, [-.24, .06, z + dz], [1, -.3, 0]));
+    });
+    hang(front.end, fp); hang(back.end, bp);
+    LEGS[z > 0 ? 'fr' : 'fl'] = front; LEGS[z > 0 ? 'br' : 'bl'] = back;   // +z is the lion's right
+  });
+
+  // head: heavy and low, a short broad muzzle, a roaring jaw, slit eyes deep under a dark brow
+  var head = new T.Group(); head.position.set(1.62, 2.02, 0); head.rotation.z = -.12; body.add(head);
+  part(head, blob(.9, .8, .86, .85), FUR, 0, 0, 0);
+  part(head, blob(.6, .46, .56, .8, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y * (1 - .15 * t), z * (1 - .2 * t)]; }), { c: function (p, n) { return mix(mix(P.coat, P.coatDark, .2), P.cream, sstep(-.1, -.6, n.y) * .8); } }, .52, -.14, 0);
+  part(head, blob(.24, .16, .3, .75), { c: P.nose, m: 'gloss' }, .85, -.02, 0);
   var jaw = new T.Group(); jaw.position.set(.15, -.34, 0); jaw.rotation.z = -.5; head.add(jaw);
-  part(jaw, blob(.68, .2, .46, .75, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y, z * (1 - .3 * t)]; }), { c: function (p, n) { return mix(P.coat, P.cream, sstep(.1, -.5, n.y)); } }, .36, -.07, 0);
+  part(jaw, blob(.7, .2, .46, .75, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y, z * (1 - .3 * t)]; }), { c: function (p, n) { return mix(P.coat, P.cream, sstep(.1, -.5, n.y)); } }, .36, -.07, 0);
   part(jaw, blob(.58, .05, .34, .8), { c: P.gum, noOcc: true }, .34, .03, 0);
   part(jaw, blob(.36, .06, .2, .9), { c: P.tongue, m: 'gloss', noOcc: true }, .3, .07, 0);
   part(head, blob(.52, .06, .38, .8), { c: P.gum, noOcc: true }, .54, -.34, 0);
   [.17, -.17].forEach(function (z) {
-    shard(head, .075, .32, 6, TOOTH, [.66, -.34, z], [.1, -1, 0]);
-    shard(jaw, .062, .26, 6, TOOTH, [.62, .03, z * .9], [-.1, 1, 0]);
+    shard(head, .08, .34, 6, TOOTH, [.66, -.34, z], [.1, -1, 0]);
+    shard(jaw, .066, .28, 6, TOOTH, [.62, .03, z * .9], [-.1, 1, 0]);
     [.34, .46].forEach(function (x) { shard(head, .03, .12, 5, TOOTH, [x, -.34, z * 1.2], [0, -1, 0]); shard(jaw, .028, .1, 5, TOOTH, [x - .12, .03, z * 1.1], [0, 1, 0]); });
   });
   var eyes = [];
   [.35, -.35].forEach(function (z) {
-    part(head, blob(.44, .14, .2, .8), FUR, .3, .28, z * .95, 0, 0, -.4);
-    eyes.push(glow(head, blob(.16, .09, .06, .7), P.eye, .39, .14, z, 0, z > 0 ? -.3 : .3, -.2));
-    halo(head, P.eye, .3, .42, .14, z * 1.08, .5);
-    part(head, blob(.26, .26, .12, .85), FUR, -.18, .46, z * .9);
+    part(head, blob(.42, .12, .2, .8), { c: P.brow, noOcc: true }, .33, .24, z * .95, 0, z > 0 ? -.15 : .15, -.42);
+    eyes.push(glow(head, blob(.19, .065, .06, .7), P.eye, .4, .13, z * 1.0, 0, z > 0 ? -.3 : .3, -.32));
+    halo(head, P.eye, .32, .43, .13, z * 1.08, .5);
     for (var wi = 0; wi < 3; wi++) part(head, blob(.04, .04, .04, .9), { c: P.nose, noOcc: true }, .62 + wi * .04, -.1 - wi * .045, z * .62);
   });
 
-  // the mane: four rings of long locks round the head, dark at the root and gold at the tip, a beard and a shoulder cape
-  var r = rng(19);
-  [[1.6, .62, 16, .34], [1.4, .74, 18, .4], [1.2, .84, 19, .46], [.98, .92, 19, .5]].forEach(function (ring) {
+  // the mane: three rings of clumps round the head, each clump three locks swept back toward the shoulders,
+  // dark at the root and gold at the tip, longest on the crest; a beard below the jaw. It rides on the neck,
+  // with a corona of sun rays rising from its upper rim
+  var onNeck = [head], r = rng(19), HC = [1.55, 2.04];
+  [[1.48, .62, 9, .6], [1.3, .76, 10, .72], [1.1, .86, 10, .84]].forEach(function (ring, k) {
     for (var i = 0; i < ring[2]; i++) {
-      var a = i / ring[2] * Math.PI * 2 + (r() - .5) * .1, cy = Math.cos(a), cz = Math.sin(a);
-      lock(body, LOCK, [ring[0] + (r() - .5) * .06, 2.05 + cy * ring[1] * .88, cz * ring[1]], [-.7, cy * .95, cz * .95], [0, cy, cz], ring[3] + r() * .1, .24, .1, .07 + r() * .04);
+      var a0 = (i + (k % 2) * .5) / ring[2] * Math.PI * 2;
+      for (var j = -1; j <= 1; j++) {
+        var a = a0 + j * .13 + (r() - .5) * .06, cy = Math.cos(a), cz = Math.sin(a), up = Math.max(0, cy);
+        var len = ring[3] * (1 + .3 * up) * (j ? .85 : 1) + r() * .1;
+        onNeck.push(lock(body, j ? LOCKM : LOCK, [ring[0] + (r() - .5) * .06, HC[1] + cy * ring[1] * .9, cz * ring[1]], [-1.3 - .5 * up, cy * .6, cz * .6], [0, cy, cz], len, .3 + r() * .06, .13, .18 + r() * .05));
+      }
     }
   });
-  for (var bi = 0; bi < 9; bi++) lock(body, LOCK, [1.5 - bi * .1, 1.55 + (bi % 3) * .05, (bi - 4) * .09], [-.2, -1, (bi - 4) * .1], [1, 0, 0], .42, .2, .1, .08);
-  for (var ci = 0; ci < 14; ci++) lock(body, LOCK, [1.0 - ci * .1, 2.0 - ci * .02, (r() - .5) * .5], [-1, -.3, 0], [0, 1, 0], .4 + r() * .1, .24, .1, .08);
+  for (var bi = 0; bi < 6; bi++) onNeck.push(lock(body, LOCK, [1.55 - bi * .08, 1.6 + (bi % 2) * .06, (bi - 2.5) * .12], [-.25, -1, (bi - 2.5) * .12], [1, 0, 0], .5, .32, .13, .1));
+  var corona = new T.Group(); corona.position.set(HC[0] - .05, HC[1] + .02, 0); body.add(corona); onNeck.push(corona);
+  // the corona is a sunburst in the plane the battle camera sees: a thin arc of light just outside the mane, from
+  // the brow over the crown to the nape, with long and short rays fanning out of it
+  var UPV3 = new T.Vector3(0, 1, 0), CR = 1.12, arc = [];
+  for (var ai = 0; ai <= 24; ai++) { var aa = 1.05 + ai / 24 * 2.3; arc.push([Math.cos(aa) * CR, Math.sin(aa) * CR, -.1]); }
+  glow(corona, ttube(arc, .03, .03, 6, 60), P.sun);
+  for (var ri = 0; ri < 11; ri++) {
+    var ra = 1.12 + ri / 10 * 2.16, long = ri % 2 === 0, len = long ? .5 + .12 * Math.sin(ri / 10 * Math.PI) : .26, dir = new T.Vector3(Math.cos(ra), Math.sin(ra), 0);
+    var bx = Math.cos(ra) * CR, by = Math.sin(ra) * CR;
+    glow(corona, new T.ConeGeometry(long ? .075 : .055, len, 5).translate(0, len / 2, 0), P.sunDeep, bx, by, -.1).quaternion.setFromUnitVectors(UPV3, dir);
+    glow(corona, new T.ConeGeometry(long ? .035 : .025, len * .85, 5).translate(0, len * .42, 0), P.sunCore, bx, by, -.08).quaternion.setFromUnitVectors(UPV3, dir);
+  }
+  onNeck.push(halo(body, P.sun, 2.8, 1.3, 2.15, 0, .2));
+  // a shoulder cape of dark locks along the spine
+  for (var ci = 0; ci < 10; ci++) lock(body, LOCK, [.95 - ci * .1, 2.0 - ci * .03, (r() - .5) * .5], [-1, -.3, 0], [0, 1, 0], .42 + r() * .1, .34, .12, .1);
 
-  // tail with a tuft, and a sun-gold glow behind the head
-  part(body, ttube([[-1.3, 1.55, 0], [-1.9, 1.5, 0], [-2.4, 1.15, 0], [-2.58, .7, 0]], .11, .07, 8, 20), FUR);
-  for (var ti = 0; ti < 8; ti++) { var ta = ti / 8 * Math.PI * 2; lock(body, LOCK, [-2.58, .72, 0], [Math.cos(ta) * .3, -1, Math.sin(ta) * .3], [Math.cos(ta), 0, Math.sin(ta)], .4, .24, .12, .1); }
-  halo(body, P.gold, 4.2, 1.3, 2.1, 0, .22);
-  var motes = [];
-  for (var mi = 0; mi < 24; mi++) motes.push({ m: glow(root, new T.IcosahedronGeometry(.03, 0), P.gold), ph: (mi * .137) % 1, sp: .15 + (mi % 5) * .04, r: .9 + (mi % 6) * .3 });
+  // sun glyphs burning under the coat on each shoulder and flank
+  var GLYPHS = [[[.95, 1.7, .5], [.82, 1.5, .56], [.9, 1.3, .56], [.78, 1.1, .5]], [[.55, 1.75, .47], [.45, 1.55, .5], [.52, 1.35, .5]], [[-.6, 1.65, .5], [-.72, 1.45, .52], [-.62, 1.25, .5]]];
+  GLYPHS.forEach(function (v) { [1, -1].forEach(function (s) { glow(body, ttube(v.map(function (q) { return [q[0], q[1], q[2] * s]; }), .022, .008, 6, 14), P.sun); }); });
+
+  // tail: a chain of joints ending in a dark tuft with a spark of sun in it
+  var tailC = limb(body, [[-1.3, 1.55, 0], [-1.75, 1.55, 0], [-2.15, 1.36, 0], [-2.4, 1.06, 0], [-2.5, .76, 0]], [[.11, .1], [.1, .085], [.085, .075], [.075, .07]], FUR), tail = tailC.root;
+  var tufts = [];
+  for (var ti = 0; ti < 8; ti++) { var ta = ti / 8 * Math.PI * 2; tufts.push(lock(body, LOCK, [-2.5, .78, 0], [Math.cos(ta) * .3, -1, Math.sin(ta) * .3], [Math.cos(ta), 0, Math.sin(ta)], .4, .26, .12, .1)); }
+  tufts.push(glow(body, new T.OctahedronGeometry(.09, 0), P.sunCore, -2.52, .7, 0), halo(body, P.sun, .7, -2.52, .7, 0, .45));
+  bind(tailC, tufts);
+
+  // the strike: three golden slashes beside the right forepaw, dark until the attack lands (clipFx below)
+  var slashes = [];
+  [[1.25, 1.34, -1.25, 1.2], [1.45, 1.55, -1.05, 1.1], [1.65, 1.72, -.9, .95]].forEach(function (q) {
+    var m = glow(body, new T.RingGeometry(q[0], q[1], 28, 1, q[2], q[3]), P.sun, 1.3, 1.6, .75, 0, 0, 0, 0);
+    m.material.side = T.DoubleSide; m.userData.noFit = true; m.userData.noMerge = true; m.visible = false; slashes.push(m);
+  });
+  // motes of sunlight drifting up round it: one instanced mesh
+  var MN = 24, motes = new T.InstancedMesh(new T.IcosahedronGeometry(.03, 0), glowMat('#ffffff'), MN), mt = new T.Object3D(), ms = [];
+  motes.frustumCulled = false; motes.userData.noFit = true; root.add(motes);
+  for (var mi = 0; mi < MN; mi++) { ms.push({ ph: (mi * .137) % 1, sp: .15 + (mi % 5) * .04, r: .9 + (mi % 6) * .26 }); motes.setColorAt(mi, new T.Color(mi % 3 ? P.sun : P.sunCore)); }
+  function placeMotes(t) {
+    ms.forEach(function (e, i) { var kk = (t * e.sp + e.ph) % 1, an = e.ph * 20 + t * .4; mt.position.set(.6 + Math.cos(an) * e.r, 1.2 + kk * 2.4, Math.sin(an) * e.r); mt.scale.setScalar(Math.max(.01, 1 - kk)); mt.updateMatrix(); motes.setMatrixAt(i, mt.matrix); });
+    motes.instanceMatrix.needsUpdate = true;
+  }
+  placeMotes(0);
   var light = new T.PointLight(0xffb84a, 2.6, 4, 1.6); light.position.set(1.7, 2.1, 0); body.add(light);
-  slashes.forEach(function (m) { m.userData.noFit = true; });
+
+  // the neck joint, where the neck meets the shoulders: it carries the head, the mane and the corona
+  part(body, blob(.8, 1.0, .85, .85), FUR, 1.25, 1.8, 0, 0, 0, -.5);
+  var neck = new T.Group(); neck.position.set(1.1, 1.85, 0); body.add(neck);
+  hang(neck, onNeck);
 
   finish(root, 3.4);
   return {
-    root: root, head: head, name: 'lion', headView: { span: 3.0, up: .35, look: 0 },
-    rig: makeRig({ plan: 'quadruped', body: body, head: head, jaw: jaw, legs: { fr: chain([swipe]) } }),
+    root: root, head: head, name: 'lion', headView: { span: 3.2, up: .35, look: 0 },
+    rig: makeRig({ plan: 'quadruped', body: body, neck: neck, head: head, jaw: jaw, tail: tailC.joints, legs: LEGS }),
+    // the attack is a rearing swipe of the right forepaw that lands as the slashes flare
+    clips: {
+      attack: { tracks: {
+        'body.pitch': [[0, 0], [.28, .22], [.42, .12], [.5, -.15], [.62, .04], [.85, 0]],
+        'head.pitch': [[0, 0], [.28, .2], [.45, -.05], [.52, -.2], [.8, 0]],
+        'jaw.open': [[0, 0], [.28, .45], [.5, .6], [.7, .2], [.9, 0]],
+        'fr.x': [[0, 0], [.28, .3], [.42, .7], [.5, .55, 'in'], [.58, 0]],
+        'fr.y': [[0, 0], [.28, .95], [.42, 1.05], [.5, .2, 'in'], [.58, 0]]
+      } }
+    },
+    clipFx: function (name, k, clip) {
+      var hit = name === 'attack' || name === 'ultimate' ? clip.impact : -1;
+      slashes.forEach(function (m, i) {
+        var d = hit < 0 ? 1 : Math.abs(k - hit - .02 - i * .015) / .07, op = Math.max(0, 1 - d) * .75;
+        m.material.opacity = op; m.visible = op > .01;
+      });
+    },
     update: function (t) {
-      var br = Math.sin(t * 1.5), ph = t * 1.8;
+      var br = Math.sin(t * 1.5);
       body.position.y = br * .015; body.scale.set(1, 1 + br * .006, 1 + br * .009);
-      swipe.rotation.z = 1.25 + Math.sin(ph) * .5;
-      slashes.forEach(function (m, i) { m.material.opacity = Math.max(0, -Math.cos(ph - i * .25)) * .65; });
-      head.rotation.z = -.1 + Math.sin(t * .8) * .03; head.rotation.y = Math.sin(t * .55) * .1;
+      head.rotation.z = -.12 + Math.sin(t * .8) * .03; head.rotation.y = Math.sin(t * .55) * .08;
       jaw.rotation.z = -.5 - (Math.sin(t * 1.5) * .5 + .5) * .08;
-      motes.forEach(function (e) { var kk = (t * e.sp + e.ph) % 1, an = e.ph * 20 + t * .4; e.m.position.set(1.0 + Math.cos(an) * e.r, 1.2 + kk * 2.6, Math.sin(an) * e.r); e.m.scale.setScalar(Math.max(.01, 1 - kk)); });
+      tail.rotation.y = Math.sin(t * 1.3) * .22; tail.rotation.z = Math.sin(t * .9) * .05;
+      corona.scale.setScalar(1 + Math.sin(t * 2.3) * .04); corona.rotation.x = Math.sin(t * .6) * .05;
+      slashes.forEach(function (m) { m.visible = false; });
+      placeMotes(t);
       light.intensity = 2.4 + Math.sin(t * 2.1) * .4;
       var blink = (t % 5.3) < .13 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
     }

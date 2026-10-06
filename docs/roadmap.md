@@ -47,7 +47,7 @@ Order: most broken first, so the lessons arrive early.
 
 | # | Creature | New element (proposed) | Role | Main work |
 | --- | --- | --- | --- | --- |
-| 1.1 | Sunmane | Light | Attacker | New mane (broad curved clumps, not spikes); neutral stance instead of the baked swipe (the swipe becomes its attack clip); darker coat for contrast; limbs without the balloon seams. |
+| 1.1 ✅ | Sunmane | Light | Attacker | Done: clumped mane swept back, a sunburst corona on the top line, darker umber coat, brow over slit eyes, neutral stance, legs as chains with joint knobs, neck and tail rigged; its attack is a rearing right-paw swipe whose golden slashes flare at the impact (`clips` and `clipFx`). Fits L; 38 merged meshes. |
 | 1.2 | Ironpaw | Neutral | Bruiser | Less cartoon: heavier brow, glowing slit eyes, a fighter's build; neutral guard stance (the punch becomes the attack); keep the headband. Fits size class S (now too tall). |
 | 1.3 | Duskseer | Dark | Support | Lose the moon, branch and ground ring; heroic brow over the big eyes (no glasses look); stands on the field. |
 | 1.4 | Grandtusk | Neutral (or Ice, see the type wheel) | Tank | Bigger readable eyes under the brow, legs without seams, value contrast; shorter to fit class L. |

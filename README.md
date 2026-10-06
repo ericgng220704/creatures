@@ -30,7 +30,7 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 | Wardshell | `wardshell` | Ward | 107 | 71,911 | 126 |
 | Pyrewing | `pyrewing` | Fire | 240 | 34,060 | 69 |
 | Stormtalon | `eagle` | Sky | 178 | 35,686 | 64 |
-| Sunmane | `lion` | Light | 214 | 74,552 | 94 |
+| Sunmane | `lion` | Light | 238 | 86,050 | 120 |
 | Grandtusk | `elephant` | Titan | 63 | 54,404 | 74 |
 | Ironpaw | `panda` | Qi | 85 | 46,054 | 61 |
 | Duskseer | `owl` | Night | 159 | 25,374 | 41 |

@@ -100,14 +100,16 @@ Cost: 178 parts, 35,686 triangles, built in about 64 ms.
 
 `lion` · element: Light · `src/creatures/lion.js`
 
-A lion in the middle of a strike, with one paw raised and its claws out.
+A lion braced to pounce, its mane a corona of sunfire, roaring with its claws out.
 
-- **Strike.** The right paw swings up and through, four long curved claws out, with a golden slash that flares as it comes down.
-- **Mane.** Four rings of long locks round the head, dark at the root and gold at the tip, with a beard and a cape over the shoulders.
-- **Body.** A deep chest, heavy shoulders and haunches, a tucked waist and a tufted tail.
-- **Face.** A roaring mouth with thick canines, burning amber eyes under a furrowed brow, and a sun-gold glow behind the head.
+- **Mane.** Three rings of clumped locks swept back toward the shoulders, dark at the root and gold at the tip, longest on the crest, with a beard and a cape along the spine.
+- **Corona.** A sunburst over the mane: an arc of light from brow to nape with long and short rays fanning out of it, the shape that says Light from across the field.
+- **Body.** A dark umber coat over a deep chest, heavy shoulders and haunches, sun glyphs burning under the fur, and a tufted tail with a spark of sun at its tip.
+- **Face.** A roaring mouth with thick canines, slit amber eyes under a heavy brow.
+- **Strike.** Its attack rears up and swipes the right forepaw through, four long claws out, with three golden slashes that flare as it lands.
+- **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.1): a neck joint carrying the head, mane and corona; four legs as joint chains with knobs at elbow and knee; a five-joint tail; its own attack and slashes (`clipFx`).
 
-Cost: 214 parts, 74,552 triangles, built in about 94 ms.
+Cost: 238 parts, 86,050 triangles, built in about 120 ms; 38 meshes once merged.
 
 ## Grandtusk
 
