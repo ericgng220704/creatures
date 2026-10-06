@@ -3,6 +3,7 @@ import { C, mix, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
 import { halo } from '../kit/materials.js';
 import { band, feather, finish, glow, lock, part, seg, shard } from '../kit/parts.js';
+import { chain, makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // IRONPAW: a panda warrior in a wide stance, one fist thrown and wrapped in qi
@@ -95,6 +96,7 @@ export function panda() {
   finish(root, 3.8);
   return {
     root: root, head: head, name: 'panda', headView: { span: 2.4, up: .3, look: 0 },
+    rig: makeRig({ plan: 'biped', body: body, head: head, jaw: jaw, arms: { r: chain([rArm]), l: chain([lArm]) }, extra: { sash: chain([tails]) } }),
     update: function (t) {
       var br = Math.sin(t * 1.6), pn = Math.max(0, Math.sin(t * 2.4));
       body.position.y = br * .015; body.scale.set(1, 1 + br * .006, 1 + br * .008);

@@ -3,6 +3,7 @@ import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, leafGeo, lumpGeo, ttube } from '../kit/geometry.js';
 import { halo } from '../kit/materials.js';
 import { finish, glow, lock, part, seg, shard } from '../kit/parts.js';
+import { chain, makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // THORNSTAG
@@ -188,6 +189,7 @@ export function thornstag() {
   finish(root, 3.0);
   return {
     root: root, head: head, name: 'thornstag',
+    rig: makeRig({ plan: 'quadruped', body: body, head: head, jaw: jaw, ears: ears, tail: [tail], extra: { antlers: chain([antlers]) } }),
     update: function (t) {
       var br = Math.sin(t * 1.8);
       body.position.y = br * .012; body.scale.set(1, 1 + br * .008, 1 + br * .01);

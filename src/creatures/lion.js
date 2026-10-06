@@ -3,6 +3,7 @@ import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
 import { halo } from '../kit/materials.js';
 import { finish, glow, lock, part, seg, shard } from '../kit/parts.js';
+import { chain, makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // SUNMANE: a lion mid-strike, one paw raised with its claws out, a great mane burning gold at the tips
@@ -103,6 +104,7 @@ export function lion() {
   finish(root, 3.4);
   return {
     root: root, head: head, name: 'lion', headView: { span: 3.0, up: .35, look: 0 },
+    rig: makeRig({ plan: 'quadruped', body: body, head: head, jaw: jaw, legs: { fr: chain([swipe]) } }),
     update: function (t) {
       var br = Math.sin(t * 1.5), ph = t * 1.8;
       body.position.y = br * .015; body.scale.set(1, 1 + br * .006, 1 + br * .009);

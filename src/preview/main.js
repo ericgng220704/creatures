@@ -5,6 +5,7 @@ import './style.css';
 import * as T from 'three';
 import { INFO, ORDER } from '../creatures/index.js';
 import { RADIAL } from '../kit/materials.js';
+import { eachJoint } from '../kit/rig.js';
 import { makeStage } from '../arena/stadium.js';
 import { CLASSES, FORMATION, checkFit, faceSlot, placeCamera, slotPosition } from '../arena/layout.js';
 // slot order in a team: front row far, middle, near; then back row far, middle, near
@@ -22,7 +23,7 @@ function team(key, def) {
 function num(key, def) { var v = parseFloat(q.get(key)); return isNaN(v) ? def : v; }
 var opt = {
   sil: q.get('sil') === '1', boxes: q.get('boxes') === '1', turn: q.get('enemy') === 'turn',
-  still: q.get('still') === '1', lights: q.get('lights') !== '0', t: num('t', 0), pick: INFO[q.get('pick')] ? q.get('pick') : 'emberwolf'
+  still: q.get('still') === '1', lights: q.get('lights') !== '0', joints: q.get('joints') === '1', flex: q.get('flex') === '1', t: num('t', 0), pick: INFO[q.get('pick')] ? q.get('pick') : 'emberwolf'
 };
 var L = {};
 LAYOUT_KEYS.forEach(function (k) { L[k] = num(k, FORMATION[k]); });
@@ -86,8 +87,35 @@ function build(id) {
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = .012; a.shadow = shadow;
   a.boxes = new T.Group();
   a.boxes.add(lineBox(c.len, c.h, c.span || c.dep, over.length ? 0xff4a4a : 0x5dff8a, .9));
+  a.markers = jointMarkers(a.rig);
   var real = lineBox(a.size.x, solid.max.y - solid.min.y, a.size.z, 0xffffff, .45); real.position.y += solid.min.y; a.boxes.add(real);
   return a;
+}
+// joint markers: a dot at every rig joint and a bone line to the next joint in its chain, drawn over everything
+var JCOL = { body: 0xffffff, head: 0xffffff, jaw: 0xffffff, neck: 0xffffff, ear: 0xffffff, tail: 0xff9a3c, legs: 0x4ad8ff, arms: 0xff5ad8, wings: 0xff5ad8, extra: 0xffe14a };
+var DOT = new T.SphereGeometry(.07, 10, 8);
+function jointMarkers(rig) {
+  var out = [];
+  eachJoint(rig, function (g, name) {
+    var kind = name.replace(/[0-9]+$/, '').split('.')[0], col = JCOL[kind] || 0xffffff;
+    var dot = new T.Mesh(DOT, new T.MeshBasicMaterial({ color: col, depthTest: false, toneMapped: false }));
+    dot.renderOrder = 20; g.add(dot); out.push(dot);
+    g.children.forEach(function (c) {
+      if (!c.isGroup || !c.userData.rest) return;   // only bones to child joints
+      var ln = new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(), c.position.clone()]), new T.LineBasicMaterial({ color: col, depthTest: false, transparent: true, opacity: .8 }));
+      ln.renderOrder = 20; g.add(ln); out.push(ln);
+    });
+  });
+  return out;
+}
+// flex: swing every joint but the body about its own z axis, out of step, to show what each one carries
+var _q = new T.Quaternion(), ZAX = new T.Vector3(0, 0, 1);
+function flex(a, t) {
+  var i = 0;
+  eachJoint(a.rig, function (g, name) {
+    if (name === 'body') return;
+    g.quaternion.copy(g.userData.rest.q).multiply(_q.setFromAxisAngle(ZAX, Math.sin(t * 2.4 + i * .8) * .4)); i++;
+  });
 }
 function fill() {
   var todo = slots.filter(function (sl) { return sl.id !== teams[sl.side][sl.i]; });
@@ -125,6 +153,7 @@ function refresh() {
     sl.a.lights.forEach(function (o) { o.visible = opt.lights && !opt.sil; });
     sl.a.shadow.visible = !opt.sil;
     sl.a.boxes.visible = opt.boxes;
+    sl.a.markers.forEach(function (m) { m.visible = opt.joints; });
   });
   st.s.updateMatrixWorld(true);
   placeLabels();
@@ -157,6 +186,8 @@ function syncUrl() {
   if (opt.boxes) p.set('boxes', '1');
   if (opt.turn) p.set('enemy', 'turn');
   if (!opt.lights) p.set('lights', '0');
+  if (opt.joints) p.set('joints', '1');
+  if (opt.flex) p.set('flex', '1');
   if (opt.still) { p.set('still', '1'); p.set('t', opt.t); }
   LAYOUT_KEYS.forEach(function (k) { p.set(k, L[k]); });
   history.replaceState(null, '', '?' + p.toString().replace(/%2C/g, ','));
@@ -209,7 +240,12 @@ var clock = new T.Clock(), time = opt.t, ready = false, settle = 0;
 function loop() {
   var dt = Math.min(.05, clock.getDelta());
   if (!opt.still) time += dt;
-  slots.forEach(function (sl, i) { if (sl.a) sl.a.update(opt.still ? opt.t : time + i * 1.3); });
+  slots.forEach(function (sl, i) {
+    if (!sl.a) return;
+    var t = opt.still ? opt.t : time + i * 1.3;
+    sl.a.update(t);
+    if (opt.flex) flex(sl.a, t);
+  });
   st.r.render(st.s, st.cam);
   // the render script waits for this: everything built and a few frames drawn
   if (settle > 0 && --settle === 0) { ready = true; window.__ready = true; }

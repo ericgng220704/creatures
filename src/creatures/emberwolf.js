@@ -2,7 +2,8 @@ import * as T from 'three';
 import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
 import { halo } from '../kit/materials.js';
-import { finish, flameCluster, glow, lock, part, seg, shard } from '../kit/parts.js';
+import { finish, flameCluster, glow, lock, part, shard } from '../kit/parts.js';
+import { bind, hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // EMBERWOLF
@@ -52,22 +53,19 @@ export function emberwolf() {
   });
   // back fur along the spine
   for (var bx = .45; bx > -.95; bx -= .17) lock(body, LOCK, [bx, 1.72 - (.45 - bx) * .06, (r() - .5) * .2], [-1, .3, 0], [0, 1, 0], .26 + r() * .08, .24, .09, .06);
-  // legs: shoulder, elbow, wrist, paw; hip, knee, hock, paw
-  var FRONT = [[.62, 1.1], [.66, .62], [.71, .26]], BACK = [[-.7, 1.18], [-.5, .74], [-.93, .38], [-.82, .12]];
+  // legs: chains of joints, shoulder > elbow > wrist and hip > knee > hock > foot, with paws and claws on the last
+  var FRONT = [[.62, 1.1], [.66, .62], [.71, .26]], BACK = [[-.7, 1.18], [-.5, .74], [-.93, .38], [-.82, .12]], LEGS = {};
+  function at(pts, z) { return pts.map(function (q) { return [q[0], q[1], z]; }); }
   [.3, -.3].forEach(function (z) {
-    seg(legs, [FRONT[0][0], FRONT[0][1], z], [FRONT[1][0], FRONT[1][1], z], .2, .14, FUR);
-    seg(legs, [FRONT[1][0], FRONT[1][1], z], [FRONT[2][0], FRONT[2][1], z], .13, .11, FUR);
-    part(legs, blob(.42, .2, .34, .7, function (x, y, zz, W) { return [x, y * (1 - .35 * Math.max(0, x / W)), zz]; }), PAW, .8, .1, z);
-    seg(legs, [BACK[0][0], BACK[0][1], z], [BACK[1][0], BACK[1][1], z], .27, .16, FUR);
-    seg(legs, [BACK[1][0], BACK[1][1], z], [BACK[2][0], BACK[2][1], z], .14, .1, FUR);
-    seg(legs, [BACK[2][0], BACK[2][1], z], [BACK[3][0], BACK[3][1], z], .1, .1, FUR);
-    part(legs, blob(.4, .19, .32, .7, function (x, y, zz, W) { return [x, y * (1 - .35 * Math.max(0, x / W)), zz]; }), PAW, -.7, .095, z);
+    var front = limb(legs, at(FRONT, z), [[.2, .14], [.13, .11]], FUR), back = limb(legs, at(BACK, z), [[.27, .16], [.14, .1], [.1, .1]], FUR);
+    var fp = [part(legs, blob(.42, .2, .34, .7, function (x, y, zz, W) { return [x, y * (1 - .35 * Math.max(0, x / W)), zz]; }), PAW, .8, .1, z)];
+    var bp = [part(legs, blob(.4, .19, .32, .7, function (x, y, zz, W) { return [x, y * (1 - .35 * Math.max(0, x / W)), zz]; }), PAW, -.7, .095, z)];
     [-.1, 0, .1].forEach(function (dz) {
-      part(legs, blob(.13, .11, .1, .8), PAW, .99, .08, z + dz);
-      shard(legs, .026, .12, 5, { c: P.claw, m: 'gloss', noAO: true }, [1.04, .07, z + dz], [1, -.45, 0]);
-      part(legs, blob(.12, .1, .09, .8), PAW, -.52, .075, z + dz);
-      shard(legs, .024, .11, 5, { c: P.claw, m: 'gloss', noAO: true }, [-.47, .065, z + dz], [1, -.45, 0]);
+      fp.push(part(legs, blob(.13, .11, .1, .8), PAW, .99, .08, z + dz), shard(legs, .026, .12, 5, { c: P.claw, m: 'gloss', noAO: true }, [1.04, .07, z + dz], [1, -.45, 0]));
+      bp.push(part(legs, blob(.12, .1, .09, .8), PAW, -.52, .075, z + dz), shard(legs, .024, .11, 5, { c: P.claw, m: 'gloss', noAO: true }, [-.47, .065, z + dz], [1, -.45, 0]));
     });
+    hang(front.end, fp); hang(back.end, bp);
+    LEGS[z > 0 ? 'fr' : 'fl'] = front; LEGS[z > 0 ? 'br' : 'bl'] = back;   // +z is the wolf's right
   });
   // head
   var head = new T.Group(); head.position.set(1.36, 2.04, 0); head.rotation.z = -.06; body.add(head);
@@ -90,26 +88,26 @@ export function emberwolf() {
     [.22, .32].forEach(function (x) { shard(jaw, .022, .07, 5, TOOTH, [x, .02, z * .9], [0, 1, 0]); });
   });
   // eyes: glowing slits under a heavy brow, ears with a dark inner, a cheek ruff
-  var eyes = [];
+  var eyes = [], ears = [];
   [.31, -.31].forEach(function (z) {
     part(head, blob(.22, .12, .06, .8), { c: P.furDark, noOcc: true }, .25, .06, z * 1.01, 0, z > 0 ? -.25 : .25, -.15);
     eyes.push(glow(head, blob(.17, .07, .05, .7), P.eye, .27, .06, z * 1.05, 0, z > 0 ? -.25 : .25, -.18));
     halo(head, P.eye, .28, .3, .06, z * 1.15, .45);
-    var ear = new T.Group(); ear.position.set(-.12, .32, z * .62); ear.rotation.set(z > 0 ? .2 : -.2, 0, .32); head.add(ear);
+    var ear = new T.Group(); ear.position.set(-.12, .32, z * .62); ear.rotation.set(z > 0 ? .2 : -.2, 0, .32); head.add(ear); ears.push(ear);
     part(ear, blob(.24, .56, .3, .72, function (x, y, zz, W, H) { var t = (y / H + 1) / 2; return [x * (1 - .7 * t), y, zz * (1 - .65 * t)]; }), FUR, 0, .26, 0);
     part(ear, blob(.1, .4, .22, .75, function (x, y, zz, W, H) { var t = (y / H + 1) / 2; return [x * (1 - .7 * t), y, zz * (1 - .7 * t)]; }), { c: P.earIn, noOcc: true }, .08, .22, 0);
     for (var i = 0; i < 4; i++) lock(head, LOCKL, [-.05 + i * .05, -.12 - i * .05, z * 1.0], [-1, -.35 - i * .1, z > 0 ? .55 : -.55], [0, -.3, z], .22 + i * .03, .22, .09, .05);
   });
-  // tail: bushy, tufted, burning at the tip
-  var tail = new T.Group(); tail.position.set(-.92, 1.38, 0); body.add(tail);
+  // tail: bushy, tufted, burning at the tip; a chain of five joints from the root, so it can lash
   var TP = [[0, 0, 0], [-.32, .1, 0], [-.6, .28, 0], [-.82, .5, 0], [-.94, .74, 0]];
-  for (var ti = 0; ti < TP.length - 1; ti++) seg(tail, TP[ti], TP[ti + 1], .2 - ti * .02, .2 - ti * .035, FUR);
+  var tailC = limb(body, TP.map(function (q) { return [q[0] - .92, q[1] + 1.38, q[2]]; }), [[.2, .2], [.18, .165], [.16, .13], [.14, .095]], FUR), tail = tailC.root;
+  var tufts = [];
   for (var tj = 0; tj < 9; tj++) {
     var tt = tj / 8, tx = -.1 - tt * .8, ty = .02 + tt * tt * .62, an = tj * 2.4;
-    lock(tail, tj % 2 ? LOCKL : LOCK, [tx, ty + Math.cos(an) * .1, Math.sin(an) * .12], [-.9, .2 + Math.cos(an) * .5, Math.sin(an) * .6], [0, Math.cos(an), Math.sin(an)], .32, .26, .1, .06);
+    tufts.push(lock(tail, tj % 2 ? LOCKL : LOCK, [tx, ty + Math.cos(an) * .1, Math.sin(an) * .12], [-.9, .2 + Math.cos(an) * .5, Math.sin(an) * .6], [0, Math.cos(an), Math.sin(an)], .32, .26, .1, .06));
   }
-  flameCluster(tail, flames, -.96, .72, 0, 1.0, .5, P);
-  halo(tail, P.ember, 1.0, -1.0, 1.05, 0, .35);
+  tufts.push(flameCluster(tail, flames, -.96, .72, 0, 1.0, .5, P), halo(tail, P.ember, 1.0, -1.0, 1.05, 0, .35));
+  bind(tailC, tufts);
   // the mane of flame from the crown down the back
   [[1.36, 2.34, .76, .9], [1.12, 2.18, .9, .95], [.88, 2.0, .92, 1], [.62, 1.86, .82, 1], [.36, 1.78, .7, 1], [.1, 1.74, .58, 1], [-.16, 1.7, .46, 1]].forEach(function (f, i) {
     var g = flameCluster(body, flames, f[0], f[1], 0, f[2], f[3], P);
@@ -138,6 +136,7 @@ export function emberwolf() {
   finish(root, 2.6);
   return {
     root: root, head: head, name: 'emberwolf',
+    rig: makeRig({ plan: 'quadruped', body: body, head: head, jaw: jaw, ears: ears, tail: tailC.joints, legs: LEGS }),
     update: function (t) {
       var br = Math.sin(t * 2.1);
       body.position.y = br * .015; body.scale.set(1, 1 + br * .008, 1 + br * .01);

@@ -3,6 +3,7 @@ import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, lumpGeo, ttube } from '../kit/geometry.js';
 import { halo } from '../kit/materials.js';
 import { band, finish, glow, onLimb, part, plateGeo, seg, shard } from '../kit/parts.js';
+import { makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // WARDSHELL: a sturdy tortoise whose shell is plated and warded
@@ -139,6 +140,7 @@ export function wardshell() {
   finish(root, 2.4);
   return {
     root: root, head: head, name: 'wardshell', headView: { span: 2.4, up: .3, look: 0 },
+    rig: makeRig({ plan: 'quadruped', body: body, head: head }),
     update: function (t) {
       var br = Math.sin(t * 1.2);
       body.position.y = br * .012; body.scale.set(1, 1 + br * .006, 1 + br * .008);

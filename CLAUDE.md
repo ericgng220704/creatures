@@ -47,13 +47,14 @@ There are no tests and no linter. "Done" for art means: rendered, looked at, and
 ```
 src/kit/         math.js (C, mix, sstep, rng), geometry.js (blob, ttube, lathe, flameGeo, leafGeo, lumpGeo, crystalGeo),
                  materials.js (MAT, glowMat, crystalMat, halo, RADIAL), parts.js (part, glow, seg, shard, lock, feather,
-                 place, plateGeo, wingKit, beatWing, onLimb, band, finish, flameCluster)
+                 place, plateGeo, wingKit, beatWing, onLimb, band, finish, flameCluster),
+                 rig.js (limb, chain, hang, bind, makeRig, eachJoint, restPose)
 src/creatures/   one file per creature + index.js (INFO, ORDER)
 src/showcase/    the creature sheet (one WebGL context per card; not how the game should render)
 src/arena/       what the battle preview and the future battle scene share: layout.js (FORMATION, CLASSES, slotPosition,
                  faceSlot, placeCamera, checkFit) and stadium.js (renderer, field, stands, lights)
 src/preview/     the battle preview (battle.html): a 6 v 6 formation, silhouette mode, size-class boxes with on-screen
-                 heights, sliders to try other layouts; settings live in the URL
+                 heights, joint markers and a flex test, sliders to try other layouts; settings live in the URL
 scripts/         render.mjs (PNGs), stats.mjs (cost table)
 reference/       the original single-file sheet, frozen. Do not edit.
 docs/            creatures.md, the catalogue
@@ -74,7 +75,14 @@ The README documents the kit API and the "things learned the hard way". Do not r
 
 ### The creature contract
 
-The builder returns `{ root, head, name, update(t), headView?, fitPad?, initYaw? }`. The creature stands on `y = 0`, faces `+x`, and `update(t)` is a pure function of time that only moves groups it kept hold of. Anything that moves after `finish()` must be its own `Group`, pivoting at its joint, built before `finish(root, H)` (which is always last). Full details in the README.
+The builder returns `{ root, head, name, update(t), rig, headView?, fitPad?, initYaw? }`. The creature stands on `y = 0`, faces `+x`, and `update(t)` is a pure function of time that only moves groups it kept hold of. Anything that moves after `finish()` must be its own `Group`, pivoting at its joint, built before `finish(root, H)` (which is always last). Full details in the README.
+
+**The rig (roadmap 0.3).** Every builder returns `rig: makeRig({...})` (`src/kit/rig.js`), naming its joints so animation can drive any creature: `plan`, `body`, `neck`, `head`, `jaw`, `ears`, `tail` (root to tip), `legs` (`fl, fr, bl, br`, or `l, r`), `arms`, `wings` (`l, r`) and `extra` chains. Left and right are the creature's own; `+z` is its right. Rules for rigging:
+
+- Build legs, arms, necks and tails with `limb()`, never loose `seg`s, so each bends at its joints. Hang paws, hooves and claws on `leg.end` with `hang()`; spread tufts along a tail with `bind()`.
+- Quadruped legs: front leg shoulder > elbow > wrist (end), hind leg hip > knee > hock > foot (end). Put the leg chains in a `legs` group outside `body`, so the body can bob and lunge while the feet stay planted.
+- Rigging must not change the look: render the creature at rest before and after, and the pictures must match.
+- Check with the battle preview's **Joints** (dots and bones) and **Flex** (swings every joint): nothing may stay behind or come loose.
 
 When you add or rename a creature, update all of: `src/creatures/index.js` (`INFO`, `ORDER`), `docs/creatures.md` (edited by hand: no export script exists despite its header), and the table in `README.md` (numbers from `npm run stats`).
 
@@ -208,7 +216,7 @@ On screen, from front-middle at 720p, a top of 3.5 stands about 128 px tall, 4.0
 - [ ] Body counter-shaded, one element accent, eyes glow and blink.
 - [ ] Neutral battle stance, faces `+x`, feet on `y = 0` (or hover base for flyers).
 - [ ] `npm run stats` says it fits its size class; FX inside the `fx` group and within reach.
-- [ ] Joint groups exposed for animation (`head`, `jaw`, `tail`, `wings`, limbs as needed).
+- [ ] Rigged: returns `rig`, legs and tail built with `limb()`, and the preview's **Flex** leaves nothing behind.
 - [ ] `npm run stats`: about 60k triangles, never over 120k without a reason.
 - [ ] `npm run render -- <id> --head` looked at, beside two neighbours.
 - [ ] `index.js`, `docs/creatures.md` and the README table updated.

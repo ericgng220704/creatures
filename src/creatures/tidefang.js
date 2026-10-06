@@ -3,6 +3,7 @@ import { C, mix, sstep } from '../kit/math.js';
 import { blob, crystalGeo, ttube } from '../kit/geometry.js';
 import { crystalMat, halo } from '../kit/materials.js';
 import { UP, finish, glow, part, seg, shard } from '../kit/parts.js';
+import { makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // TIDEFANG
@@ -152,6 +153,7 @@ export function tidefang() {
   finish(root, 1.4);
   return {
     root: root, head: head, name: 'tidefang',
+    rig: makeRig({ plan: 'quadruped', body: body, head: head, jaw: jaw }),
     update: function (t) {
       var br = Math.sin(t * 1.6);
       body.position.y = LIFT + br * .01; body.scale.set(1, 1 + br * .01, 1 + br * .012);

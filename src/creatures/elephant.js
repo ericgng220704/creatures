@@ -2,6 +2,7 @@ import * as T from 'three';
 import { C, mix, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
 import { band, finish, glow, lock, part, seg } from '../kit/parts.js';
+import { chain, makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // GRANDTUSK: a giant elephant with tusks as long as its body is deep
@@ -71,6 +72,7 @@ export function elephant() {
   finish(root, 4.0);
   return {
     root: root, head: head, name: 'elephant', headView: { span: 4.4, up: .2, look: -.2 },
+    rig: makeRig({ plan: 'quadruped', body: body, head: head, ears: ears, extra: { trunk: chain(tj.map(function (j) { return j.g; })) } }),
     update: function (t) {
       var br = Math.sin(t * 1.0);
       body.position.y = br * .02; body.scale.set(1, 1 + br * .005, 1 + br * .008);

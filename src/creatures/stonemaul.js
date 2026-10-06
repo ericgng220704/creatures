@@ -3,6 +3,7 @@ import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, lumpGeo, ttube } from '../kit/geometry.js';
 import { halo } from '../kit/materials.js';
 import { band, finish, glow, lock, onLimb, part, seg, shard } from '../kit/parts.js';
+import { makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // STONEMAUL: a huge bear in stone and iron, whose claws are its weapons
@@ -146,6 +147,7 @@ export function stonemaul() {
   finish(root, 2.8);
   return {
     root: root, head: head, name: 'stonemaul', headView: { span: 2.8, up: .35, look: -.05 },
+    rig: makeRig({ plan: 'quadruped', body: body, head: head, jaw: jaw, ears: ears }),
     update: function (t) {
       var br = Math.sin(t * 1.5);
       body.position.y = br * .018; body.scale.set(1, 1 + br * .007, 1 + br * .01);

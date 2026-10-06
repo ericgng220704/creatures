@@ -3,6 +3,7 @@ import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, leafGeo, lumpGeo, ttube } from '../kit/geometry.js';
 import { halo } from '../kit/materials.js';
 import { feather, finish, glow, part, seg } from '../kit/parts.js';
+import { makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // DUSKSEER: a wise owl on a mossy branch, under a crescent moon
@@ -98,6 +99,7 @@ export function owl() {
   finish(root, 3.0);
   return {
     root: root, head: head, name: 'owl', headView: { span: 1.9, up: .1, look: 0 }, initYaw: -.9,
+    rig: makeRig({ plan: 'perched', body: body, head: head }),
     update: function (t) {
       var br = Math.sin(t * 1.5);
       body.position.y = br * .012; body.scale.set(1, 1 + br * .008, 1 + br * .012);

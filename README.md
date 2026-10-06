@@ -67,6 +67,7 @@ Each file in `src/creatures/` exports one function that builds a creature and re
   head,        // a Group at the head, used by the sheet's close-up
   name,        // the id
   update(t),   // pose the creature for time t, in seconds
+  rig,         // its joints by name, from makeRig() in src/kit/rig.js (see "Rigs" below)
   headView,    // optional { span, up, look }: how the close-up is framed
   fitPad,      // optional { up }: extra headroom, for wings that rise above the build pose
   initYaw      // optional: the angle the turntable starts at
@@ -80,7 +81,20 @@ The creature stands on the ground at `y = 0`, faces `+x`, and is a few units tal
 - `blob(w, h, d, e, deform)` is the workhorse: an ellipsoid (`e = 1`) that gets boxier as `e` falls. `deform(x, y, z, W, H, D)` sculpts it, which is how chests, haunches and snouts are made.
 - `part(parent, geometry, look, x, y, z, rx, ry, rz)` adds a mesh. `look` says how it is coloured: `c` is a colour or a function `(worldPosition, worldNormal) => Color` (spots, stripes, hexagonal shell plates, belly gradients are all colour functions), `m` picks a material (`matte`, `flat`, `gloss`, `metal`, `leaf`, `plume`, `feather`), and `noAO` / `noOcc` switch contact shading off for a part.
 - `seg` is a limb segment between two points, `shard` a cone, `ttube` a tube that tapers along a path, `lock` a lock of fur, `feather` a feather, `wingKit` a three-part wing with rows of feathers, `band` a ring round a limb, `plateGeo` a flat plate cut from an outline.
+- `limb(parent, points, radii, look)` builds a leg, arm, neck or tail as a **chain of joints** (see "Rigs").
 - **`finish(root, height)` goes last.** It bakes every part's colour, a gradient up from the ground and contact shading where parts meet into vertex colours, from their world positions at build time. After that the creature has no textures to load and no lights beyond the scene's.
+
+### Rigs
+
+Animation drives creatures through their **rig**: named joints, each a `Group` that pivots at its point. `src/kit/rig.js` has the pieces:
+
+- `limb(parent, pts, radii, look)` puts a joint at every point and the segment to the next point inside it, so turning a joint swings everything after it. `radii` is `[r0, r1]` per segment. It returns a chain `{ joints, root, end }`; the last joint has no segment and carries the paw, hoof or tail tip.
+- `hang(joint, parts)` moves parts that were placed in the chain's parent space onto one joint without moving them (paws and claws onto `leg.end`). `bind(chain, parts)` does the same but picks the nearest joint for each part (tufts along a tail).
+- `chain(groups)` wraps Groups a creature already has (wing arm, forearm, hand; trunk joints) as a chain.
+- `makeRig({ plan, body, neck, head, jaw, ears, tail, legs, arms, wings, extra })` makes the standard rig and saves every joint's build pose as its rest pose. `plan` is `quadruped`, `biped`, `flyer` or `perched`. Legs are `fl, fr, bl, br` (or `l, r`), arms and wings `l, r`, `extra` any other named chain. Left and right are the creature's own: it faces `+x`, so `+z` is its right, the side the battle camera sees.
+- `eachJoint(rig, fn)` visits every joint with a name (`legs.fr.1`, `tail3`, `extra.trunk.5`); `restPose(rig)` puts them all back.
+
+Because the colours are baked once in the build pose, a rig changes nothing about how the creature looks until a joint turns. Emberwolf is fully rigged (four leg chains and a five-joint tail); the others return the joints they already had, and get legs as they are reworked. The battle preview's **Joints** and **Flex** toggles show and swing every joint.
 
 ### Adding a creature
 

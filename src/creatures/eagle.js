@@ -3,6 +3,7 @@ import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
 import { halo } from '../kit/materials.js';
 import { beatWing, feather, finish, glow, lock, part, seg, wingKit } from '../kit/parts.js';
+import { chain, makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // STORMTALON: an eagle riding the wind, wings wide, talons open
@@ -83,6 +84,7 @@ export function eagle() {
   finish(root, 4.2);
   return {
     root: root, head: head, name: 'eagle', headView: { span: 2.4, up: .2, look: 0 }, fitPad: { up: .9 }, initYaw: -1.1,
+    rig: makeRig({ plan: 'flyer', body: body, head: head, tail: [tail], wings: { r: chain([wings[0].W, wings[0].F, wings[0].H]), l: chain([wings[1].W, wings[1].F, wings[1].H]) } }),
     update: function (t) {
       var sp = t * 1.7;
       body.position.y = BASE + Math.sin(sp + .6) * .1; body.rotation.z = Math.sin(sp + 1) * .025; body.rotation.x = Math.sin(t * .5) * .05;

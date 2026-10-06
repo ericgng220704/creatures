@@ -3,6 +3,7 @@ import { C, mix, sstep } from '../kit/math.js';
 import { blob } from '../kit/geometry.js';
 import { halo } from '../kit/materials.js';
 import { feather, finish, flameCluster, glow, part, seg, shard } from '../kit/parts.js';
+import { chain, makeRig } from '../kit/rig.js';
 
 // =====================================================================
 // PYREWING: a phoenix on the wing, in layered feathers that go from crimson to gold
@@ -109,6 +110,7 @@ export function pyrewing() {
   finish(root, 4.4);
   return {
     root: root, head: head, name: 'pyrewing', headView: { span: 2.4, up: .2, look: 0 }, fitPad: { up: 1.6 }, initYaw: -1.15,
+    rig: makeRig({ plan: 'flyer', body: body, head: head, jaw: jaw, tail: [tail], wings: { r: chain([wings[0].W, wings[0].F, wings[0].H]), l: chain([wings[1].W, wings[1].F, wings[1].H]) } }),
     update: function (t) {
       var sp = t * 2.6;
       body.position.y = BASE + Math.sin(sp + .6) * .14;
