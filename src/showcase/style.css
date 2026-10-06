@@ -1,0 +1,53 @@
+/* Layout: a showcase. One large turntable view per creature, its name and notes beside or below, nothing else. */
+:root {
+  --bg: #eceef3;
+  --panel: #ffffff;
+  --ink: #1f2230;
+  --ink-soft: #5d6274;
+  --line: #d6d9e2;
+  --btn: #1f2230;
+  --btn-ink: #ffffff;
+  --well-a: #e3e6ee;
+  --well-b: #aeb5c4;
+  --font-display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15161b; --panel: #1f2027; --ink: #eef0f6; --ink-soft: #a2a7b8; --line: #30323d;
+    --btn: #eef0f6; --btn-ink: #15161b; --well-a: #3a3d49; --well-b: #17181d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15161b; --panel: #1f2027; --ink: #eef0f6; --ink-soft: #a2a7b8; --line: #30323d;
+  --btn: #eef0f6; --btn-ink: #15161b; --well-a: #3a3d49; --well-b: #17181d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; padding-inline: 16px; padding-block: 28px 56px; }
+main { max-width: 1120px; margin-inline: auto; display: grid; gap: 30px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.1; }
+h3 { font-size: 24px; }
+p { margin: 0; }
+.lede { color: var(--ink-soft); max-width: 66ch; margin-top: 10px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 24px; padding: 14px; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+@media (max-width: 820px) { .card { grid-template-columns: minmax(0, 1fr); } }
+.view { position: relative; aspect-ratio: 16 / 11; max-width: 100%; border-radius: 18px; overflow: hidden; background: radial-gradient(110% 85% at 50% 32%, var(--well-a), var(--well-b)); touch-action: pan-y; cursor: grab; }
+.view:active { cursor: grabbing; }
+.view canvas { display: block; width: 100%; height: 100%; }
+.hint { position: absolute; right: 12px; bottom: 10px; font-size: 12px; font-weight: 800; color: var(--ink-soft); opacity: .85; pointer-events: none; }
+.side { display: grid; gap: 12px; padding: 6px 4px; min-width: 0; }
+.head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.tag { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.note { color: var(--ink-soft); font-size: 14px; }
+ul.parts { margin: 0; padding-left: 18px; display: grid; gap: 5px; color: var(--ink-soft); font-size: 14px; }
+ul.parts b { color: var(--ink); font-weight: 800; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+button { font: inherit; font-weight: 800; font-size: 14px; border: 0; border-radius: 999px; padding: 9px 16px; min-height: 40px; background: var(--btn); color: var(--btn-ink); cursor: pointer; }
+button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+button[aria-pressed="true"].ghost { background: var(--btn); color: var(--btn-ink); border-color: var(--btn); }
+button:focus-visible { outline: 3px solid var(--ink-soft); outline-offset: 2px; }
+button:active { transform: scale(.96); }
+.fail { padding: 16px; color: var(--ink-soft); }

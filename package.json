@@ -1,0 +1,21 @@
+{
+  "name": "creatures",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Procedural 3D creatures drawn in code with three.js, for a game.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "render": "node scripts/render.mjs",
+    "stats": "node scripts/stats.mjs"
+  },
+  "dependencies": {
+    "three": "0.158.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1",
+    "vite": "^6.0.0"
+  }
+}
