@@ -15,6 +15,8 @@ npm run render -- --battle   # the battle preview as PNGs in renders/battle/
 
 The sheet shows each creature on a turntable. Drag to turn it, **Head** shows the face close up, **Spin** stops the turning. A creature is built when its card nears the screen and drawn only while it is visible.
 
+**Online, without installing anything:** once GitHub Pages is switched on (Settings > Pages > Source: "GitHub Actions"), every push to `main` publishes both pages through `.github/workflows/pages.yml`, at `https://<owner>.github.io/creatures/` (the sheet) and `.../battle.html` (the preview). Each page links to the other.
+
 The **battle preview** (`battle.html`) shows creatures as the game will: at true size, from the fixed side camera, in a 6 v 6 formation on the stadium field, all in one scene. **Silhouette** turns them into black shapes on white, **Size boxes** checks each against its size class and shows how tall it stands on screen, and the sliders move the camera and the formation. Every setting is kept in the URL, so a view can be shared or rendered.
 
 ## The creatures

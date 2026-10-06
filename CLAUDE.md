@@ -59,6 +59,7 @@ src/arena/       what the battle preview and the future battle scene share: layo
 src/preview/     the battle preview (battle.html): a 6 v 6 formation, silhouette mode, size-class boxes with on-screen
                  heights, joint markers and a flex test, sliders to try other layouts; settings live in the URL
 scripts/         render.mjs (PNGs), stats.mjs (cost table)
+.github/workflows/pages.yml   builds and publishes both pages to GitHub Pages on every push to main
 reference/       the original single-file sheet, frozen. Do not edit.
 docs/            creatures.md, the catalogue
 ```
