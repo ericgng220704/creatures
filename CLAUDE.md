@@ -154,7 +154,7 @@ A player should be able to tell a creature's role from its outline before readin
 | Stormtalon | Electric | brown `#4a3426`, white head | wind `#cfe8ff` | `#ffc933` |
 | Sunmane (reworked, rigged) | Light | umber `#7a5432` / `#44291a`, mane `#2a170b` > `#e9a640` | gold `#ffcf5a`, sunburst `#ffb02e` > `#fff6d0` | `#ffc13a` |
 | Grandtusk | Ice (to be recoloured) | grey `#82838d`, ivory, gold | gold rune `#ffd25a` | `#ffd98a` |
-| Ironpaw | Neutral | black / white, red `#c0282d`, gold | qi `#fff2a0`, `#ffb02e` | `#ffe9a0` |
+| Ironpaw (reworked, rigged) | Neutral | black `#1a191e`, cream `#cfc7b8`, red wraps `#9e2228`, gold | white-gold qi `#ffcf7a` > `#ffe9b8` > `#fffaf0` | `#ffe08a` |
 | Duskseer | Dark | plum `#4b3f5e`, cream disc | violet rune `#a58cff`, moon `#e8eaff` | `#ffd34a` |
 
 ### Rules for every creature (new or changed)
@@ -184,6 +184,7 @@ A player should be able to tell a creature's role from its outline before readin
 - Triangle budget: aim for 60k; over 120k needs a reason. Mark small parts `noOcc`. The game runs on a laptop (P1), so detail may win over thrift, but twelve creatures share one frame.
 - Put asymmetric detail (a scar, a moss patch, a raised paw) on the **+z flank**. It is the show side: the battle camera only ever sees +z, on both teams, because enemies are mirrored.
 - Fill the class. A creature far below its class height (Tidefang, Wardshell) reads as small and weak on the field.
+- A bruiser's fists must stand clear of the body in the guard, or the silhouette is one blob: Ironpaw's first guard tucked them under the chin and the role vanished.
 - The element shape on the top line must read **from the side**: build it in the x-y plane the camera sees. Sunmane's first corona radiated in y-z and, seen edge-on, looked like lightning bolts; as a sunburst fanned in x-y it reads as sun at once.
 - Glow colours from the element's ramp (the type wheel's colour keys in `docs/roadmap.md`); eyes may stay warm amber as the house signature.
 
@@ -209,16 +210,16 @@ On screen, from front-middle at 720p, a top of 3.5 stands about 128 px tall, 4.0
 ### Known weaknesses (from the renders; fix these before making more)
 
 1. **Mixed vibes.** Only Emberwolf fully has the benchmark look. The rest need reworking to it (decided: the owner wants every creature to feel like the wolf).
-2. **Balloon limbs.** Elephant and Ironpaw limbs (Sunmane fixed in 1.1: tapered chains with knobs at elbow and knee) read as stacked sausages with visible seams at the joints. Needs overlap, tapering and joint blobs.
+2. **Balloon limbs.** Elephant limbs (Sunmane and Ironpaw fixed in 1.1 and 1.2: tapered chains with knobs at the middle joint) read as stacked sausages with visible seams at the joints. Needs overlap, tapering and joint blobs.
 3. ~~Sunmane's mane reads as spikes.~~ Fixed in 1.1: clumps of three locks swept back toward the shoulders, darker at the root. The lesson for any mane or ruff: locks pointing straight out from the head read as petals; sweep them back.
-4. **Sizes are all over the place.** Six of eleven fail their class (`npm run stats`, exact vertex bounds): Thornstag (height 4.4 > 3.75), Ironpaw (height 4.0 > 3.5), Wardshell (length 6.91 > 6.5, depth 4.71 > 4, its shields), Tidefang (length 6.6 > 6.5), Stormtalon (length 4.67 > 4.5, span 10.41 > 6, lift 0.71 < 0.8) and Pyrewing (length 6.01 > 4.5, span 6.83 > 6, lift 0.36 < 0.8). Tidefang (54 px) and Wardshell (72 px) also stand far too low for their class.
-5. **Action poses are baked in.** Ironpaw is mid-punch, Stormtalon mid-dive (Sunmane fixed in 1.1: neutral stance, the swipe is its attack clip). They need neutral idles; the action becomes an attack animation.
+4. **Sizes are all over the place.** Five of eleven fail their class (Ironpaw fixed in 1.2) (`npm run stats`, exact vertex bounds): Thornstag (height 4.4 > 3.75), Wardshell (length 6.91 > 6.5, depth 4.71 > 4, its shields), Tidefang (length 6.6 > 6.5), Stormtalon (length 4.67 > 4.5, span 10.41 > 6, lift 0.71 < 0.8) and Pyrewing (length 6.01 > 4.5, span 6.83 > 6, lift 0.36 < 0.8). Tidefang (54 px) and Wardshell (72 px) also stand far too low for their class.
+5. **Action poses are baked in.** Stormtalon is mid-dive (Sunmane and Ironpaw fixed in 1.1 and 1.2: neutral stances, the swipe and the punch are attack clips). They need neutral idles; the action becomes an attack animation.
 6. **FX and scenery bleed out.** Wardshell's shields orbit 6.9 units wide, Stonemaul's rocks and rings, Duskseer's moon, branch and ring, Stormtalon's wind ribbons. They will cover the neighbours in formation.
 7. ~~One PointLight per creature.~~ Solved in 0.5: `bakeLights()` bakes each creature's light into its own parts, so it no longer spills onto neighbours. Keep giving creatures a `PointLight` for their element glow; it is baked away in battle.
 8. **Weak value contrast.** Grandtusk, Wardshell and Thornstag (Sunmane darkened in 1.1) have mid-value bodies, so their element glow does not pop the way Emberwolf's does. Darken or deepen the body before brightening the glow.
 9. **Small faces.** Grandtusk's and Stonemaul's eyes vanish at battle size; Tidefang's and Stormtalon's heads are tiny relative to the body. Faces carry personality and must read.
 10. **Thin or flat silhouettes.** Thornstag is mostly antler on a slim body; Tidefang is long and low, nearly invisible from an elevated camera.
-11. **Off-tone creatures.** Ironpaw (warrior with clothes) and Duskseer (cartoon owl with glasses-like rims) lean cartoonish. The tone is heroic, like Emberwolf; both need pulling toward it.
+11. **Off-tone creatures.** Duskseer (cartoon owl with glasses-like rims) leans cartoonish (Ironpaw pulled toward heroic in 1.2: slit eyes under a black brow, a snarl, a fighter's guard). The tone is heroic, like Emberwolf; both need pulling toward it.
 
 ### Checklist before you call a creature done
 

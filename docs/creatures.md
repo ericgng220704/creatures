@@ -128,14 +128,15 @@ Cost: 63 parts, 54,404 triangles, built in about 74 ms.
 
 `panda` · element: Neutral · `src/creatures/panda.js`
 
-A panda warrior in a wide stance, one fist thrown and the other drawn back.
+A panda fighter in a low guard, fists up and wrapped, white qi burning off its shoulders.
 
-- **Fists.** The right arm drives forward in wrapped knuckles, with gold qi at the fist and bands of light flying off it. The left fist rests drawn back at the hip.
-- **Stance.** A wide horse stance on black legs, a black belt with a gold buckle and red sash tails.
-- **Face.** Black patches and ears, brows pulled down, a shouting mouth, and a red headband with a gold plate and two tails that stream behind.
-- **Build.** A round, heavy trunk with a black shoulder band.
+- **Guard.** A low, wide stance on planted black legs, the right fist leading and the left held back at the chin, forearms wrapped in red, fists bound in cream with gold knuckle plates.
+- **Qi.** Pale flames of qi rising off the shoulders and back along the top line, qi lines burning on the chest and forearms, a glow and sparks round each fist.
+- **Face.** A heavy round head, black patches with slit eyes under a black brow, a snarl with fangs, and a red headband with a gold plate and two tails that stream behind.
+- **Strike.** Its attack swings the lead arm up level and snaps the elbow straight into a punch; its ultimate throws a left and then a right.
+- **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.2): the first biped rig, with legs and arms as joint chains (feet planted, elbows that straighten into punches) and a neck joint.
 
-Cost: 85 parts, 46,054 triangles, built in about 61 ms.
+Cost: 80 parts, 52,090 triangles, built in about 71 ms; 40 meshes once merged.
 
 ## Duskseer
 

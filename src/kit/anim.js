@@ -8,7 +8,8 @@
 //   head.pitch, head.turn (shared half and half with the neck when there is one), neck.pitch (the neck alone), jaw.open, ears.back, tail.curl (+ tip up), tail.side
 //   front.x, front.y, back.x, back.y    foot targets for the front and hind pairs (+x forward, +y up);
 //                                       fl.x, fr.y... add to one leg. Feet stay planted unless moved.
-//   arms.r.swing, arms.l.swing (+ forward and up), arms.r.stretch, arms.l.stretch (1 + this along the arm)
+//   arms.r.swing, arms.l.swing (+ forward and up), arms.r.bend (the elbow; - straightens a guard), arms.r.stretch
+//   feet.x, feet.y      both feet of a two-legged creature; l.x, r.y... one foot
 //   wings.lift (+ up), wings.beat (flap size), wings.rate (flaps a second), trunk.curl
 //   shake               a fast tremble of the body, for wind-ups
 //
@@ -99,10 +100,18 @@ var PLAN = {
     hit: { 'front.x': [[0, 0], [.2, -.12], [.6, 0]] },
     victory: { 'front.x': [[0, 0], [.3, .1], [.75, .1], [1, 0]], 'front.y': [[0, 0], [.3, .55], [.75, .55], [1, 0]] }
   },
+  // bipeds punch: the shoulder swings the arm up level (swing) while the elbow straightens (bend), from a guard
   biped: {
-    attack: { 'arms.r.swing': [[0, 0], [.25, -.4], [.45, .25], [.6, 0]], 'arms.r.stretch': [[0, 0], [.25, -.15], [.46, .4, 'in'], [.6, .1], [.8, 0]], 'arms.l.swing': [[0, 0], [.25, .2], [.6, 0]] },
-    ultimate: { 'arms.r.swing': [[0, 0], [.4, -.6], [.6, .3], [.75, 0]], 'arms.r.stretch': [[0, 0], [.4, -.2], [.62, .6, 'in'], [.8, 0]], 'arms.l.swing': [[0, 0], [.4, .5], [.62, .3], [.8, 0]] },
-    victory: { 'arms.r.swing': [[0, 0], [.3, 1.0], [.75, 1.0], [1, 0]], 'arms.l.swing': [[0, 0], [.3, .8], [.75, .8], [1, 0]] }
+    attack: {
+      'arms.r.swing': [[0, 0], [.25, -.25], [.46, .95, 'in'], [.6, .35], [.8, 0]], 'arms.r.bend': [[0, 0], [.25, .25], [.46, -1.6, 'in'], [.6, -.5], [.8, 0]],
+      'arms.l.swing': [[0, 0], [.25, .15], [.6, 0]], 'r.x': [[0, 0], [.3, 0], [.42, .3], [.62, .15], [.85, 0]], 'r.y': [[0, 0], [.32, .2], [.42, 0]]
+    },
+    ultimate: {
+      'arms.l.swing': [[0, 0], [.35, -.3], [.5, .9, 'in'], [.58, .3], [.75, 0]], 'arms.l.bend': [[0, 0], [.35, .3], [.5, -1.5, 'in'], [.6, -.4], [.75, 0]],
+      'arms.r.swing': [[0, 0], [.4, -.4], [.62, 1.0, 'in'], [.72, .4], [.88, 0]], 'arms.r.bend': [[0, 0], [.4, .3], [.62, -1.7, 'in'], [.72, -.6], [.88, 0]]
+    },
+    hit: { 'arms.r.swing': [[0, 0], [.15, .35], [.6, 0]], 'arms.l.swing': [[0, 0], [.15, .25], [.6, 0]] },
+    victory: { 'arms.r.swing': [[0, 0], [.3, 1.7], [.75, 1.7], [1, 0]], 'arms.r.bend': [[0, 0], [.3, -.5], [.75, -.5], [1, 0]], 'arms.l.swing': [[0, 0], [.3, .3], [.75, .3], [1, 0]] }
   },
   flyer: {
     attack: {
@@ -186,7 +195,10 @@ export function applyClip(a, clip, k, w, time) {
   if (r.extra.trunk) { var tj = r.extra.trunk.joints; tj.forEach(function (g) { turn(g, 0, 0, ch('trunk.curl') / tj.length); }); }
   ['r', 'l'].forEach(function (sd) {
     var arm = r.arms[sd];
-    if (arm) { turn(arm.root, 0, 0, ch('arms.' + sd + '.swing')); arm.root.scale.x = arm.root.userData.rest.s.x * (1 + ch('arms.' + sd + '.stretch')); }
+    if (arm) {
+      turn(arm.root, 0, 0, ch('arms.' + sd + '.swing')); arm.root.scale.x = arm.root.userData.rest.s.x * (1 + ch('arms.' + sd + '.stretch'));
+      if (arm.joints[1] && arm.joints[1] !== arm.end) turn(arm.joints[1], 0, 0, ch('arms.' + sd + '.bend'));
+    }
     var wg = r.wings[sd];
     if (wg) {
       var amp = ch('wings.beat'), sp = time * Math.PI * 2 * (ch('wings.rate') || 1.2), lift = ch('wings.lift'), J = wg.joints, sg = sd === 'r' ? -1 : 1;
@@ -204,7 +216,7 @@ export function applyClip(a, clip, k, w, time) {
       var c = l.ch, pts = c.pts, J = c.joints, n = pts.length, par = c.root.parent, front = l.name.charAt(0) === 'f';
       par.updateMatrix();
       var hipV = new T.Vector3(pts[0][0], pts[0][1], pts[0][2]).applyMatrix4(par.matrix).applyMatrix4(_m).applyMatrix4(_mi.copy(par.matrix).invert());
-      var pre = front ? 'front' : 'back';
+      var pre = l.name === 'l' || l.name === 'r' ? 'feet' : front ? 'front' : 'back';   // two legs: feet.x, feet.y
       var fx = pts[n - 1][0] + (ch(pre + '.x') + ch(l.name + '.x')) * s, fy = pts[n - 1][1] + (ch(pre + '.y') + ch(l.name + '.y')) * s;
       // with three segments, the last one (hock to foot) keeps its rest slope
       var C = n >= 4 ? pts[2] : pts[n - 1], tgt = n >= 4 ? [fx - (pts[3][0] - pts[2][0]), fy - (pts[3][1] - pts[2][1])] : [fx, fy];

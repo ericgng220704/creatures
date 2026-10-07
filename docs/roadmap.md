@@ -48,7 +48,7 @@ Order: most broken first, so the lessons arrive early.
 | # | Creature | New element (proposed) | Role | Main work |
 | --- | --- | --- | --- | --- |
 | 1.1 ✅ | Sunmane | Light | Attacker | Done: clumped mane swept back, a sunburst corona on the top line, darker umber coat, brow over slit eyes, neutral stance, legs as chains with joint knobs, neck and tail rigged; its attack is a rearing right-paw swipe whose golden slashes flare at the impact (`clips` and `clipFx`). Fits L; 38 merged meshes. |
-| 1.2 | Ironpaw | Neutral | Bruiser | Less cartoon: heavier brow, glowing slit eyes, a fighter's build; neutral guard stance (the punch becomes the attack); keep the headband. Fits size class S (now too tall). |
+| 1.2 ✅ | Ironpaw | Neutral | Bruiser | Done: a low guard with big wrapped fists held clear of the body, slit eyes under a black brow, a snarl, white-gold qi flames on the shoulders and back, qi lines on chest and forearms. The first biped rig: legs and arms as chains, the attack a straight punch (shoulder swings level, elbow snaps straight), the ultimate a left-right. Now fits S; 40 merged meshes. |
 | 1.3 | Duskseer | Dark | Support | Lose the moon, branch and ground ring; heroic brow over the big eyes (no glasses look); stands on the field. |
 | 1.4 | Grandtusk | Ice (a woolly mammoth: shaggy coat, frost on the tusks) | Tank | Bigger readable eyes under the brow, legs without seams, value contrast; shorter to fit class L. |
 | 1.5 | Stonemaul | Ground | Tank | Rocks and rune rings into a small `fx` group or gone; bigger eyes; trim the armour so the silhouette reads from the side. |
