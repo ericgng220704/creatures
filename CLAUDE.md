@@ -145,7 +145,7 @@ A player should be able to tell a creature's role from its outline before readin
 
 | Creature | Element | Body | Element glow | Eye |
 | --- | --- | --- | --- | --- |
-| Emberwolf (the pilot, fully rigged) | Fire | charcoal violet `#544c5c` / `#36313b` | ember `#ff4510` > `#ff8d1c` > `#ffe885` | `#ffb72e` |
+| Emberwolf (the pilot, fully rigged) | Fire | blue-grey `#8590a8` / `#66718a`, cream `#e8ddcb` | ember `#ff4510` > `#ff8d1c` > `#ffe885` | iris `#e0861c` |
 | Tidefang (reworked, rigged) | Water | deep teal `#163c4b` / `#2a5f70`, pale belly | crystal `#3fd2ff`, `#0099ff` | `#b4fdff` |
 | Thornstag | Grass | warm brown `#a4794c`, cream | leaf `#78c255`, rune `#a6ff70` | `#c4ff86` |
 | Stonemaul (reworked, rigged) | Ground | dark brown `#4f3828` / `#2c1f17`, stone `#5f626d`, iron | amber `#c96a1a` > `#ffb347` > `#ffe0a0` | `#ffad33` |

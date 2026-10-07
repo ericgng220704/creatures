@@ -179,7 +179,7 @@ Ten types, close to Palworld's nine, with Light added as the partner of Dark. **
 
 Dark and Light are strong against each other (both directions x1.2). Every other pair is x1.0.
 
-**Element colour keys** (the glow ramp each type owns; body palettes stay dark and quiet):
+**Element colour keys** (the glow ramp each type owns; bodies stay mid-value and natural, so the glow is the only unlit colour):
 
 | Type | Glow ramp (deep > mid > core) |
 | --- | --- |

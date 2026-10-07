@@ -9,8 +9,8 @@ Generated from `src/creatures/index.js` by the export. Edit the source, not this
 A heavy-shouldered wolf whose fire lives in its coat.
 
 - **Body.** Deep chest, tucked waist, bent hind legs on hocks, toes and claws.
-- **Coat.** Dark along the back, pale on the chest and belly. Soft overlapping locks of fur make the ruff, cheeks, chest fringe, spine and tail, darker at the root and paler at the tip.
-- **Face.** Heavy brow, glowing slit eyes that blink, a jaw that breathes open on fangs and a tongue.
+- **Coat.** Blue-grey, a shade darker along the back, cream on the chest and belly. Soft overlapping locks of fur make the ruff, cheeks, chest fringe, spine and tail, darker at the root and paler at the tip.
+- **Face.** Round amber eyes with a catchlight under a soft brow, a jaw that breathes a little open on two fangs and a tongue.
 - **Fire.** A mane of layered flame from crown to back, a burning tail, ember veins, rising sparks and firelight on its own fur.
 
 - **Rig.** The pilot for every creature (roadmap 0.8): a neck joint carrying the head, the outer ruff and the crown of the mane; four legs as joint chains with planted feet; a five-joint tail. Attacks with a crouch, a leap and a bite; its embers are one instanced mesh.
