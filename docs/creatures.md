@@ -32,7 +32,7 @@ Cost: 341 parts, 87,714 triangles, built in about 164 ms.
 
 ## Thornstag
 
-`thornstag` · element: Plant · `src/creatures/thornstag.js`
+`thornstag` · element: Grass · `src/creatures/thornstag.js`
 
 A tall, gentle stag that the forest grows on, kind in the face and mighty in the shoulder.
 
@@ -45,7 +45,7 @@ Cost: 242 parts, 110,228 triangles, built in about 261 ms.
 
 ## Stonemaul
 
-`stonemaul` · element: Earth · `src/creatures/stonemaul.js`
+`stonemaul` · element: Ground · `src/creatures/stonemaul.js`
 
 A huge mountain bear in stone and iron, roaring, whose claws are its weapons.
 
@@ -59,7 +59,7 @@ Cost: 300 parts, 89,460 triangles, built in about 174 ms.
 
 ## Wardshell
 
-`wardshell` · element: Ward · `src/creatures/wardshell.js`
+`wardshell` · element: Water · `src/creatures/wardshell.js`
 
 A sturdy tortoise with a plated shell, calm and hard to move, guarded by shields that circle it.
 
@@ -85,7 +85,7 @@ Cost: 240 parts, 34,060 triangles, built in about 69 ms.
 
 ## Stormtalon
 
-`eagle` · element: Sky · `src/creatures/eagle.js`
+`eagle` · element: Electric · `src/creatures/eagle.js`
 
 An eagle riding the wind, wings wide and eyes fixed on something far below.
 
@@ -113,7 +113,7 @@ Cost: 238 parts, 86,050 triangles, built in about 120 ms; 38 meshes once merged.
 
 ## Grandtusk
 
-`elephant` · element: Titan · `src/creatures/elephant.js`
+`elephant` · element: Ice · `src/creatures/elephant.js`
 
 A giant elephant with tusks as long as its body is deep, wise and slow to anger.
 
@@ -126,7 +126,7 @@ Cost: 63 parts, 54,404 triangles, built in about 74 ms.
 
 ## Ironpaw
 
-`panda` · element: Qi · `src/creatures/panda.js`
+`panda` · element: Neutral · `src/creatures/panda.js`
 
 A panda warrior in a wide stance, one fist thrown and the other drawn back.
 
@@ -139,7 +139,7 @@ Cost: 85 parts, 46,054 triangles, built in about 61 ms.
 
 ## Duskseer
 
-`owl` · element: Night · `src/creatures/owl.js`
+`owl` · element: Dark · `src/creatures/owl.js`
 
 A wise owl on a mossy branch, awake while the world sleeps.
 

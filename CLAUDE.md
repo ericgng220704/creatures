@@ -147,15 +147,15 @@ A player should be able to tell a creature's role from its outline before readin
 | --- | --- | --- | --- | --- |
 | Emberwolf (the pilot, fully rigged) | Fire | charcoal violet `#544c5c` / `#36313b` | ember `#ff4510` > `#ff8d1c` > `#ffe885` | `#ffb72e` |
 | Tidefang | Water | deep teal `#1f4e60` / `#3a8197`, pale belly | crystal `#3fd2ff`, `#0099ff` | `#b4fdff` |
-| Thornstag | Plant | warm brown `#a4794c`, cream | leaf `#78c255`, rune `#a6ff70` | `#c4ff86` |
-| Stonemaul | Earth | brown `#6a4a36`, stone `#7b7f8c`, iron | amber rune `#ffb347` | `#ffad33` |
-| Wardshell | Ward | green shell `#4b7a5f`, olive skin, gold | teal rune `#6ff0d0` | `#ffd75a` |
+| Thornstag | Grass | warm brown `#a4794c`, cream | leaf `#78c255`, rune `#a6ff70` | `#c4ff86` |
+| Stonemaul | Ground | brown `#6a4a36`, stone `#7b7f8c`, iron | amber rune `#ffb347` | `#ffad33` |
+| Wardshell | Water | green shell `#4b7a5f`, olive skin, gold | teal rune `#6ff0d0` | `#ffd75a` |
 | Pyrewing | Fire | crimson `#a31f17` > gold `#ffc233` | ember (same as Emberwolf) | `#fff3b0` |
-| Stormtalon | Sky | brown `#4a3426`, white head | wind `#cfe8ff` | `#ffc933` |
+| Stormtalon | Electric | brown `#4a3426`, white head | wind `#cfe8ff` | `#ffc933` |
 | Sunmane (reworked, rigged) | Light | umber `#7a5432` / `#44291a`, mane `#2a170b` > `#e9a640` | gold `#ffcf5a`, sunburst `#ffb02e` > `#fff6d0` | `#ffc13a` |
-| Grandtusk | Titan | grey `#82838d`, ivory, gold | gold rune `#ffd25a` | `#ffd98a` |
-| Ironpaw | Qi | black / white, red `#c0282d`, gold | qi `#fff2a0`, `#ffb02e` | `#ffe9a0` |
-| Duskseer | Night | plum `#4b3f5e`, cream disc | violet rune `#a58cff`, moon `#e8eaff` | `#ffd34a` |
+| Grandtusk | Ice (to be recoloured) | grey `#82838d`, ivory, gold | gold rune `#ffd25a` | `#ffd98a` |
+| Ironpaw | Neutral | black / white, red `#c0282d`, gold | qi `#fff2a0`, `#ffb02e` | `#ffe9a0` |
+| Duskseer | Dark | plum `#4b3f5e`, cream disc | violet rune `#a58cff`, moon `#e8eaff` | `#ffd34a` |
 
 ### Rules for every creature (new or changed)
 
@@ -185,7 +185,7 @@ A player should be able to tell a creature's role from its outline before readin
 - Put asymmetric detail (a scar, a moss patch, a raised paw) on the **+z flank**. It is the show side: the battle camera only ever sees +z, on both teams, because enemies are mirrored.
 - Fill the class. A creature far below its class height (Tidefang, Wardshell) reads as small and weak on the field.
 - The element shape on the top line must read **from the side**: build it in the x-y plane the camera sees. Sunmane's first corona radiated in y-z and, seen edge-on, looked like lightning bolts; as a sunburst fanned in x-y it reads as sun at once.
-- Glow colours from the element's ramp (see "Element colour keys" once decided); eyes may stay warm amber as the house signature.
+- Glow colours from the element's ramp (the type wheel's colour keys in `docs/roadmap.md`); eyes may stay warm amber as the house signature.
 
 ### The battle camera
 
@@ -271,7 +271,7 @@ Made by the owner, October 2026. Treat them as rules.
 
 | # | Decision |
 | --- | --- |
-| R1 | **A familiar type wheel** like Palworld or Pokémon, not invented elements. Ward, Titan, Qi, Sky and Night go. Proposed list and mapping in [docs/roadmap.md](docs/roadmap.md#type-wheel-proposed); **confirm with the owner before re-colouring any creature.** |
+| R1 | **Ten types** (confirmed October 2026): Fire, Water, Grass, Electric, Ice, Ground, Dark, Light, Dragon, Neutral, close to Palworld's nine with Light added as Dark's partner. The wheel, the chart and each type's glow ramp are in [docs/roadmap.md](docs/roadmap.md#type-wheel). The eleven: Emberwolf and Pyrewing **Fire**; Tidefang and Wardshell **Water**; Thornstag **Grass**; Stonemaul **Ground**; Stormtalon **Electric**; Sunmane **Light**; Duskseer **Dark**; Ironpaw **Neutral**; Grandtusk **Ice** (a woolly mammoth). A creature takes its type's glow ramp when it is reworked. |
 | R2 | **Each creature has one fixed element.** Element variants of a creature (an ice Emberwolf, an electric one) come in a **second round**, chosen by the owner. **Round one is unique creatures only.** |
 
 ### Battle
@@ -296,11 +296,10 @@ Made by the owner, October 2026. Treat them as rules.
 
 ### Still open (ask; do not assume)
 
-1. Type list and the creature-to-type mapping (proposal in the roadmap).
-2. The exact action-bar formula: bar length, how speed fills it, how a round is counted.
-3. Turn-limit tiebreak: HP remaining as a percentage of max HP, or absolute HP.
-4. Stat set and the damage formula's numbers.
-5. Skill targeting rules (row, column, back row), after the creatures are done.
-6. Whether fights are reproducible from a seed (for replays and testing). Parked until the art is done.
+1. The exact action-bar formula: bar length, how speed fills it, how a round is counted.
+2. Turn-limit tiebreak: HP remaining as a percentage of max HP, or absolute HP.
+3. Stat set and the damage formula's numbers.
+4. Skill targeting rules (row, column, back row), after the creatures are done.
+5. Whether fights are reproducible from a seed (for replays and testing). Parked until the art is done.
 
 Record each answer here when it is made, and turn the matching "provisional" rules above into firm ones.

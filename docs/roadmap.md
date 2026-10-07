@@ -50,7 +50,7 @@ Order: most broken first, so the lessons arrive early.
 | 1.1 ✅ | Sunmane | Light | Attacker | Done: clumped mane swept back, a sunburst corona on the top line, darker umber coat, brow over slit eyes, neutral stance, legs as chains with joint knobs, neck and tail rigged; its attack is a rearing right-paw swipe whose golden slashes flare at the impact (`clips` and `clipFx`). Fits L; 38 merged meshes. |
 | 1.2 | Ironpaw | Neutral | Bruiser | Less cartoon: heavier brow, glowing slit eyes, a fighter's build; neutral guard stance (the punch becomes the attack); keep the headband. Fits size class S (now too tall). |
 | 1.3 | Duskseer | Dark | Support | Lose the moon, branch and ground ring; heroic brow over the big eyes (no glasses look); stands on the field. |
-| 1.4 | Grandtusk | Neutral (or Ice, see the type wheel) | Tank | Bigger readable eyes under the brow, legs without seams, value contrast; shorter to fit class L. |
+| 1.4 | Grandtusk | Ice (a woolly mammoth: shaggy coat, frost on the tusks) | Tank | Bigger readable eyes under the brow, legs without seams, value contrast; shorter to fit class L. |
 | 1.5 | Stonemaul | Ground | Tank | Rocks and rune rings into a small `fx` group or gone; bigger eyes; trim the armour so the silhouette reads from the side. |
 | 1.6 | Wardshell | Water | Tank | Shields tight round the body (or only shown when it defends); water glow; bigger head and eyes. |
 | 1.7 | Tidefang | Water | Attacker | Taller, less flat; bigger head; shorter tail for the slot; under 60k triangles. |
@@ -114,12 +114,12 @@ Concept seeds, to discuss and replace freely:
 
 | Type | Have | Seeds for new creatures |
 | --- | --- | --- |
-| Neutral | Ironpaw, Grandtusk | a war ram (bruiser) |
+| Neutral | Ironpaw | a war ram (bruiser), a stag beetle or rhino (tank) |
 | Fire | Emberwolf, Pyrewing | a magma rhino (tank) |
 | Water | Tidefang, Wardshell | a storm-sea otter or seal (speedster) |
 | Grass | Thornstag | a mantis (attacker), a bark-armoured boar (tank) |
 | Electric | Stormtalon | a thunder jackal (attacker), a dynamo ram or goat (tank) |
-| Ice | none | a frost lynx (speedster), a woolly mammoth or ice bear (tank), an aurora fox (support) |
+| Ice | Grandtusk (to become a woolly mammoth) | a frost lynx (speedster), an aurora fox (support) |
 | Ground | Stonemaul | a pangolin (tank), a sand drake or monitor lizard (attacker) |
 | Dark | Duskseer | a shadow panther (attacker), a bat (speedster) |
 | Light | Sunmane | a crane (support), a white stag or unicorn (support or tank) |
@@ -158,9 +158,9 @@ Evolution (A3), PvP and a server (P3), publishing and the questions that come wi
 
 ---
 
-## Type wheel (proposed)
+## Type wheel
 
-Ten types, close to Palworld's nine, with Light added as the partner of Dark. **Not decided yet**: confirm or change it before any creature is re-coloured.
+Ten types, close to Palworld's nine, with Light added as the partner of Dark. **Confirmed by the owner (October 2026)**, with Grandtusk becoming an Ice mammoth.
 
 **Strong against** (x1.2 when attacking; the reverse direction is x0.8 weak):
 

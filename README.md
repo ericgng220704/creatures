@@ -25,15 +25,15 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 | --- | --- | --- | ---: | ---: | ---: |
 | Emberwolf | `emberwolf` | Fire | 227 | 77,258 | 343 |
 | Tidefang | `tidefang` | Water | 341 | 87,714 | 164 |
-| Thornstag | `thornstag` | Plant | 242 | 110,228 | 261 |
-| Stonemaul | `stonemaul` | Earth | 300 | 89,460 | 174 |
-| Wardshell | `wardshell` | Ward | 107 | 71,911 | 126 |
+| Thornstag | `thornstag` | Grass | 242 | 110,228 | 261 |
+| Stonemaul | `stonemaul` | Ground | 300 | 89,460 | 174 |
+| Wardshell | `wardshell` | Water | 107 | 71,911 | 126 |
 | Pyrewing | `pyrewing` | Fire | 240 | 34,060 | 69 |
-| Stormtalon | `eagle` | Sky | 178 | 35,686 | 64 |
+| Stormtalon | `eagle` | Electric | 178 | 35,686 | 64 |
 | Sunmane | `lion` | Light | 238 | 86,050 | 120 |
-| Grandtusk | `elephant` | Titan | 63 | 54,404 | 74 |
-| Ironpaw | `panda` | Qi | 85 | 46,054 | 61 |
-| Duskseer | `owl` | Night | 159 | 25,374 | 41 |
+| Grandtusk | `elephant` | Ice | 63 | 54,404 | 74 |
+| Ironpaw | `panda` | Neutral | 85 | 46,054 | 61 |
+| Duskseer | `owl` | Dark | 159 | 25,374 | 41 |
 
 Cost is measured by `npm run stats` at three r158. Descriptions of each are in [docs/creatures.md](docs/creatures.md).
 
