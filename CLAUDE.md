@@ -147,12 +147,12 @@ A player should be able to tell a creature's role from its outline before readin
 | --- | --- | --- | --- | --- |
 | Emberwolf (the pilot, fully rigged) | Fire | blue-grey `#8590a8` / `#66718a`, cream `#e8ddcb` | ember `#ff4510` > `#ff8d1c` > `#ffe885` | iris `#e0861c` |
 | Tidefang (reworked, rigged) | Water | deep teal `#163c4b` / `#2a5f70`, pale belly | crystal `#3fd2ff`, `#0099ff` | `#b4fdff` |
-| Thornstag | Grass | warm brown `#a4794c`, cream | leaf `#78c255`, rune `#a6ff70` | `#c4ff86` |
+| Thornstag (reworked, rigged) | Grass | fawn `#b98b5c` / `#94693f`, cream `#f1e4c9`, bark `#86684a` | leaf `#4c973a` > `#78c255` > `#c4ff86` | iris `#8a9a35` |
 | Stonemaul (reworked, rigged) | Ground | dark brown `#4f3828` / `#2c1f17`, stone `#5f626d`, iron | amber `#c96a1a` > `#ffb347` > `#ffe0a0` | `#ffad33` |
 | Wardshell (reworked, rigged) | Water | deep-sea shell `#2c4f4c` / `#142826`, slate skin `#4a5548`, gold | water `#0099ff` > `#3fd2ff` > `#c9fbff` | `#ffd75a` |
 | Pyrewing | Fire | crimson `#a31f17` > gold `#ffc233` | ember (same as Emberwolf) | `#fff3b0` |
 | Stormtalon | Electric | brown `#4a3426`, white head | wind `#cfe8ff` | `#ffc933` |
-| Sunmane (reworked, rigged) | Light | umber `#7a5432` / `#44291a`, mane `#2a170b` > `#e9a640` | gold `#ffcf5a`, sunburst `#ffb02e` > `#fff6d0` | `#ffc13a` |
+| Sunmane (reworked, rigged) | Light | tawny `#c99a5c` / `#a87a44`, cream `#f3e4c6`, mane `#66361a` > `#d08a3c` | gold `#ffcf5a`, sunburst `#ffb02e` > `#fff6d0` | iris `#d9861c` |
 | Grandtusk (reworked, rigged) | Ice | dark brown `#4a382d` / `#2b201a`, frost tips `#9fb3c2`, ivory | ice `#4aa8ff` > `#a8e4ff` > `#f2fdff`, crystal `#7fd4ff` | `#bff0ff` |
 | Ironpaw (reworked, rigged) | Neutral | black `#1a191e`, cream `#cfc7b8`, red wraps `#9e2228`, gold | white-gold qi `#ffcf7a` > `#ffe9b8` > `#fffaf0` | `#ffe08a` |
 | Duskseer (reworked, rigged) | Dark | indigo `#3a3150` / `#221c30`, lavender breast `#857b98` | violet `#5a2bbf` > `#a58cff` > `#e6dcff` | `#ffb52e` |

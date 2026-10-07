@@ -35,14 +35,16 @@ Cost: 317 parts, 65,178 triangles, built in about 150 ms; 65 meshes once merged.
 
 `thornstag` · element: Grass · `src/creatures/thornstag.js`
 
-A tall, gentle stag that the forest grows on, kind in the face and mighty in the shoulder.
+A gentle forest stag whose antler crown blooms with living green light.
 
-- **Body.** A barrel of ribs, a tucked flank, withers and hips that rise, built shoulders and thighs, a crest of neck muscle. Slim legs with knees and hocks, cloven hooves, a soft throat ruff and a raised tail, cream beneath and tipped with a leaf sprig.
-- **Coat.** Warm brown with a dark stripe down the spine, cream below, fawn spots over the flanks and haunches.
-- **Face.** Large leaf ears that flick, wide soft eyes and a long muzzle closed in a small smile. No fangs.
-- **Magic.** Great antlers in leaf and blossom with a glow behind them, leaves and petals turning round the crown, vines and blossoms at the neck, a leaf emblem on the chest, a moss mantle, rune light and fireflies.
+- **Body.** A deep barrel of ribs, a tucked flank, strong shoulders and thighs, long legs with knees and hocks on cloven hooves, a short raised tail fringed with locks.
+- **Coat.** Warm fawn, a shade darker along the back, cream on the belly, throat and rump, with a mantle of moss and grass down the spine and a vine wound round the neck.
+- **Face.** Round hazel eyes under a soft fawn brow, large ears that flick, and a long muzzle closed in a calm line.
+- **Bloom.** An antler crown fanned wide and low in the side plane, green veins of light along the beams, and a bloom of leaves, glowing leaves and buds on every tip, the shape that says Grass from the side; leaves of light drift round it and seeds rise.
+- **Thorns.** Its attack lowers the crown and tosses it up through the target; its ultimate bursts a ring of glowing thorns from the ground at its forefeet.
+- **Rig.** Reworked (roadmap 1.8): legs as joint chains with planted hooves, a neck joint carrying the head and vine, a three-joint tail, the antler crown as an extra chain.
 
-Cost: 242 parts, 110,228 triangles, built in about 261 ms.
+Cost: 277 parts, 53,847 triangles, built in about 511 ms; 58 meshes once merged.
 
 ## Stonemaul
 
@@ -104,12 +106,12 @@ Cost: 178 parts, 35,686 triangles, built in about 64 ms.
 
 `lion` · element: Light · `src/creatures/lion.js`
 
-A lion braced to pounce, its mane a corona of sunfire, roaring with its claws out.
+A lion braced to pounce, its mane crowned with a corona of sunfire, claws ready.
 
-- **Mane.** Three rings of clumped locks swept back toward the shoulders, dark at the root and gold at the tip, longest on the crest, with a beard and a cape along the spine.
+- **Mane.** Three rings of clumped locks swept back toward the shoulders, warm brown at the root and honey at the tip, longest on the crest, with a beard and a cape along the spine.
 - **Corona.** A sunburst over the mane: an arc of light from brow to nape with long and short rays fanning out of it, the shape that says Light from across the field.
-- **Body.** A dark umber coat over a deep chest, heavy shoulders and haunches, sun glyphs burning under the fur, and a tufted tail with a spark of sun at its tip.
-- **Face.** A roaring mouth with thick canines, slit amber eyes under a heavy brow.
+- **Body.** A tawny golden coat with a cream belly over a deep chest, heavy shoulders and haunches, sun glyphs burning under the fur, and a tufted tail with a spark of sun at its tip.
+- **Face.** Round amber eyes under a soft golden brow, a jaw just open on two small fangs.
 - **Strike.** Its attack rears up and swipes the right forepaw through, four long claws out, with three golden slashes that flare as it lands.
 - **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.1): a neck joint carrying the head, mane and corona; four legs as joint chains with knobs at elbow and knee; a five-joint tail; its own attack and slashes (`clipFx`).
 

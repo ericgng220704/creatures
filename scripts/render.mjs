@@ -22,7 +22,8 @@ const wanted = args.filter(a => !a.startsWith('--'));
 const ids = wanted.length ? ORDER.filter(id => wanted.includes(id)) : ORDER;
 
 mkdirSync('renders', { recursive: true });
-const server = await createServer({ server: { port: +process.env.RENDER_PORT || 5199, strictPort: true }, logLevel: 'error' });
+const PORT = +process.env.RENDER_PORT || 5199;
+const server = await createServer({ server: { port: PORT, strictPort: true, hmr: false }, logLevel: 'error' });
 await server.listen();
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || undefined,
@@ -42,7 +43,7 @@ if (problems.length) { console.error('\nProblems:\n' + problems.join('\n')); pro
 async function renderBattle() {
   mkdirSync('renders/battle', { recursive: true });
   const shot = async (name, query) => {
-    await page.goto('http://localhost:5199/battle.html?still=1&t=0' + query);
+    await page.goto('http://localhost:' + PORT + '/battle.html?still=1&t=0' + query);
     await page.waitForFunction(() => window.__ready === true, null, { timeout: 180000 });
     await (await page.$('#frame')).screenshot({ path: `renders/battle/${name}.png` });
     console.log('rendered battle', name);
@@ -60,7 +61,7 @@ async function renderBattle() {
 }
 
 async function renderSheet() {
-  await page.goto('http://localhost:5199/');
+  await page.goto('http://localhost:' + PORT + '/');
   const cards = await page.$$('.card');
   for (const id of ids) {
     const card = cards[ORDER.indexOf(id)];
