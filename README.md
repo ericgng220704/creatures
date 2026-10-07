@@ -31,7 +31,7 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 | Pyrewing | `pyrewing` | Fire | 240 | 34,060 | 69 |
 | Stormtalon | `eagle` | Electric | 178 | 35,686 | 64 |
 | Sunmane | `lion` | Light | 238 | 86,050 | 120 |
-| Grandtusk | `elephant` | Ice | 63 | 54,404 | 74 |
+| Grandtusk | `elephant` | Ice | 187 | 73,684 | 115 |
 | Ironpaw | `panda` | Neutral | 80 | 52,090 | 71 |
 | Duskseer | `owl` | Dark | 139 | 21,424 | 44 |
 

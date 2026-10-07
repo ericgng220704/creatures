@@ -115,14 +115,15 @@ Cost: 238 parts, 86,050 triangles, built in about 120 ms; 38 meshes once merged.
 
 `elephant` · element: Ice · `src/creatures/elephant.js`
 
-A giant elephant with tusks as long as its body is deep, wise and slow to anger.
+A woolly mammoth in a shaggy frost-tipped coat, ice ridged along its hump, tusks rimed with frost.
 
-- **Tusks.** Thick curved ivory, banded in gold at the base, each with a glowing gem.
-- **Trunk.** Eight joints, so it sways and curls in a slow wave.
-- **Body.** A vast barrel with pillar legs and wide feet, wrinkled grey skin, and ears like sails that flap.
-- **Face.** A great dome of a brow, small kind eyes, and a rune of light on the forehead.
+- **Coat.** A near-black brown coat over a vast barrel and a high shoulder hump, with a skirt of long shaggy locks round the belly and legs, frosted at the tips, and frost veins glowing under the fur.
+- **Ridge.** A row of ice crystals along the hump and back, leaning back, the shape that says Ice from the side.
+- **Tusks.** Great ivory spirals curving up and in, banded with frost, their points rimed with glowing ice and small crystals.
+- **Face.** A high domed skull, small furred ears, heavy brows over pale ice eyes, a frost rune on the brow, and an eight-joint trunk furred at the root.
+- **Rig.** Reworked to the Emberwolf benchmark as an Ice mammoth (roadmap 1.4): pillar legs as joint chains with planted feet, a neck under the hump, a short tail chain, the eight-joint trunk. Its attack rears, curls the trunk and drives the tusks up through the target.
 
-Cost: 63 parts, 54,404 triangles, built in about 74 ms.
+Cost: 187 parts, 73,684 triangles, built in about 115 ms; 42 meshes once merged.
 
 ## Ironpaw
 
