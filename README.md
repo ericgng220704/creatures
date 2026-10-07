@@ -26,7 +26,7 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 | Emberwolf | `emberwolf` | Fire | 227 | 77,258 | 343 |
 | Tidefang | `tidefang` | Water | 341 | 87,714 | 164 |
 | Thornstag | `thornstag` | Grass | 242 | 110,228 | 261 |
-| Stonemaul | `stonemaul` | Ground | 300 | 89,460 | 174 |
+| Stonemaul | `stonemaul` | Ground | 249 | 90,764 | 183 |
 | Wardshell | `wardshell` | Water | 107 | 71,911 | 126 |
 | Pyrewing | `pyrewing` | Fire | 240 | 34,060 | 69 |
 | Stormtalon | `eagle` | Electric | 178 | 35,686 | 64 |

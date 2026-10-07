@@ -47,15 +47,16 @@ Cost: 242 parts, 110,228 triangles, built in about 261 ms.
 
 `stonemaul` · element: Ground · `src/creatures/stonemaul.js`
 
-A huge mountain bear in stone and iron, roaring, whose claws are its weapons.
+A huge bear in stone and iron, stone spires cracked with amber light along its hump, claws as weapons.
 
-- **Body.** A great shoulder hump, a deep barrel chest, pillar forelegs and a heavy rump, under a thick ruff of fur.
+- **Body.** A great shoulder hump, a deep barrel chest, pillar forelegs and a heavy rump under a thick dark ruff.
+- **Spires.** Jagged stone spires along the hump, cracked with amber light and burning at the points, the shape that says Ground from the side.
+- **Armour.** Stone gauntlets with iron bands and spikes and slimmer stone pauldrons, lined with amber rune light.
 - **Claws.** Four steel claws on each forepaw, as long as a forearm and hooked down like blades.
-- **Armour.** Stone gauntlets with iron bands and spikes, stone pauldrons with iron spikes, plates down the hump, all lined with amber rune light.
-- **Face.** A roaring mouth with thick canines, small glowing eyes under angry brows.
-- **Aura.** Two turning rings of rune light on the ground, rocks circling the bear, amber haze and rising motes.
+- **Face.** A roaring mouth with thick canines, slit amber eyes under heavy angry brows.
+- **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.5): the ground rings and orbiting rocks are gone; legs as joint chains with the gauntlets on the forearms, a neck carrying the head and outer ruff. Its attack rears up roaring and brings both clawed forepaws down.
 
-Cost: 300 parts, 89,460 triangles, built in about 174 ms.
+Cost: 249 parts, 90,764 triangles, built in about 183 ms; 41 meshes once merged.
 
 ## Wardshell
 
