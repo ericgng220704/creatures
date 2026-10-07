@@ -52,11 +52,11 @@ Cost: 277 parts, 53,847 triangles, built in about 511 ms; 58 meshes once merged.
 
 A huge bear in stone and iron, stone spires cracked with amber light along its hump, claws as weapons.
 
-- **Body.** A great shoulder hump, a deep barrel chest, pillar forelegs and a heavy rump under a thick dark ruff.
+- **Body.** A great shoulder hump, a deep barrel chest, pillar forelegs and a heavy rump under a thick ruff.
 - **Spires.** Jagged stone spires along the hump, cracked with amber light and burning at the points, the shape that says Ground from the side.
 - **Armour.** Stone gauntlets with iron bands and spikes and slimmer stone pauldrons, lined with amber rune light.
-- **Claws.** Four steel claws on each forepaw, as long as a forearm and hooked down like blades.
-- **Face.** A roaring mouth with thick canines, slit amber eyes under heavy angry brows.
+- **Claws.** Four steel claws on each forepaw, long and hooked down.
+- **Face.** Round honey eyes under a soft brow of fur, a mouth just open on two small fangs.
 - **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.5): the ground rings and orbiting rocks are gone; legs as joint chains with the gauntlets on the forearms, a neck carrying the head and outer ruff. Its attack rears up roaring and brings both clawed forepaws down.
 
 Cost: 249 parts, 90,764 triangles, built in about 183 ms; 41 meshes once merged.
@@ -95,14 +95,15 @@ Cost: 307 parts, 51,005 triangles, built in about 328 ms; 152 meshes once merged
 
 `eagle` · element: Electric · `src/creatures/eagle.js`
 
-An eagle riding the wind, wings wide and eyes fixed on something far below.
+A storm eagle hovering on raised wings, a crest of lightning crackling on its crown.
 
-- **Wings.** Broad wings with the fingered tips of a true eagle, in dark brown that pales to gold at the edge, beating slowly with the tips following a moment behind.
-- **Head.** A white head with a heavy brow, a keen amber eye and a great hooked beak, a golden nape and a white ruff.
-- **Talons.** Yellow legs thrust forward with the talons spread and hooked, ready to strike.
-- **Wind.** Pale ribbons of wind circle the bird, and bright specks drift in its wake.
+- **Body.** A deep chest held high and the tail end dropping as it hangs in the air; short yellow legs in feathered trousers, talons curled under.
+- **Wings.** Raised high in a V with the hands swept back and fingered tips, warm brown paling to buff at the edges, beating slowly; a lightning vein runs down each one.
+- **Face.** A big round white head, round golden eyes that blink, and a short yellow hooked beak that opens.
+- **Storm.** A crest of lightning plumes fanned back from the crown, the shape that says Electric from the side; arcs crackle round the bird and sparks jump off it. Its attack dives and throws the talons forward in a burst of sparks; its ultimate calls a bolt down from the sky onto its target.
+- **Rig.** Reworked (roadmap 1.9): wings as arm > forearm > hand chains raised in a ready V, a neck joint carrying the head, hood and crest, a beak jaw, a tail joint, legs as joint chains.
 
-Cost: 178 parts, 35,686 triangles, built in about 64 ms.
+Cost: 266 parts, 38,796 triangles, built in about 140 ms; 60 meshes once merged.
 
 ## Sunmane
 
@@ -125,10 +126,10 @@ Cost: 238 parts, 86,050 triangles, built in about 120 ms; 38 meshes once merged.
 
 A woolly mammoth in a shaggy frost-tipped coat, ice ridged along its hump, tusks rimed with frost.
 
-- **Coat.** A near-black brown coat over a vast barrel and a high shoulder hump, with a skirt of long shaggy locks round the belly and legs, frosted at the tips, and frost veins glowing under the fur.
+- **Coat.** A warm mid-brown coat over a vast barrel and a high shoulder hump, with a skirt of long shaggy locks round the belly and legs, lighter at the tips, and frost veins glowing under the fur.
 - **Ridge.** A row of ice crystals along the hump and back, leaning back, the shape that says Ice from the side.
 - **Tusks.** Great ivory spirals curving up and in, banded with frost, their points rimed with glowing ice and small crystals.
-- **Face.** A high domed skull, small furred ears, heavy brows over pale ice eyes, a frost rune on the brow, and an eight-joint trunk furred at the root.
+- **Face.** A high domed skull, small furred ears, round ice-blue eyes under a soft brow, a frost rune on the brow, and an eight-joint trunk furred at the root.
 - **Rig.** Reworked to the Emberwolf benchmark as an Ice mammoth (roadmap 1.4): pillar legs as joint chains with planted feet, a neck under the hump, a short tail chain, the eight-joint trunk. Its attack rears, curls the trunk and drives the tusks up through the target.
 
 Cost: 187 parts, 73,684 triangles, built in about 115 ms; 42 meshes once merged.

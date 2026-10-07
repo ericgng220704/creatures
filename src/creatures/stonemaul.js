@@ -2,22 +2,23 @@ import * as T from 'three';
 import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
 import { glowMat, halo } from '../kit/materials.js';
-import { band, finish, glow, lock, onLimb, part, shard } from '../kit/parts.js';
+import { band, eye, finish, glow, lock, onLimb, part, shard } from '../kit/parts.js';
 import { hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
-// STONEMAUL: a huge bear in stone and iron, stone spires cracked with amber light along its hump, claws as weapons
+// STONEMAUL: a big warm-brown bear in grey stone and iron, stone spires cracked with amber light along its hump, claws as weapons
 // =====================================================================
 export function stonemaul() {
   var P = {
-    fur: C('#4f3828'), furDark: C('#2c1f17'), furLight: C('#7a5c44'), cream: C('#9c805f'), nose: C('#15100e'),
-    stone: C('#5f626d'), stoneDark: C('#383a43'), iron: C('#3f434d'), steel: C('#d6dce6'),
-    tooth: C('#f1e9d6'), gum: C('#5a1f22'), tongue: C('#c25f66'), scar: C('#d9bfa0'), earIn: C('#b58b6b'),
-    eye: '#ffad33', rune: '#ffb347', runeDeep: '#c96a1a', runeCore: '#ffe0a0'
+    fur: C('#93725a'), furDark: C('#755a46'), furLight: C('#b8987c'), cream: C('#ecdcc2'), nose: C('#3a2b26'),
+    stone: C('#9a9ca6'), stoneDark: C('#767884'), iron: C('#7c828e'), steel: C('#d6dce6'),
+    tooth: C('#f1e9d6'), gum: C('#a8505c'), tongue: C('#e8808c'), scar: C('#d9bfa0'), earIn: C('#e0a890'),
+    iris: C('#d9861e'), rune: '#ffb347', runeDeep: '#c96a1a', runeCore: '#ffe0a0'
   };
   var root = new T.Group(), legs = new T.Group(), body = new T.Group(); root.add(legs, body);
-  function coat(p, n) { var c = mix(P.fur, P.furDark, sstep(.3, .9, n.y)); return mix(c, P.furLight, sstep(-.1, -.6, n.y) * .5); }
-  var FUR = { c: coat }, LOCK = { c: coat, tip: P.furLight, tipAmt: .6, aoK: .4, noOcc: true };
+  // the coat: warm brown, a shade darker along the back, cream underneath and on a bib across the chest
+  function coat(p, n) { var c = mix(P.fur, P.furDark, sstep(.3, .9, n.y)); return mix(c, P.cream, Math.max(sstep(-.1, -.7, n.y) * .6, sstep(.3, .8, n.x) * sstep(1.2, 1.6, p.x) * sstep(2.4, 1.8, p.y) * sstep(.5, .9, p.y) * .85)); }
+  var FUR = { c: coat }, LOCK = { c: coat, tip: P.furLight, tipAmt: .4, aoK: .4, noOcc: true };
   var STONE = { c: function (p, n) { return mix(P.stone, P.stoneDark, sstep(.2, -.6, n.y)); }, m: 'flat' };
   var IRON = { c: P.iron, m: 'metal' }, STEEL = { c: P.steel, m: 'metal', noAO: true, noOcc: true };
   var TOOTH = { c: P.tooth, m: 'gloss', noAO: true, noOcc: true };
@@ -47,7 +48,7 @@ export function stonemaul() {
     fore.push(onLimb(legs, blob(.6, .64, .62, .5), STONE, el, wr, .5), band(legs, IRON, el, wr, .12, .4, .1), band(legs, IRON, el, wr, .88, .33, .1));
     [.3, .55].forEach(function (f) {
       var px = el[0] + (wr[0] - el[0]) * f, py = el[1] + (wr[1] - el[1]) * f;
-      fore.push(shard(legs, .06, .24, 5, IRON, [px, py + .06, s * (.84 + .32)], [.1, .35, s]));
+      fore.push(shard(legs, .06, .24, 5, STONE, [px, py + .06, s * (.84 + .32)], [.1, .35, s]));
     });
     fore.push(glow(legs, ttube([[.62, .78, s * 1.16], [.7, .62, s * 1.14], [.66, .5, s * 1.16], [.78, .38, s * 1.12]], .018, .011, 6, 16), P.rune));
     fore.push(lock(legs, LOCK, [.45, .9, s * .86], [-1, -.2, s * .1], [0, 1, s], .34, .24, .1, .06), lock(legs, LOCK, [.45, .7, s * .86], [-1, -.3, s * .1], [0, 1, s], .3, .22, .1, .06));
@@ -61,7 +62,7 @@ export function stonemaul() {
     LEGS[s > 0 ? 'fr' : 'fl'] = front;
     // pauldron
     part(body, blob(.72, .42, .66, .5), STONE, .62, 2.05, s * .76);
-    [0, 1, 2].forEach(function (i) { shard(body, .08, .32, 5, IRON, [.4 + i * .22, 2.28, s * .74], [.1, 1, s * .4]); });
+    [0, 1, 2].forEach(function (i) { shard(body, .08, .32, 5, STONE, [.4 + i * .22, 2.28, s * .74], [.1, 1, s * .4]); });
     // hind leg
     var hip = [-.95, 1.45, s * .7], kn = [-.55, .9, s * .82], hk = [-1.05, .45, s * .74];
     var back = limb(legs, [hip, kn, hk, [-.95, .14, s * .74]], [[.58, .4], [.38, .28], [.26, .22]], FUR);
@@ -89,27 +90,22 @@ export function stonemaul() {
     glow(body, new T.ConeGeometry(.06, h * 1.1, 5).translate(0, h * .55, 0), P.rune, q[0], y + .02, (i % 2 ? .1 : -.1), 0, i * .7, q[2] + .35, .95);
   });
 
-  // head: heavy, lowered, roaring
+  // head: heavy and lowered, the jaw a little open on two fangs
   var head = new T.Group(); head.position.set(1.7, 1.95, 0); head.rotation.z = -.12; body.add(head);
   part(head, blob(1.0, .92, 1.0, .85), FUR, 0, 0, 0);
   part(head, blob(.85, .52, .62, .8, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y * (1 - .2 * t), z * (1 - .3 * t)]; }), { c: function (p, n) { return mix(P.fur, P.cream, sstep(-.1, -.6, n.y) + sstep(.3, .8, n.x) * .5); } }, .62, -.2, 0);
   part(head, blob(.24, .17, .28, .75), { c: P.nose, m: 'gloss' }, 1.02, -.08, 0);
-  var jaw = new T.Group(); jaw.position.set(.08, -.42, 0); jaw.rotation.z = -.55; head.add(jaw);
+  var jaw = new T.Group(); jaw.position.set(.08, -.42, 0); jaw.rotation.z = -.12; head.add(jaw);
   part(jaw, blob(.95, .22, .5, .75, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y, z * (1 - .35 * t)]; }), { c: function (p, n) { return mix(P.fur, P.cream, sstep(.1, -.5, n.y)); } }, .5, -.08, 0);
   part(jaw, blob(.8, .05, .38, .8), { c: P.gum, noOcc: true }, .46, .03, 0);
   part(jaw, blob(.46, .07, .22, .9), { c: P.tongue, m: 'gloss', noOcc: true }, .4, .07, 0);
-  part(head, blob(.8, .07, .42, .8), { c: P.gum, noOcc: true }, .6, -.46, 0);
-  [.18, -.18].forEach(function (z) {
-    shard(head, .085, .36, 6, TOOTH, [.72, -.46, z], [.1, -1, 0]);
-    shard(jaw, .07, .28, 6, TOOTH, [.78, .03, z * .9], [-.1, 1, 0]);
-    [.34, .48, .9].forEach(function (x) { shard(head, .035, .13, 5, TOOTH, [x, -.46, z * 1.15], [0, -1, 0]); });
-    [.3, .44, .6].forEach(function (x) { shard(jaw, .032, .12, 5, TOOTH, [x, .03, z * 1.1], [0, 1, 0]); });
-  });
+  part(head, blob(.7, .04, .34, .8), { c: P.gum, noOcc: true }, .6, -.45, 0);
+  [.18, -.18].forEach(function (z) { shard(head, .07, .24, 6, TOOTH, [.76, -.46, z], [.1, -1, 0]); });
+  // eyes: round and honey-coloured under a soft brow of fur
   var eyes = [], ears = [];
   [.44, -.44].forEach(function (z) {
-    part(head, blob(.5, .17, .25, .8), { c: P.furDark, noOcc: true }, .37, .28, z * .96, 0, z > 0 ? -.15 : .15, -.36);
-    eyes.push(glow(head, blob(.21, .075, .06, .7), P.eye, .42, .13, z, 0, z > 0 ? -.3 : .3, -.25));
-    halo(head, P.eye, .42, .45, .13, z * 1.08, .55);
+    part(head, blob(.42, .1, .2, .8), FUR, .4, .31, z * .96, 0, z > 0 ? -.15 : .15, -.06);
+    eyes.push(eye(head, P.iris, .43, .13, z * 1.0, .26, .22, z > 0 ? -.3 : .3, 0));
     var ear = new T.Group(); ear.position.set(-.2, .48, z * .8); head.add(ear); ears.push(ear);
     part(ear, blob(.34, .34, .16, .85), FUR, 0, 0, 0);
     part(ear, blob(.2, .2, .08, .85), { c: P.earIn, noOcc: true }, .02, 0, z > 0 ? .04 : -.04);
@@ -154,7 +150,7 @@ export function stonemaul() {
   return {
     root: root, head: head, name: 'stonemaul', headView: { span: 2.8, up: .35, look: -.05 },
     rig: makeRig({ plan: 'quadruped', body: body, neck: neck, head: head, jaw: jaw, ears: ears, legs: LEGS }),
-    // it rears up roaring and brings both clawed forepaws down on the target
+    // it rears up and brings both clawed forepaws down on the target
     clips: {
       attack: { tracks: {
         'body.pitch': [[0, 0], [.28, .32], [.42, .2], [.5, -.12, 'in'], [.62, 0]],
@@ -166,7 +162,7 @@ export function stonemaul() {
       var br = Math.sin(t * 1.5);
       body.position.y = br * .018; body.scale.set(1, 1 + br * .007, 1 + br * .01);
       head.rotation.z = -.12 + Math.sin(t * .9) * .04; head.rotation.y = Math.sin(t * .6) * .1;
-      jaw.rotation.z = -.55 - (Math.sin(t * 1.5) * .5 + .5) * .08;
+      jaw.rotation.z = -.12 - (Math.sin(t * 1.5) * .5 + .5) * .05;
       ears[0].rotation.z = Math.sin(t * 3.1) * .08;
       placeMotes(t);
       light.intensity = 2.2 + Math.sin(t * 2.3) * .5;

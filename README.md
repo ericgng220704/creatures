@@ -29,7 +29,7 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 | Stonemaul | `stonemaul` | Ground | 249 | 73,004 | 148 |
 | Wardshell | `wardshell` | Water | 93 | 58,919 | 99 |
 | Pyrewing | `pyrewing` | Fire | 307 | 51,005 | 328 |
-| Stormtalon | `eagle` | Electric | 178 | 33,910 | 70 |
+| Stormtalon | `eagle` | Electric | 266 | 38,796 | 140 |
 | Sunmane | `lion` | Light | 238 | 64,738 | 87 |
 | Grandtusk | `elephant` | Ice | 187 | 57,700 | 68 |
 | Ironpaw | `panda` | Neutral | 80 | 42,322 | 48 |

@@ -2,24 +2,24 @@ import * as T from 'three';
 import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, crystalGeo, ttube } from '../kit/geometry.js';
 import { crystalMat, glowMat, halo } from '../kit/materials.js';
-import { band, finish, glow, lock, part } from '../kit/parts.js';
+import { band, eye, finish, glow, lock, part } from '../kit/parts.js';
 import { bind, chain, hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
-// GRANDTUSK: a woolly mammoth in a shaggy frost-tipped coat, ice ridged along its hump, tusks rimed with frost
+// GRANDTUSK: a woolly mammoth in a warm brown shaggy coat, ice ridged along its hump, tusks rimed with frost
 // =====================================================================
 export function elephant() {
   var P = {
-    fur: C('#4a382d'), furDark: C('#2b201a'), furLight: C('#6d5646'), frost: C('#9fb3c2'), skin: C('#3a302b'), ivory: C('#efe6d0'),
-    nail: C('#cfc6b2'), crystal: '#7fd4ff', crystalGlow: '#2a9cff',
-    eye: '#bff0ff', ice: '#4aa8ff', iceMid: '#a8e4ff', iceCore: '#f2fdff'
+    fur: C('#8d6e57'), furDark: C('#715641'), tipW: C('#c4a98f'), cream: C('#e6d5bf'), frost: C('#b9c8d4'),
+    skin: C('#86705f'), ivory: C('#f2ead8'), nail: C('#d3c5ab'), iris: C('#4f9fd6'), crystal: '#7fd4ff', crystalGlow: '#2a9cff',
+    ice: '#4aa8ff', iceMid: '#a8e4ff', iceCore: '#f2fdff'
   };
   var root = new T.Group(), legs = new T.Group(), body = new T.Group(); root.add(legs, body);
   var r = rng(23);
-  // the coat: near-black brown along the back and hump, warmer on the flanks
-  function coat(p, n) { var c = mix(P.fur, P.furDark, sstep(.1, .8, n.y) * .8); return mix(c, P.furLight, sstep(-.2, -.7, n.y) * .4); }
+  // the coat: warm mid brown, a shade darker along the back and hump, cream underneath
+  function coat(p, n) { var c = mix(P.fur, P.furDark, sstep(.1, .8, n.y) * .8); return mix(c, P.cream, sstep(-.2, -.7, n.y) * .5); }
   var FUR = { c: coat }, SKIN = { c: function (p, n) { return mix(P.skin, P.furDark, sstep(.2, .8, n.y) * .5); } };
-  var LOCK = { c: P.furDark, tip: P.frost, tipAmt: .28, aoK: .35, noOcc: true }, LOCKW = { c: P.fur, tip: P.frost, tipAmt: .25, aoK: .35, noOcc: true };
+  var LOCK = { c: P.furDark, tip: P.tipW, tipAmt: .3, aoK: .35, noOcc: true }, LOCKW = { c: P.fur, tip: P.tipW, tipAmt: .28, aoK: .35, noOcc: true };
   var IVORY = { c: function (p, n) { return mix(P.ivory, C('#b7ad96'), sstep(.3, -.6, n.y) * .5); }, m: 'gloss' }, NAIL = { c: P.nail, m: 'gloss', noAO: true, noOcc: true };
   var ICE = crystalMat(P.crystal, P.crystalGlow);
 
@@ -28,7 +28,7 @@ export function elephant() {
   part(body, blob(1.6, 2.0, 1.85, .85), FUR, .9, 2.2, 0);
   part(body, blob(1.5, 1.1, 1.4, .85), FUR, .7, 3.0, 0);
   part(body, blob(1.35, 1.7, 1.75, .85), FUR, -1.0, 2.05, 0);
-  // a skirt of long shaggy locks round the belly and flanks, frosted at the tips
+  // a skirt of long shaggy locks round the belly and flanks, paler at the tips
   for (var si = 0; si < 30; si++) {
     var sa = si / 30 * Math.PI * 2, sx = Math.cos(sa) * 1.45, sz = Math.sin(sa) * .98;
     lock(body, si % 2 ? LOCK : LOCKW, [sx, 1.55 + r() * .15, sz], [Math.cos(sa) * .15, -1, Math.sin(sa) * .25], [Math.cos(sa), 0, Math.sin(sa)], .7 + r() * .25, .42, .14, .08);
@@ -72,28 +72,27 @@ export function elephant() {
   for (var ti = 0; ti < 6; ti++) tufts.push(lock(body, LOCK, [-1.98, 1.72, 0], [Math.cos(ti) * .25, -1, Math.sin(ti) * .25], [Math.cos(ti), 0, Math.sin(ti)], .35, .16, .08, .06));
   bind(tailC, tufts);
 
-  // head: a high domed skull, small furred ears, heavy brows over pale ice eyes that read across the field
+  // head: a high domed skull, small furred ears, a soft brow over round ice-blue eyes that read across the field
   var head = new T.Group(); head.position.set(1.95, 2.62, 0); head.rotation.z = -.08; body.add(head);
   part(head, blob(1.2, 1.4, 1.1, .85, function (x, y, z, W, H) { var t = (y / H + 1) / 2; return [x * (1 - .15 * t), y, z * (1 - .2 * t)]; }), FUR, 0, .1, 0);
   part(head, blob(.85, .8, .95, .85), FUR, .35, -.35, 0);
   for (var hi = 0; hi < 9; hi++) { var ha = -1.1 + hi / 8 * 2.2; lock(head, LOCK, [-.05 + Math.cos(ha) * .1, .62 + Math.cos(ha) * .12, Math.sin(ha) * .36], [-1, .2, Math.sin(ha) * .5], [0, 1, Math.sin(ha)], .38, .3, .1, .12); }
   var eyes = [], ears = [];
   [.5, -.5].forEach(function (z) {
-    part(head, blob(.42, .17, .22, .8), { c: P.furDark, noOcc: true }, .42, .26, z * .9, 0, z > 0 ? -.2 : .2, -.3);
-    eyes.push(glow(head, blob(.16, .08, .06, .7), P.eye, .5, .13, z * .98, 0, z > 0 ? -.35 : .35, -.22));
-    halo(head, P.ice, .45, .53, .13, z * 1.05, .5);
+    part(head, blob(.44, .11, .2, .8), FUR, .3, .33, z * .86, 0, z > 0 ? -.35 : .35, .08);
+    eyes.push(eye(head, P.iris, .32, .14, z * .91, .31, .27, z > 0 ? -.45 : .45, 0));
     var ear = new T.Group(); ear.position.set(-.3, .3, z * .55); ear.rotation.y = z > 0 ? .25 : -.25; head.add(ear); ears.push(ear);
     part(ear, blob(.16, .6, .5, .8), FUR, 0, 0, z * .2);
   });
   // a frost rune on the brow
-  glow(head, ttube([[.58, .62, 0], [.64, .46, .08], [.62, .34, -.06], [.66, .2, .05]], .016, .01, 6, 14), P.iceMid);
+  glow(head, ttube([[.42, .62, 0], [.5, .46, .08], [.54, .34, -.06], [.57, .2, .05]], .016, .01, 6, 14), P.iceMid);
   // the trunk: eight joints, each turning a little more, so it can sway and curl; furred to the tip
   var trunk = new T.Group(); trunk.position.set(.7, -.2, 0); head.add(trunk);
   var base = [-.55, -.4, -.25, -.12, .05, .25, .5, .8], tj = [], pg = trunk;
   for (var i = 0; i < 8; i++) {
     var g = new T.Group(); g.position.set(i ? .38 : 0, 0, 0); g.rotation.z = base[i]; pg.add(g); pg = g;
     var rr = .27 - i * .022;
-    part(g, blob(.56, rr * 2, rr * 2, .9), i < 3 ? FUR : SKIN, .2, 0, 0);
+    part(g, blob(.64, rr * 2, rr * 2, .9), i < 3 ? FUR : SKIN, .19, 0, 0);
     tj.push({ g: g, base: base[i] });
   }
   // tusks: great ivory spirals curving up and in, banded with frost, their points rimed with glowing ice
