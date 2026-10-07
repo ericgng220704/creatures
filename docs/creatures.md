@@ -140,9 +140,9 @@ Cost: 187 parts, 73,684 triangles, built in about 115 ms; 42 meshes once merged.
 
 A panda fighter in a low guard, fists up and wrapped, white qi burning off its shoulders.
 
-- **Guard.** A low, wide stance on planted black legs, the right fist leading and the left held back at the chin, forearms wrapped in red, fists bound in cream with gold knuckle plates.
+- **Guard.** A low, wide stance on planted charcoal legs, the right fist leading and the left held back at the chin, forearms wrapped in red, fists bound in cream with gold knuckle plates.
 - **Qi.** Pale flames of qi rising off the shoulders and back along the top line, qi lines burning on the chest and forearms, a glow and sparks round each fist.
-- **Face.** A heavy round head, black patches with slit eyes under a black brow, a snarl with fangs, and a red headband with a gold plate and two tails that stream behind.
+- **Face.** A heavy round cream head, charcoal eye patches with round amber eyes tipped toward the camera, a slightly open smile, and a red headband with a gold plate and two tails that stream behind; the headband is its brow.
 - **Strike.** Its attack swings the lead arm up level and snaps the elbow straight into a punch; its ultimate throws a left and then a right.
 - **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.2): the first biped rig, with legs and arms as joint chains (feet planted, elbows that straighten into punches) and a neck joint.
 
@@ -152,11 +152,11 @@ Cost: 80 parts, 52,090 triangles, built in about 71 ms; 40 meshes once merged.
 
 `owl` · element: Dark · `src/creatures/owl.js`
 
-A horned owl of the night, stern under a V brow, a crest of shadow quills burning violet.
+A horned owl of the night, bright-eyed under a soft brow, a crest of shadow quills burning violet.
 
-- **Face.** A pale heart-shaped disc, amber eyes under a stern black V brow, a hooked beak that opens, tall ear tufts tipped with violet; the head rests turned toward the camera, as an owl's does.
+- **Face.** A cream heart-shaped disc, big round amber eyes under a soft lavender brow, a horn-coloured hooked beak that opens, tall ear tufts tipped with violet; the head rests turned toward the camera, as an owl's does.
 - **Crest.** Shadow quills fanned from crown to nape, violet with pale cores, the shape that says Dark from the side.
-- **Plumage.** Near-black indigo on the back, a muted lavender breast of barred scale-feathers, wings folded down the sides with a violet crescent and rune lines on each, a short dark tail.
+- **Plumage.** Lavender-indigo, darker on the back, a pale lavender-cream breast of barred scale-feathers, wings folded down the sides with a violet crescent and rune lines on each, a short dark tail.
 - **Stance.** Upright on short feathered legs, three hooked talons forward and one back, motes of starlight drifting round it.
 - **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.3): the moon, branch and ground ring are gone; legs as joint chains with planted talons, wings on shoulder joints that flare, a neck, and a jaw in the beak. Attacks with a talon-first leap, wings flared (the shared perched clips).
 

@@ -2,7 +2,7 @@ import * as T from 'three';
 import { C, mix, sstep } from '../kit/math.js';
 import { blob, flameGeo, ttube } from '../kit/geometry.js';
 import { glowMat, halo } from '../kit/materials.js';
-import { band, feather, finish, glow, part, shard } from '../kit/parts.js';
+import { band, eye, feather, finish, glow, part, shard } from '../kit/parts.js';
 import { chain, hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
@@ -10,25 +10,25 @@ import { chain, hang, limb, makeRig } from '../kit/rig.js';
 // =====================================================================
 export function panda() {
   var P = {
-    black: C('#1a191e'), blackSoft: C('#2c2a31'), cream: C('#cfc7b8'), creamDark: C('#958c7d'), red: C('#9e2228'), redDark: C('#5e1216'),
-    gold: C('#d9ab3d'), nose: C('#0d0d0f'), gum: C('#4a1a1c'), tongue: C('#a84a52'), tooth: C('#f3eee3'), claw: C('#e6dcc6'),
-    eye: '#ffe08a', qi: '#ffe9b8', qiDeep: '#ffcf7a', qiCore: '#fffaf0'
+    black: C('#504f5a'), blackSoft: C('#6a6975'), cream: C('#efe8dc'), creamDark: C('#c4b9a7'), red: C('#ad2c32'), redDark: C('#741b20'),
+    gold: C('#d9ab3d'), nose: C('#2a2328'), gum: C('#a8505c'), tongue: C('#e8808c'), claw: C('#ece5d8'),
+    iris: C('#d98a22'), qi: '#ffe9b8', qiDeep: '#ffcf7a', qiCore: '#fffaf0'
   };
   var root = new T.Group(), legs = new T.Group(), body = new T.Group(); root.add(legs, body);
-  // the coat: muted cream, shaded down the belly, with the black band across the shoulders and down the arms
+  // the coat: warm cream, shaded down the belly, with the charcoal band across the shoulders and down the arms
   function coat(p, n) { var c = mix(P.cream, P.creamDark, sstep(.25, -.6, n.y) * .55 + sstep(.4, .95, n.y) * .15); return mix(c, P.black, sstep(2.28, 2.42, p.y)); }
   var BODYL = { c: coat }, FURB = { c: function (p, n) { return mix(P.blackSoft, P.black, sstep(-.2, .7, n.y)); } }, FURW = { c: coat };
   var HEADW = { c: function (p, n) { return mix(P.cream, P.creamDark, sstep(.1, -.7, n.y) * .5); } };
   var GOLD = { c: P.gold, m: 'metal' }, WRAP = { c: function (p, n) { return mix(P.red, P.redDark, sstep(.3, -.6, n.y)); } };
-  var CLAW = { c: P.claw, m: 'gloss', noAO: true, noOcc: true }, TOOTH = { c: P.tooth, m: 'gloss', noAO: true, noOcc: true };
+  var CLAW = { c: P.claw, m: 'gloss', noAO: true, noOcc: true };
   var RIB = { m: 'plume', g: [P.redDark, P.red, C('#c83a34')], noOcc: true, aoK: .3 };
   var UPV = [0, 1, 0];
 
-  // body: a broad, heavy trunk leaning into the guard, a deep chest, a black band over huge shoulders
+  // body: a broad, heavy trunk leaning into the guard, a deep chest, a charcoal band over huge shoulders
   part(body, blob(1.25, .9, 1.25, .85), FURB, -.05, 1.3, 0);
   part(body, blob(1.42, 1.5, 1.45, .86, function (x, y, z, W, H) { var t = (y / H + 1) / 2; return [x * (.9 + .2 * t), y, z * (.88 + .22 * t)]; }), BODYL, .02, 1.95, 0, 0, 0, -.14);
   [1, -1].forEach(function (s) { part(body, blob(.78, .72, .7, .85), FURB, .1, 2.42, s * .66, 0, 0, -.1); });
-  // a black belt, a gold buckle and the red tails of a knot
+  // a charcoal belt, a gold buckle and the red tails of a knot
   var belt = [];
   for (var b = 0; b < 24; b++) { var ab = b / 24 * Math.PI * 2; belt.push([Math.cos(ab) * .7 - .03, 1.5, Math.sin(ab) * .7]); }
   part(body, ttube(belt, .1, .1, 8, 72, true), { c: P.black });
@@ -63,23 +63,20 @@ export function panda() {
     ARMS[s > 0 ? 'r' : 'l'] = arm;
   });
 
-  // head: round and heavy, low behind the guard; black patches with slit eyes under a black brow, a snarl
+  // head: round and heavy, low behind the guard; charcoal patches round big amber eyes, the headband for a brow, a small open smile
   var head = new T.Group(); head.position.set(.46, 2.86, 0); head.rotation.z = -.12; body.add(head);
   part(head, blob(1.06, .94, 1.02, .9), HEADW, 0, 0, 0);
   part(head, blob(.46, .36, .5, .85), HEADW, .6, -.18, 0);
   part(head, blob(.2, .14, .26, .75), { c: P.nose, m: 'gloss' }, .86, -.06, 0);
-  var jaw = new T.Group(); jaw.position.set(.24, -.36, 0); jaw.rotation.z = -.28; head.add(jaw);
+  var jaw = new T.Group(); jaw.position.set(.24, -.36, 0); jaw.rotation.z = -.12; head.add(jaw);
   part(jaw, blob(.52, .15, .42, .8, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y, z * (1 - .3 * t)]; }), HEADW, .26, -.04, 0);
   part(jaw, blob(.44, .05, .32, .8), { c: P.gum, noOcc: true }, .25, .03, 0);
   part(jaw, blob(.26, .05, .16, .9), { c: P.tongue, m: 'gloss', noOcc: true }, .2, .06, 0);
-  part(head, blob(.44, .05, .36, .8), { c: P.gum, noOcc: true }, .56, -.36, 0);
-  [.12, -.12].forEach(function (z) { shard(head, .05, .17, 6, TOOTH, [.7, -.36, z], [0, -1, 0]); shard(jaw, .045, .14, 6, TOOTH, [.46, .03, z * .9], [0, 1, 0]); });
   var eyes = [];
   [.36, -.36].forEach(function (z) {
-    part(head, blob(.34, .44, .17, .8), FURB, .4, .04, z, z > 0 ? .55 : -.55, 0, -.3);
-    eyes.push(glow(head, blob(.17, .055, .05, .7), P.eye, .49, .08, z * 1.05, 0, z > 0 ? -.3 : .3, -.38));
-    halo(head, P.eye, .3, .52, .08, z * 1.12, .5);
-    part(head, blob(.4, .12, .24, .8), FURB, .4, .22, z * .95, 0, z > 0 ? -.15 : .15, -.5);
+    part(head, blob(.36, .44, .17, .8), FURB, .4, .04, z, z > 0 ? .55 : -.55, 0, -.25);
+    // the eye tipped up a little toward the battle camera, which looks down on it
+    var ey = eye(head, P.iris, .465, .08, z * 1.26, .25, .27, z > 0 ? .55 : -.55, 0); ey.rotation.x = z > 0 ? -.35 : .35; eyes.push(ey);
     part(head, blob(.28, .28, .15, .85), FURB, -.12, .42, z * 1.2);
   });
   // a headband: a red loop with a gold plate, and two tails that stream behind
@@ -124,13 +121,13 @@ export function panda() {
       var br = Math.sin(t * 1.6), sway = Math.sin(t * .9);
       body.position.y = br * .015; body.position.x = sway * .02; body.scale.set(1, 1 + br * .006, 1 + br * .008);
       head.rotation.z = -.12 + Math.sin(t * .8) * .03; head.rotation.y = Math.sin(t * .55) * .06;
-      jaw.rotation.z = -.28 - (br * .5 + .5) * .05;
+      jaw.rotation.z = -.12 - (br * .5 + .5) * .04;
       tails.rotation.y = Math.sin(t * 3.1) * .22; tails.rotation.z = Math.sin(t * 2.3) * .08;
       wisps.forEach(function (g, i) { var w = Math.sin(t * 5 + i * 1.7) * .5 + Math.sin(t * 3.3 + i) * .5; g.scale.set(1 - w * .06, 1 + w * .16, 1 - w * .06); });
       fistGlows.forEach(function (h, i) { var k = .4 + .12 * Math.sin(t * 3 + i * 2); h.material.opacity = k; });
       placeSparks(t);
       light.intensity = 1.9 + Math.sin(t * 2.2) * .3;
-      var blink = (t % 5.2) < .12 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
+      var blink = ((t + 2.6) % 5.2) < .12 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
     }
   };
 }

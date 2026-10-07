@@ -154,8 +154,8 @@ A player should be able to tell a creature's role from its outline before readin
 | Stormtalon (reworked, rigged) | Electric | brown `#8a6446` / `#6a4a33`, buff `#e6d2b0`, white head `#f6f1e6`, yellow beak and feet | lightning `#ffb800` > `#ffe23a` > `#fffbd0`, cold edge `#9fd8ff` | iris `#e8a21e` |
 | Sunmane (reworked, rigged) | Light | tawny `#c99a5c` / `#a87a44`, cream `#f3e4c6`, mane `#66361a` > `#d08a3c` | gold `#ffcf5a`, sunburst `#ffb02e` > `#fff6d0` | iris `#d9861c` |
 | Grandtusk (reworked, rigged) | Ice | wool `#8d6e57` / `#715641`, tips `#c4a98f`, cream `#e6d5bf`, ivory | ice `#4aa8ff` > `#a8e4ff` > `#f2fdff`, crystal `#7fd4ff` | iris `#4f9fd6` |
-| Ironpaw (reworked, rigged) | Neutral | black `#1a191e`, cream `#cfc7b8`, red wraps `#9e2228`, gold | white-gold qi `#ffcf7a` > `#ffe9b8` > `#fffaf0` | `#ffe08a` |
-| Duskseer (reworked, rigged) | Dark | indigo `#3a3150` / `#221c30`, lavender breast `#857b98` | violet `#5a2bbf` > `#a58cff` > `#e6dcff` | `#ffb52e` |
+| Ironpaw (reworked, rigged) | Neutral | charcoal `#504f5a` / `#6a6975`, cream `#efe8dc`, red wraps, gold | white-gold qi `#ffcf7a` > `#ffe9b8` > `#fffaf0` | iris `#d98a22` |
+| Duskseer (reworked, rigged) | Dark | lavender-indigo `#6b628a` / `#554c70`, breast `#e6dde4`, disc `#efe8ea` | violet `#5a2bbf` > `#a58cff` > `#e6dcff` | iris `#e48a1e` |
 
 ### Rules for every creature (new or changed)
 

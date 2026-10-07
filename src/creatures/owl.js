@@ -2,27 +2,27 @@ import * as T from 'three';
 import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
 import { glowMat, halo } from '../kit/materials.js';
-import { feather, finish, glow, part } from '../kit/parts.js';
+import { eye, feather, finish, glow, part } from '../kit/parts.js';
 import { chain, hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
-// DUSKSEER: a horned owl of the night, stern under a V brow, a crest of shadow quills burning violet
+// DUSKSEER: a horned owl of the night, big amber eyes under a soft brow, a crest of shadow quills burning violet
 // =====================================================================
 export function owl() {
   var P = {
-    plum: C('#3a3150'), dark: C('#221c30'), bar: C('#16111f'), chest: C('#857b98'), disc: C('#a99fba'), discDark: C('#5d5372'),
-    brow: C('#17121f'), beak: C('#2b2530'), leg: C('#6e6488'), talon: C('#1c1820'),
-    eye: '#ffb52e', deep: '#5a2bbf', mid: '#a58cff', core: '#e6dcff'
+    plum: C('#6b628a'), dark: C('#554c70'), chest: C('#e6dde4'), disc: C('#efe8ea'), discDark: C('#b3a8c8'),
+    beak: C('#c4974a'), leg: C('#9a90b6'), talon: C('#4a4252'),
+    iris: C('#e48a1e'), deep: '#5a2bbf', mid: '#a58cff', core: '#e6dcff'
   };
   var root = new T.Group(), legs = new T.Group(), body = new T.Group(); root.add(legs, body);
   var UPV = [0, 1, 0], r = rng(41);
-  // plumage: near-black indigo on the back, a muted lavender breast
-  function plum(p, n) { var c = mix(P.plum, P.dark, sstep(.1, .8, n.y) * .7); return mix(c, P.chest, sstep(.35, .9, n.x) * .55 * sstep(1.0, 1.6, p.y)); }
+  // plumage: lavender-indigo, darker on the back, a pale lavender-cream breast
+  function plum(p, n) { var c = mix(P.plum, P.dark, sstep(.1, .8, n.y) * .7); return mix(c, P.chest, sstep(.35, .9, n.x) * .7 * sstep(1.0, 1.6, p.y)); }
   var BODYL = { c: plum };
-  var CHEST = { m: 'plume', g: [C('#5f5674'), C('#8a80a0'), C('#2c2440')], noOcc: true, aoK: .3 };
-  var WING = { m: 'plume', g: [C('#1d1729'), C('#3a3150'), C('#16111f')], noOcc: true, aoK: .3 };
-  var WINGC = { m: 'plume', g: [C('#3a3150'), C('#56496e'), C('#8d84a0')], noOcc: true, aoK: .3 };
-  var TUFT = { m: 'plume', g: [C('#16111f'), C('#2c2440'), C('#4a3e66')], noOcc: true, aoK: .3 };
+  var CHEST = { m: 'plume', g: [C('#c8bdd0'), C('#efe6e2'), C('#ab9fbe')], noOcc: true, aoK: .3 };
+  var WING = { m: 'plume', g: [C('#4c4369'), C('#6a5f8c'), C('#463e62')], noOcc: true, aoK: .3 };
+  var WINGC = { m: 'plume', g: [C('#6a5f8c'), C('#857aa6'), C('#bdb3d0')], noOcc: true, aoK: .3 };
+  var TUFT = { m: 'plume', g: [C('#4a4168'), C('#5f5582'), C('#7c71a0')], noOcc: true, aoK: .3 };
   var LEGL = { c: function (p, n) { return mix(P.leg, P.dark, sstep(.2, -.5, n.y) * .4); } }, CLAW = { c: P.talon, m: 'gloss', noAO: true, noOcc: true };
 
   // body: upright and broad in the shoulder, a breast of barred scale-feathers, fluffed thighs
@@ -62,7 +62,7 @@ export function owl() {
     LEGS[z > 0 ? 'r' : 'l'] = leg;
   });
 
-  // head: wide and round with a pale heart-shaped disc, a stern V brow over amber eyes, a hooked beak that can
+  // head: wide and round with a pale heart-shaped disc, a soft brow over big round amber eyes, a hooked beak that can
   // open, and tall ear tufts tipped with violet; a crest of shadow quills fans back from the crown
   // the head rests turned a quarter toward the camera's side (+z), as an owl's does, so its face reads in battle
   var head = new T.Group(); head.position.set(.14, 2.32, 0); head.rotation.y = -.45; body.add(head);
@@ -70,10 +70,8 @@ export function owl() {
   var eyes = [];
   [1, -1].forEach(function (s) {
     part(head, blob(.16, .7, .5, .9), { c: function (p, n) { return mix(P.disc, P.discDark, sstep(.1, .6, Math.abs(p.z) - .1)); } }, .5, -.04, s * .27, 0, s * .12, 0);
-    part(head, blob(.5, .12, .26, .8), { c: P.brow, noOcc: true }, .52, .2, s * .24, s > 0 ? .3 : -.3, s * -.35, -.38);
-    var ey = glow(head, new T.SphereGeometry(.17, 18, 14), P.eye, .55, .02, s * .27); ey.scale.x = .55; eyes.push(ey);
-    part(head, new T.SphereGeometry(.075, 12, 10), { c: '#0a0810', noOcc: true, noAO: true, m: 'gloss' }, .63, .02, s * .27);
-    halo(head, P.eye, .5, .62, .04, s * .3, .45);
+    part(head, blob(.44, .1, .26, .8), BODYL, .5, .25, s * .25, 0, s * -.3, -.1);
+    eyes.push(eye(head, P.iris, .57, .02, s * .27, .36, .36, s * (Math.PI / 2 - .25), 0));
     feather(head, TUFT, [-.05, .36, s * .28], [-.45, 1, s * .3], UPV, .78, .24, .1);
     feather(head, TUFT, [-.12, .32, s * .22], [-.6, 1, s * .15], UPV, .58, .2, .1);
     var tip = [-.05 + (-.45 / 1.14) * .78 * .92, .36 + (1 / 1.14) * .78 * .92, s * (.28 + (.3 / 1.14) * .78 * .9)];
@@ -103,7 +101,7 @@ export function owl() {
   }
   placeMotes(0);
   halo(body, P.deep, 3.2, 0, 1.7, 0, .16);
-  var light = new T.PointLight(0x9a7cff, 2, 3.6, 1.6); light.position.set(.6, 2.4, .5); body.add(light);
+  var light = new T.PointLight(0x9a7cff, 1.2, 3.6, 1.6); light.position.set(.6, 2.4, .5); body.add(light);
 
   // the neck joint, low in the shoulders, carrying the head; an owl turns its head a long way on it
   var neck = new T.Group(); neck.position.set(.1, 2.1, 0); body.add(neck);
@@ -121,8 +119,8 @@ export function owl() {
       jaw.rotation.z = -(Math.sin(t * .9) * .5 + .5) * .05;
       crest.scale.setScalar(1 + Math.sin(t * 2.6) * .05);
       placeMotes(t);
-      light.intensity = 1.9 + Math.sin(t * 1.3) * .35;
-      var blink = (t % 6.1) < .16 ? .12 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
+      light.intensity = 1.15 + Math.sin(t * 1.3) * .2;
+      var blink = ((t + 3) % 6.1) < .16 ? .12 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
     }
   };
 }
