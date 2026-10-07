@@ -27,6 +27,19 @@ export function glow(parent, geo, color, x, y, z, rx, ry, rz, op) {
   return mesh;
 }
 
+// a friendly eye, set into the side of a head: a glossy coloured iris, a dark pupil toward the outside and a
+// white catchlight up and forward. It is a Group, so scaling its y blinks it. w and h are its width and height
+// (keep h at least 0.75 w: narrow slits read as menacing), ry and rz turn and tilt it like any part.
+export function eye(parent, iris, x, y, z, w, h, ry, rz, pupil) {
+  var g = new T.Group(), s = z >= 0 ? 1 : -1, L = function (c) { return { c: c, m: 'gloss', noAO: true, noOcc: true }; };
+  g.position.set(x, y, z); g.rotation.set(0, ry || 0, rz || 0); parent.add(g);
+  part(g, blob(w, h, w * .42, .8), L(iris));
+  part(g, blob(w * .6, h * .66, w * .3, .85), L(pupil || '#191314'), -w * .04, -h * .04, s * w * .1);
+  var hl = glow(g, blob(w * .24, w * .24, w * .1, .9), '#ffffff', w * .14, h * .2, s * w * .2);
+  hl.userData.noBloom = true;
+  return g;
+}
+
 // a limb segment from a (top) to b (bottom), radius r0 at a and r1 at b
 export function seg(parent, a, b, r0, r1, look, e, flatZ) {
   var A = new T.Vector3(a[0], a[1], a[2]), B = new T.Vector3(b[0], b[1], b[2]);

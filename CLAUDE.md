@@ -101,32 +101,32 @@ Analysed from the code and from renders of all eleven creatures (October 2026). 
 
 ### What the style is
 
-**"Painted vinyl toy with magic in it."** Smooth, soft, sculpted volumes with no texture, lit like a studio figurine, with one element's magic glowing out of it.
+**"Painted vinyl toy with magic in it."** Smooth, soft, sculpted volumes with no texture, lit like a studio figurine, with one element's magic glowing out of it. The mood is a **friendly adventure, like Pokémon**: mid-value, gently coloured, neither dark nor neon, and never creepy (decision A2, revised October 2026).
 
 | Trait | How it is done |
 | --- | --- |
 | Soft sculpted volumes | `blob()` superellipsoids, `e` between 0.7 and 0.9, sculpted with `deform`. Hard edges only on stone (`m: 'flat'`) and crystal. |
-| Built from anatomy | Torso + chest + haunch blobs, `seg` limbs shoulder > elbow > wrist > paw, hocks on hind legs, toes and claws. Real animal structure, pushed heroic: deep chest, tucked waist, heavy shoulders. |
+| Built from anatomy | Torso + chest + haunch blobs, `seg` limbs shoulder > elbow > wrist > paw, hocks on hind legs, toes and claws. Real animal structure, pushed a little heroic: deep chest, tucked waist, strong shoulders. |
 | Colour by function, not texture | Counter-shading on every body: dark on top (`sstep` on `n.y`), pale belly, chest or throat. Patterns (spots, hex plates, stripes, wrinkles) are colour functions of world position. |
 | Baked light | `finish()` bakes a ground gradient (0.78 at the feet to 1.0 at the top) and contact shading into vertex colours. No textures, ever. |
 | Hair and feathers as cards | `lock` for fur (darker root, lighter tip, `tipAmt` 0.5 to 0.9), `feather` with a 3-stop `g` gradient root > mid > tip. Always `noOcc: true`, `aoK` about 0.3 to 0.4. |
-| Natural body, magic accent | Body colours are natural and muted (greys, browns, olive, slate). The element is the only saturated colour, and it is unlit (`glow`, `toneMapped: false`). |
-| Glowing eyes | Every creature: an unlit `glow` eye, a `halo` sprite on it (all but Grandtusk), and a blink in `update` (`scale.y` to about 0.1 for 0.12 to 0.16 s every 4.7 to 6.3 s). Nine of eleven eyes are warm yellow to amber; only Tidefang (cyan) and Thornstag (green) take the element colour. |
+| Natural body, magic accent | Body colours are natural, **mid-value** and gently saturated (warm browns, blue-greys, sage, tawny, teal), never near black. The element is the only glowing colour, and it is unlit (`glow`, `toneMapped: false`). |
+| Friendly eyes | Every creature: the kit's `eye()` (a glossy coloured iris, a dark pupil, a white catchlight), round rather than slit (height at least 0.75 of the width), under a soft brow in the body colour, and a blink in `update` (`scale.y` to about 0.1 for 0.12 to 0.16 s every 4.7 to 6.3 s). No glowing eyes, no halo on the eye. |
 | Gloss for the hard bits | Teeth, claws, nails, noses, beaks, tongues are `m: 'gloss'`, usually `noAO` and `noOcc`. Teeth and claws are off-white (`#f3eee3` family), never pure white. |
-| Gold trim as rank | Gold or iron bands, rims, buckles and sigils (`m: 'metal'`, gold `#d9ab3d` / dark `#9a6a1a`) mark the "trained, heroic" creatures. |
+| Gold trim as rank | Gold or iron bands, rims, buckles and sigils (`m: 'metal'`, gold `#d9ab3d` / dark `#9a6a1a`) mark the "trained" creatures. |
 | Element kit | Each creature draws on the same five layers of magic: rune lines (`ttube` glow, radius 0.01 to 0.02), motes (tiny icosahedra that rise or orbit), a body `halo` (opacity 0.16 to 0.35), an element-specific feature (flame mane, crystal spine, antler bloom, ward shields...), and one `PointLight` in the element colour. |
 | Alive at rest | `update` always has breathing (body y and scale, period about 3 to 6 s), a slow head sway, a secondary motion (tail, ears, jaw, wings) and the blink. |
 
 ### The benchmark: Emberwolf
 
-The tone is **heroic**, and **Emberwolf is the benchmark**. Every creature, new or reworked, should feel like it belongs in the same pack as the wolf. What gives Emberwolf its vibe, and what every creature takes from it:
+The tone is **friendly and adventurous, like Pokémon** (revised October 2026: the first, darker "heroic" look read as too dark and a bit creepy), and **Emberwolf is the benchmark**. Every creature, new or reworked, should feel like it belongs in the same pack as the wolf. What gives Emberwolf its vibe, and what every creature takes from it:
 
-1. **Dark, quiet body; loud element.** The body is low in value and muted (`#36313b` to `#544c5c`), so the element glow is the brightest thing on screen by far. Contrast in *value*, not body saturation.
-2. **Heavy brow over glowing slit eyes.** A dark brow ridge sits over narrow glowing eyes angled inward. Determined, not cute. Support creatures may open the eyes wider, but keep the brow.
+1. **Mid-value body; glowing element.** The body is a clear, friendly mid-tone (blue-grey `#8590a8` over `#66718a`, a cream chest `#e8ddcb`), so the creature reads as light and approachable, and the element glow still pops as the only unlit colour. Not dark, not neon.
+2. **Bright, round eyes under a soft brow.** `eye()` with a warm coloured iris, a dark pupil and a catchlight; a brow in the body colour gives a little determination, never a scowl. Lively and brave, not menacing.
 3. **The element grows out of the anatomy.** Flames rise from the mane line, ember veins run under the fur, the tail burns at the tip. Magic lives on and in the body, not orbiting around it.
 4. **One dominant element shape on the top line.** The flame mane runs crown to back. Seen from the side, the top of the silhouette tells you the element at once (flame mane, crystal spine, antler bloom, storm crest...).
 5. **Layered surface rhythm.** Overlapping clumps of locks (or feathers, scales, plates), darker at the root and paler at the tip, break up the big shapes.
-6. **The weapon on show.** An open jaw with fangs, hooked claws, talons, horns or tusks: the viewer can see how it hurts you. Calm supports show their tool (antlers, shell) instead.
+6. **The weapon on show, kept friendly.** A pair of fangs (not a row of teeth), claws, talons, horns or tusks: the viewer can see how it fights. Calm supports show their tool (antlers, shell) instead.
 7. **Forward weight.** Chest high and forward, head low and level, ready to lunge.
 
 ### Roles shape the silhouette
@@ -164,7 +164,7 @@ A player should be able to tell a creature's role from its outline before readin
 1. **Read at battle size first.** Design the silhouette for the battle camera, then add detail. In the battle preview at 1280 x 720 a creature stands about **100 to 150 px** tall, ground to top (the size-box labels show the number); under about 80 px it is too small to read (Tidefang today: 54). If it is not recognisable in the preview's **Silhouette** mode at that size, it is not done. Close-up detail is a bonus, never the point.
 2. **One element, one accent hue.** The body stays natural and muted; the element owns the only saturated, glowing colour. No second competing glow colour (a pale core of the same hue is fine).
 3. **Counter-shade the body.** Darker on top, paler underneath, via a colour function on `n.y`. No flat single-colour bodies.
-4. **Eyes glow and blink.** Unlit `glow` eye + `halo` + blink in `update`. Eyes must be big enough to read at battle size (see weakness 9 below).
+4. **Friendly eyes that blink.** The kit's `eye()` + blink in `update`; no glowing eyes. Eyes must be big enough to read at battle size (see weakness 9 below).
 5. **Neutral battle stance as the build pose.** Standing, facing `+x`, weight on all feet, ready. Attacks, strikes and punches are animation, not the build pose.
 6. **Fit the footprint.** The solid body (no FX) fits its size class (see table; `npm run stats` and the preview's Size boxes check it). Battle formation slots are fixed; a creature that does not fit overlaps its neighbour.
 7. **FX live in their own group.** Auras, orbiting shields, rocks, rings, moons, perches, wind ribbons and particles go in an `fx` group (marked `userData.noFit`) that the game can scale, shorten or switch off. Nothing in `fx` may reach more than 1.5 x the body's half-length from its centre.
@@ -223,12 +223,12 @@ On screen, from front-middle at 720p, a top of 3.5 stands about 128 px tall, 4.0
 8. **Weak value contrast.** Thornstag (Sunmane, Grandtusk and Wardshell darkened in 1.1, 1.4 and 1.6) have mid-value bodies, so their element glow does not pop the way Emberwolf's does. Darken or deepen the body before brightening the glow.
 9. **Small faces.** (Grandtusk and Stonemaul fixed in 1.4 and 1.5); Tidefang's and Stormtalon's heads are tiny relative to the body. Faces carry personality and must read.
 10. **Thin or flat silhouettes.** Thornstag is mostly antler on a slim body (Tidefang raised in 1.7).
-11. ~~Off-tone creatures.~~ Fixed: Ironpaw (1.2) and Duskseer (1.3) pulled toward heroic with dark brows over glowing eyes.
+11. ~~Off-tone creatures.~~ Fixed: Ironpaw (1.2) and Duskseer (1.3) pulled toward the house tone.
 
 ### Checklist before you call a creature done
 
 - [ ] Silhouette recognisable in the battle preview's Silhouette mode, **from the side**, at true size (`npm run render -- --battle <id>`).
-- [ ] Passes the Emberwolf test: dark quiet body, brow over glowing eyes, element growing from the body, element shape on the top line, weapon on show.
+- [ ] Passes the Emberwolf test: friendly mid-value body, bright round eyes under a soft brow, element growing from the body, element shape on the top line, weapon on show but not menacing.
 - [ ] Role readable from the outline.
 - [ ] Body counter-shaded, one element accent, eyes glow and blink.
 - [ ] Neutral battle stance, faces `+x`, feet on `y = 0` (or hover base for flyers).
@@ -263,7 +263,8 @@ Made by the owner, October 2026. Treat them as rules.
 | # | Decision |
 | --- | --- |
 | A1 | **Render style: 3D clay figures** (the current procedural look). No toon shading, no 2D sprites. |
-| A2 | **Tone: heroic.** Emberwolf is the benchmark (see above). |
+| A2 | **Tone: friendly adventure, like Pokémon** (revised October 2026; first set as "heroic"). Mid-value, gently coloured bodies, neither too dark nor too bright, childlike but not babyish, never creepy. Emberwolf is the benchmark (see above). |
+| A10 | **Some creatures attack from range** (projectiles, beams, bursts) instead of lunging. Which ones, and how a ranged attack looks, is set per creature; the clip system's `travel` track can stay at zero for them. |
 | A3 | **No evolution for now.** Wanted later; not in the first rounds. Do not design evolution stages yet. |
 | A4 | **Roster target: 30 to 60** unique creatures. |
 | A5 | **Side view** battle camera. |

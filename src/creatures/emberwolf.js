@@ -2,7 +2,7 @@ import * as T from 'three';
 import { C, mix, rng, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
 import { glowMat, halo } from '../kit/materials.js';
-import { finish, flameCluster, glow, lock, part, shard } from '../kit/parts.js';
+import { eye, finish, flameCluster, glow, lock, part, shard } from '../kit/parts.js';
 import { bind, hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
@@ -10,9 +10,9 @@ import { bind, hang, limb, makeRig } from '../kit/rig.js';
 // =====================================================================
 export function emberwolf() {
   var P = {
-    furDark: C('#36313b'), fur: C('#544c5c'), furLight: C('#8c8392'), cream: C('#b3aab3'), earIn: C('#8a4b52'),
-    paw: C('#2c2830'), claw: C('#ece5d8'), nose: C('#141116'), gum: C('#4e1820'), tongue: C('#c1505f'), tooth: C('#f3eee3'),
-    eye: '#ffb72e', ember: '#ff4510', emberMid: '#ff8d1c', emberCore: '#ffe885', vein: '#ff9a26'
+    furDark: C('#66718a'), fur: C('#8590a8'), furLight: C('#e8ddcb'), cream: C('#f6efe2'), earIn: C('#e8a493'),
+    paw: C('#5a637a'), claw: C('#ece5d8'), nose: C('#2a2328'), gum: C('#a8505c'), tongue: C('#e8808c'), tooth: C('#f3eee3'),
+    iris: C('#e0861c'), ember: '#ff4510', emberMid: '#ff8d1c', emberCore: '#ffe885', vein: '#ff9a26'
   };
   var root = new T.Group(), legs = new T.Group(), body = new T.Group(); root.add(legs, body);
   var flames = [], embers = [];
@@ -25,7 +25,7 @@ export function emberwolf() {
   }
   var FUR = { c: coat }, PAW = { c: P.paw };
   // locks of fur: smooth, darker at the root, lighter at the tip, with only a little contact shading
-  var LOCK = { c: coat, tip: P.furLight, tipAmt: .75, aoK: .4 }, LOCKL = { c: P.furLight, tip: P.cream, tipAmt: .7, aoK: .4 };
+  var LOCK = { c: coat, tip: P.furLight, tipAmt: .35, aoK: .4 }, LOCKL = { c: P.furLight, tip: P.cream, tipAmt: .5, aoK: .4 };
   // torso: deep chest, tucked waist, a slight arch
   part(body, blob(1.95, 1.0, 1.0, .82, function (x, y, z, W) {
     var xn = x / W, t = (xn + 1) / 2, sy = .84 + .3 * t, sz = .84 + .24 * t;
@@ -77,7 +77,7 @@ export function emberwolf() {
   part(head, blob(.15, .12, .19, .7), { c: P.nose, m: 'gloss' }, .84, -.05, 0);
   [.06, -.06].forEach(function (z) { part(head, blob(.04, .03, .03, 1), { c: '#000000', noAO: true, noOcc: true }, .9, -.08, z); });
   // jaw on a hinge, a little open
-  var jaw = new T.Group(); jaw.position.set(.18, -.25, 0); jaw.rotation.z = -.2; head.add(jaw);
+  var jaw = new T.Group(); jaw.position.set(.18, -.25, 0); jaw.rotation.z = -.14; head.add(jaw);
   part(jaw, blob(.58, .14, .3, .72, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y, z * (1 - .3 * t)]; }), { c: function (p, n) { return mix(P.fur, P.cream, sstep(.2, -.7, n.y)); } }, .3, -.05, 0);
   part(jaw, blob(.52, .1, .24, .8), { c: P.gum, noOcc: true }, .28, .03, 0);
   part(jaw, blob(.32, .06, .16, .9), { c: P.tongue, m: 'gloss', noOcc: true }, .24, .07, 0);
@@ -86,15 +86,12 @@ export function emberwolf() {
   [.12, -.12].forEach(function (z) {
     shard(head, .045, .2, 6, TOOTH, [.72, -.25, z], [0, -1, 0]);
     shard(jaw, .04, .16, 6, TOOTH, [.5, .02, z * .85], [-.1, 1, 0]);
-    [.36, .46, .56].forEach(function (x) { shard(head, .024, .08, 5, TOOTH, [x, -.27, z * 1.08], [0, -1, 0]); });
-    [.22, .32].forEach(function (x) { shard(jaw, .022, .07, 5, TOOTH, [x, .02, z * .9], [0, 1, 0]); });
   });
-  // eyes: glowing slits under a heavy brow, ears with a dark inner, a cheek ruff
+  // eyes: round and bright under a soft brow, ears with a pink inner, a cheek ruff
   var eyes = [], ears = [];
   [.31, -.31].forEach(function (z) {
-    part(head, blob(.22, .12, .06, .8), { c: P.furDark, noOcc: true }, .25, .06, z * 1.01, 0, z > 0 ? -.25 : .25, -.15);
-    eyes.push(glow(head, blob(.17, .07, .05, .7), P.eye, .27, .06, z * 1.05, 0, z > 0 ? -.25 : .25, -.18));
-    halo(head, P.eye, .28, .3, .06, z * 1.15, .45);
+    part(head, blob(.24, .07, .1, .8), FUR, .25, .2, z * .98, 0, z > 0 ? -.25 : .25, .05);
+    eyes.push(eye(head, P.iris, .28, .06, z * 1.04, .2, .18, z > 0 ? -.25 : .25, 0));
     var ear = new T.Group(); ear.position.set(-.12, .32, z * .62); ear.rotation.set(z > 0 ? .2 : -.2, 0, .32); head.add(ear); ears.push(ear);
     part(ear, blob(.24, .56, .3, .72, function (x, y, zz, W, H) { var t = (y / H + 1) / 2; return [x * (1 - .7 * t), y, zz * (1 - .65 * t)]; }), FUR, 0, .26, 0);
     part(ear, blob(.1, .4, .22, .75, function (x, y, zz, W, H) { var t = (y / H + 1) / 2; return [x * (1 - .7 * t), y, zz * (1 - .7 * t)]; }), { c: P.earIn, noOcc: true }, .08, .22, 0);
@@ -156,7 +153,7 @@ export function emberwolf() {
       var br = Math.sin(t * 2.1);
       body.position.y = br * .015; body.scale.set(1, 1 + br * .008, 1 + br * .01);
       head.rotation.z = -.06 + Math.sin(t * 1.1) * .045; head.rotation.y = Math.sin(t * .7) * .06;
-      jaw.rotation.z = -.2 - (Math.sin(t * 2.1) * .5 + .5) * .06;
+      jaw.rotation.z = -.14 - (Math.sin(t * 2.1) * .5 + .5) * .06;
       tail.rotation.y = Math.sin(t * 2.3) * .28; tail.rotation.z = Math.sin(t * 1.6) * .06;
       flames.forEach(function (f, i) { var w = Math.sin(t * 13 + i * 1.9) * .5 + Math.sin(t * 7.1 + i * 2.3) * .5; f.scale.set(1 - w * .07, 1 + w * .15, 1 - w * .07); });
       light.intensity = 4 + Math.sin(t * 17) * .6 + Math.sin(t * 9.3) * .5;
