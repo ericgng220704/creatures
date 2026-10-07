@@ -64,20 +64,22 @@ export function bakeLights(a) {
 }
 
 // ---------- finding what moves ----------
-function state(o) {
+// a part's state: its transform, and its material's values when the material is its own. A material shared by
+// several parts (a pulsing crystal) changes for all of them alike, so they can still merge and share it
+function state(o, users) {
   var s = o.position.toArray().concat(o.quaternion.toArray(), o.scale.toArray(), [o.visible ? 1 : 0]);
-  if (o.material) { var m = o.material; s.push(m.opacity, m.emissiveIntensity || 0, m.color ? m.color.getHex() : 0); }
+  if (o.material && users.get(o.material) === 1) { var m = o.material; s.push(m.opacity, m.emissiveIntensity || 0, m.color ? m.color.getHex() : 0); }
   if (o.geometry && o.geometry.attributes.position) s.push(o.geometry.attributes.position.version);
   return s;
 }
 function liveSet(a) {
-  var objs = [], first = [], live = new Set();
-  a.root.traverse(function (o) { objs.push(o); });
+  var objs = [], first = [], live = new Set(), users = new Map();
+  a.root.traverse(function (o) { objs.push(o); if (o.material) users.set(o.material, (users.get(o.material) || 0) + 1); });
   [0, .41, 1.3, 2.23, 3.71, 4.75, 6.2].forEach(function (t, i) {
     if (a.rig) restPose(a.rig);
     a.update(t);
     objs.forEach(function (o, j) {
-      var s = state(o);
+      var s = state(o, users);
       if (!i) first[j] = s;
       else if (!live.has(o) && s.some(function (v, q) { return Math.abs(v - first[j][q]) > 1e-6; })) live.add(o);
     });

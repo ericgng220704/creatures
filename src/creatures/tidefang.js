@@ -2,23 +2,23 @@ import * as T from 'three';
 import { C, mix, sstep } from '../kit/math.js';
 import { blob, crystalGeo, ttube } from '../kit/geometry.js';
 import { crystalMat, halo } from '../kit/materials.js';
-import { UP, finish, glow, part, seg, shard } from '../kit/parts.js';
-import { makeRig } from '../kit/rig.js';
+import { UP, finish, glow, part, shard } from '../kit/parts.js';
+import { hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
-// TIDEFANG
+// TIDEFANG: a heavy armoured crocodile carrying the sea in crystal, high on its arms, jaws wide
 // =====================================================================
 export function tidefang() {
   var P = {
-    back: C('#1f4e60'), flank: C('#3a8197'), belly: C('#d9e8d6'), scute: C('#28596b'), keel: C('#6fb3c2'),
+    back: C('#163c4b'), flank: C('#2a5f70'), belly: C('#d9e8d6'), scute: C('#28596b'), keel: C('#6fb3c2'),
     mouth: C('#b25466'), gum: C('#7d2f3d'), tooth: C('#f4f0e6'), claw: C('#e3ece6'), web: C('#5b9fb0'),
     crystal: '#3fd2ff', crystalGlow: '#0099ff', core: '#c9fbff', eye: '#b4fdff', wave: '#8ff6ff'
   };
   var root = new T.Group(), legs = new T.Group(), body = new T.Group(); root.add(legs, body);
   // the body rides high on its arms; the tail slopes down to the ground behind it
-  var LIFT = .2, TD = .7, TY = .6;
+  var LIFT = .42, TD = .78, TY = .6, TL = 1.75;
   body.position.y = LIFT;
-  var crystals = [];
+  var crystals = [], CRY = crystalMat(P.crystal, P.crystalGlow);   // one material: every crystal pulses together
   function hide(p, n) {
     var c = mix(P.flank, P.back, sstep(.2, .8, n.y));
     if (n.y > -.25 && Math.sin(p.x * 7.5) > .55) c.multiplyScalar(.82);
@@ -38,22 +38,22 @@ export function tidefang() {
   part(body, blob(1.1, .72, 1.0, .82, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y * (1 - .12 * t), z * (1 - .08 * t)]; }), HIDE, 1.1, .62, 0);
   // tail: one tapered, flattened body; a travelling wave bends it, and its crest rides along
   var TAIL0 = -.95, tailPts = [], riders = [];
-  for (var k = 0; k <= 6; k++) { var tt = k / 6; tailPts.push([TAIL0 - tt * 2.55, TY - tt * TD + Math.sin(tt * Math.PI) * .04, 0]); }
+  for (var k = 0; k <= 6; k++) { var tt = k / 6; tailPts.push([TAIL0 - tt * TL, TY - tt * TD + Math.sin(tt * Math.PI) * .04, 0]); }
   var tailGeo = ttube(tailPts, .44, .035, 14, 44), tp = tailGeo.attributes.position;
-  for (var i = 0; i < tp.count; i++) { var ty = tp.getY(i), tcy = TY - Math.min(1, (TAIL0 - tp.getX(i)) / 2.55) * TD; tp.setZ(i, tp.getZ(i) * .86); tp.setY(i, tcy + (ty - tcy) * 1.05); }
+  for (var i = 0; i < tp.count; i++) { var ty = tp.getY(i), tcy = TY - Math.min(1, (TAIL0 - tp.getX(i)) / TL) * TD; tp.setZ(i, tp.getZ(i) * .86); tp.setY(i, tcy + (ty - tcy) * 1.05); }
   tailGeo.computeVertexNormals();
   part(body, tailGeo, HIDE);
   var tailBase = Float32Array.from(tp.array);
-  function tailR(x) { var t = Math.min(1, Math.max(0, (TAIL0 - x) / 2.55)); return { t: t, r: .44 + (.035 - .44) * Math.pow(t, .9), y: TY - t * TD + Math.sin(t * Math.PI) * .04 }; }
-  for (var cxp = TAIL0 - .1; cxp > TAIL0 - 2.4; cxp -= .14) {
+  function tailR(x) { var t = Math.min(1, Math.max(0, (TAIL0 - x) / TL)); return { t: t, r: .44 + (.035 - .44) * Math.pow(t, .9), y: TY - t * TD + Math.sin(t * Math.PI) * .04 }; }
+  for (var cxp = TAIL0 - .1; cxp > TAIL0 - TL + .15; cxp -= .12) {
     var q = tailR(cxp), h = .13 - q.t * .07;
     (q.t < .55 ? [.1 * (1 - q.t), -.1 * (1 - q.t)] : [0]).forEach(function (z) {
       riders.push(shard(body, .05 - q.t * .02, h, 4, { c: P.keel, m: 'flat' }, [cxp, q.y + q.r * .9, z], [-.35, 1, z * 2], Math.PI / 4));
     });
   }
-  var fan = new T.Group(), qe = tailR(TAIL0 - 2.5); fan.position.set(TAIL0 - 2.5, qe.y, 0); body.add(fan); riders.push(fan);
+  var fan = new T.Group(), qe = tailR(TAIL0 - TL + .05); fan.position.set(TAIL0 - TL + .05, qe.y, 0); body.add(fan); riders.push(fan);
   [-.55, 0, .55].forEach(function (a) {
-    var c = new T.Mesh(crystalGeo(.055, .5 - Math.abs(a) * .18), crystalMat(P.crystal, P.crystalGlow));
+    var c = new T.Mesh(crystalGeo(.055, .5 - Math.abs(a) * .18), CRY);
     c.rotation.set(0, 0, 1.3 + a); c.castShadow = true; fan.add(c); crystals.push(c);
   });
   riders.forEach(function (m) { m.userData.base = m.position.clone(); m.userData.baseQ = m.quaternion.clone(); });
@@ -73,7 +73,7 @@ export function tidefang() {
   for (var cx = -.95; cx <= .95; cx += .38) {
     var s = .8 + (cx + .95) / 1.9 * .5, grp = new T.Group(); grp.position.set(cx, topY(cx) + .02, 0); body.add(grp);
     [[0, .55, 0, .11], [.08, .38, .2, .08], [-.06, .34, -.22, .08], [.12, .26, -.05, .06]].forEach(function (k) {
-      var c = new T.Mesh(crystalGeo(k[3] * s, k[1] * s), crystalMat(P.crystal, P.crystalGlow));
+      var c = new T.Mesh(crystalGeo(k[3] * s, k[1] * s), CRY);
       c.position.set(k[0] * s, 0, 0); c.rotation.set(k[2] * 2, 0, .28); c.castShadow = true; grp.add(c); crystals.push(c);
       glow(grp, crystalGeo(k[3] * s * .4, k[1] * s * .75), P.core, k[0] * s, 0, 0, k[2] * 2, 0, .28, .4);
     });
@@ -86,7 +86,7 @@ export function tidefang() {
     glow(body, ttube(pts, .02, .012, 6, 40), P.wave);
   });
   // head: wide skull, long snout, bulb nose, eye turrets, a heavy jaw
-  var head = new T.Group(); head.position.set(1.46, .54, 0); head.rotation.z = -.07; head.scale.set(1, 1.22, 1.08); body.add(head);
+  var head = new T.Group(); head.position.set(1.46, .54, 0); head.rotation.z = -.07; head.scale.set(1.0, 1.4, 1.25); body.add(head);
   // profile along the head: t = 0 at the back of the skull, 1 at the nose
   function bulb(t) { return Math.exp(-Math.pow((t - .92) / .06, 2)); }
   function headH(t) { return (t < .28 ? 1 : 1 - .48 * sstep(.28, .85, t)) + .22 * bulb(t); }
@@ -118,42 +118,48 @@ export function tidefang() {
   // legs: a muscled shoulder or hip, a long upper arm, an elbow knuckle, a heavy forearm,
   // then a palm with five toes in front (four behind) joined by a web, each toe ending in a claw
   var CLAW = { c: P.claw, m: 'gloss', noAO: true };
+  var LEGS = {};
   [[.62, 1], [.62, -1], [-.7, 1], [-.7, -1]].forEach(function (l) {
     var x = l[0], s = l[1], back = x < 0;
-    var sh = [x, .84, s * .54], el = back ? [x + .12, .45, s * .96] : [x - .04, .43, s * .92], wr = back ? [x - .08, .14, s * .82] : [x + .08, .13, s * .8];
-    part(legs, blob(back ? .5 : .4, .4, .34, .85), HIDE, x, .78, s * .6, 0, 0, back ? .25 : -.2);
-    seg(legs, sh, el, back ? .21 : .18, back ? .14 : .12, HIDE);
-    part(legs, blob(.22, .22, .22, .9), HIDE, el[0], el[1], el[2]);
-    seg(legs, el, wr, back ? .13 : .12, .085, HIDE);
-    part(legs, blob(.15, .13, .15, .9), HIDE, wr[0], wr[1], wr[2]);
+    var sh = [x, 1.06, s * .54], el = back ? [x + .12, .6, s * .96] : [x - .04, .58, s * .92], wr = back ? [x - .08, .14, s * .82] : [x + .08, .13, s * .8];
+    var leg = limb(legs, [sh, el, wr], [[back ? .21 : .18, back ? .14 : .12], [back ? .13 : .12, .085]], HIDE), upper = [], lower = [], foot = [];
+    upper.push(part(legs, blob(back ? .5 : .4, .4, .34, .85), HIDE, x, 1.0, s * .6, 0, 0, back ? .25 : -.2));
+    lower.push(part(legs, blob(.22, .22, .22, .9), HIDE, el[0], el[1], el[2]));
+    foot.push(part(legs, blob(.15, .13, .15, .9), HIDE, wr[0], wr[1], wr[2]));
     // keeled scutes up the back edge of each segment
     [[sh, el], [el, wr]].forEach(function (pair, pi) {
       [.25, .55, .85].forEach(function (t) {
         var bp = [pair[0][0] + (pair[1][0] - pair[0][0]) * t - .07, pair[0][1] + (pair[1][1] - pair[0][1]) * t + .06, pair[0][2] + (pair[1][2] - pair[0][2]) * t + s * .05];
-        shard(legs, .036 - pi * .006, .1 - pi * .02, 4, SCUTE, bp, [-.4, .8, s * .5], Math.PI / 4);
+        (pi ? lower : upper).push(shard(legs, .036 - pi * .006, .1 - pi * .02, 4, SCUTE, bp, [-.4, .8, s * .5], Math.PI / 4));
       });
     });
     // a small crystal pushing out of each elbow
     [[.04, .2, .9, .45], [.03, .13, .45, -.25]].forEach(function (k, ki) {
-      var c = new T.Mesh(crystalGeo(k[0], k[1]), crystalMat(P.crystal, P.crystalGlow));
+      var c = new T.Mesh(crystalGeo(k[0], k[1]), CRY);
       c.position.set(el[0] - .03 - ki * .04, el[1] + .06, el[2] + s * (.08 + ki * .04));
-      c.rotation.set(s * k[2], 0, k[3]); c.castShadow = true; legs.add(c); crystals.push(c);
+      c.rotation.set(s * k[2], 0, k[3]); c.castShadow = true; legs.add(c); crystals.push(c); lower.push(c);
     });
     // the foot
     var fz = s * .82, toes = back ? [-.15, -.05, .05, .15] : [-.2, -.1, 0, .1, .2];
-    part(legs, blob(.3, .1, .34, .8), HIDE, x + .08, .06, fz);
-    part(legs, blob(.44, .03, .56, .7), { c: P.web }, x + .22, .028, fz);
+    foot.push(part(legs, blob(.3, .1, .34, .8), HIDE, x + .08, .06, fz), part(legs, blob(.44, .03, .56, .7), { c: P.web }, x + .22, .028, fz));
     toes.forEach(function (dz) {
       var reach = .07 * (1 - Math.abs(dz) / .22), mid = [x + .2 + reach * .6, .065, fz + dz * .85], tip = [x + .34 + reach, .045, fz + dz * 1.25];
-      seg(legs, [x + .04, .07, fz + dz * .3], mid, .05, .042, HIDE);
-      seg(legs, mid, tip, .042, .03, HIDE);
-      shard(legs, .024, .09, 5, CLAW, [tip[0] + .03, tip[1], tip[2]], [1, -.35, dz * 1.2]);
+      foot.push(part(legs, ttube([[x + .04, .07, fz + dz * .3], mid, tip], .05, .03, 6, 6), HIDE));
+      foot.push(shard(legs, .024, .09, 5, CLAW, [tip[0] + .03, tip[1], tip[2]], [1, -.35, dz * 1.2]));
     });
+    hang(leg.joints[0], upper); hang(leg.joints[1], lower); hang(leg.end, foot);
+    LEGS[(back ? 'b' : 'f') + (s > 0 ? 'r' : 'l')] = leg;
   });
+  // the neck joint, behind the skull, carrying the head; and the whole crocodile a size up
+  var neck = new T.Group(); neck.position.set(1.1, .6, 0); body.add(neck);
+  hang(neck, [head]);
+  root.scale.setScalar(1.1);
   finish(root, 1.4);
   return {
     root: root, head: head, name: 'tidefang',
-    rig: makeRig({ plan: 'quadruped', body: body, head: head, jaw: jaw }),
+    rig: makeRig({ plan: 'quadruped', body: body, neck: neck, head: head, jaw: jaw, legs: LEGS }),
+    // it lunges with its jaws thrown wide and slams them shut on the target
+    clips: { attack: { tracks: { 'jaw.open': [[0, 0], [.3, .9], [.48, 0, 'in'], [.6, .3], [.85, 0]], 'head.pitch': [[0, 0], [.28, .3], [.48, -.1], [.7, 0]] } } },
     update: function (t) {
       var br = Math.sin(t * 1.6);
       body.position.y = LIFT + br * .01; body.scale.set(1, 1 + br * .01, 1 + br * .012);

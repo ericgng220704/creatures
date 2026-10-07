@@ -21,14 +21,15 @@ Cost: 227 parts, 77,258 triangles, built in about 343 ms; 57 meshes once merged.
 
 `tidefang` · element: Water · `src/creatures/tidefang.js`
 
-A heavy, armoured crocodile carrying the sea in crystal.
+A heavy armoured crocodile carrying the sea in crystal, high on its arms, jaws wide.
 
-- **Body.** Long, deep and round-bellied, carried high on arms with shoulder and hip muscle, elbow knuckles, scutes up the back of each limb and a small crystal at every elbow. Webbed feet: five clawed toes in front, four behind.
-- **Armour.** Keeled scutes in rows, a double crest down the tail, dark bands across the back, a pale belly.
-- **Face.** Eye turrets with glowing eyes, a bulb nose, an interlocking jaw with two long fangs a side, and a deeper head to match the body.
-- **Crystal.** Glowing clusters down the spine and a crystal fan at the tail, pulsing light onto its own scales, wave lines on each flank.
+- **Body.** Long, deep and round-bellied, carried high on muscled arms with elbow knuckles, scutes up the back of each limb and a small crystal at every elbow. Webbed feet: five clawed toes in front, four behind.
+- **Armour.** Keeled scutes in rows, a double crest down a shorter tail, dark bands across a deep teal back, a pale belly.
+- **Face.** A big deep head, eye turrets with glowing eyes, a bulb nose, and an interlocking jaw with two long fangs a side.
+- **Crystal.** Glowing clusters down the spine and a crystal fan at the tail, all pulsing together, and wave lines on each flank.
+- **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.7): legs as joint chains with planted feet, a neck, the jaw; the tail still swims on its own wave. Its attack throws the jaws wide and slams them shut.
 
-Cost: 341 parts, 87,714 triangles, built in about 164 ms.
+Cost: 317 parts, 65,178 triangles, built in about 150 ms; 65 meshes once merged.
 
 ## Thornstag
 

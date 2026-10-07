@@ -24,7 +24,7 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 | Creature | Id | Element | Parts | Triangles | Build (ms) |
 | --- | --- | --- | ---: | ---: | ---: |
 | Emberwolf | `emberwolf` | Fire | 227 | 77,258 | 343 |
-| Tidefang | `tidefang` | Water | 341 | 87,714 | 164 |
+| Tidefang | `tidefang` | Water | 317 | 65,178 | 150 |
 | Thornstag | `thornstag` | Grass | 242 | 110,228 | 261 |
 | Stonemaul | `stonemaul` | Ground | 249 | 90,764 | 183 |
 | Wardshell | `wardshell` | Water | 93 | 60,695 | 102 |
@@ -118,6 +118,7 @@ A built creature is hundreds of small meshes, and each is a draw call. `src/kit/
 - `bakeLights(creature)` bakes the creature's own `PointLight`s into its parts as a per-vertex glow (a `glowLight` attribute that the shared materials add to their emitted light), then takes the lights out. The creature looks the same, and no longer lights its neighbours.
 - `merge(creature)` merges every part that never moves on its own into one mesh per material per joint. It finds what moves by running `update(t)` at a few moments and watching transforms, material values and geometry: eyes, flames, embers, shields and crystals stay separate, as do rig joints and sprites. Glow parts of different colours merge through vertex colours.
 - Inside a group that moves on its own (a flickering flame), glow layers of different opacities merge too, their opacity carried in a per-vertex alpha: solid layers first, then see-through ones in the order they were made. Drawn apart, three.js sorted those layers by a camera depth they nearly share, so they flipped order now and then; merged, they hold the order they had most of the time.
+- A material shared by several parts may change in `update(t)` (a pulse) and they still merge: only a part whose material is its own counts as moving when the material changes.
 - `merge()` leaves an `InstancedMesh` alone. Swarms of particles (embers, sparks, motes) should be one `InstancedMesh` whose instances `update(t)` moves, not one mesh each: Emberwolf's 18 embers are one draw.
 - `optimize(creature)` does both. For all eleven: 2,191 meshes become 576, and the shadow pass 1,718 casters become 268. Twelve Emberwolves on the field: 4,727 draw calls a frame as built, 1,062 optimised (1,730 with bloom, which draws the scene a second time).
 
