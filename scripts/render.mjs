@@ -22,7 +22,7 @@ const wanted = args.filter(a => !a.startsWith('--'));
 const ids = wanted.length ? ORDER.filter(id => wanted.includes(id)) : ORDER;
 
 mkdirSync('renders', { recursive: true });
-const server = await createServer({ server: { port: 5199, strictPort: true }, logLevel: 'error' });
+const server = await createServer({ server: { port: +process.env.RENDER_PORT || 5199, strictPort: true }, logLevel: 'error' });
 await server.listen();
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || undefined,
