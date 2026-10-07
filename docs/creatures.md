@@ -62,14 +62,16 @@ Cost: 249 parts, 90,764 triangles, built in about 183 ms; 41 meshes once merged.
 
 `wardshell` · element: Water · `src/creatures/wardshell.js`
 
-A sturdy tortoise with a plated shell, calm and hard to move, guarded by shields that circle it.
+A deep-sea tortoise, its domed shell crested with breaking waves, its wards rising when it is struck.
 
-- **Shell.** A dome of raised hexagonal plates with sunken seams, a gold rim with spikes, a sigil and glowing gem at the crown, and a patch of moss and blossoms on one shoulder.
-- **Legs.** Four thick pillars in stone shin plates and gold bands, with blunt nails.
-- **Face.** A calm, noble head: a domed brow with a small stone crest, big golden eyes under heavy lids, a hooked beak and a closed mouth turned up at the corners.
-- **Ward.** Eight shields of light circle the whole body, with a faint ring of light on their path.
+- **Shell.** A high dark dome of raised hexagonal plates with sunken seams, a gold rim with stone spikes, and a line of water light rippling round it.
+- **Crest.** Four breaking waves along the spine of the shell, dark fins with crests of glowing water, the shape that says Water from the side.
+- **Body.** Pillar legs in stone shin plates and gold bands with blunt nails, a short spiked tail, a neck that reaches out from a gold collar.
+- **Face.** A big heavy head, stern brow scutes over amber eyes, a hooked beak that snaps, and a water gem on the crown.
+- **Wards.** Six shields of water light that rise and circle it when it is struck, and swirl round it in its ultimate.
+- **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.6): the orbiting shields only appear when it is hit or calls them (`clipFx`); legs, tail and a two-joint neck as chains, a beak jaw. Its attack draws the neck back and snaps out at the target.
 
-Cost: 107 parts, 71,911 triangles, built in about 126 ms.
+Cost: 93 parts, 60,695 triangles, built in about 102 ms; 57 meshes once merged.
 
 ## Pyrewing
 
