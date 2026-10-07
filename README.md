@@ -28,7 +28,7 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 | Thornstag | `thornstag` | Grass | 277 | 53,847 | 511 |
 | Stonemaul | `stonemaul` | Ground | 249 | 73,004 | 148 |
 | Wardshell | `wardshell` | Water | 93 | 58,919 | 99 |
-| Pyrewing | `pyrewing` | Fire | 240 | 32,284 | 55 |
+| Pyrewing | `pyrewing` | Fire | 307 | 51,005 | 328 |
 | Stormtalon | `eagle` | Electric | 178 | 33,910 | 70 |
 | Sunmane | `lion` | Light | 238 | 64,738 | 87 |
 | Grandtusk | `elephant` | Ice | 187 | 57,700 | 68 |

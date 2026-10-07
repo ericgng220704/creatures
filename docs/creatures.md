@@ -80,14 +80,16 @@ Cost: 93 parts, 60,695 triangles, built in about 102 ms; 57 meshes once merged.
 
 `pyrewing` · element: Fire · `src/creatures/pyrewing.js`
 
-A phoenix on the wing, with feathers that run from crimson to gold and burn at the tips.
+A young phoenix hovering on raised wings, warm red-orange with a golden breast, a crest and tail of living flame.
 
-- **Wings.** Wide wings in layered feathers, hinged at the arm, forearm and hand so the tips follow the beat a moment late, with flame on the longest feathers.
-- **Tail.** Seven long tail feathers and two streamers, each burning at the end.
-- **Face.** A hooked beak, burning white-gold eyes, a crest of plumes with a crown of flame.
-- **Fire.** Flames burn along the back, the neck, the shoulders, the thighs and the tail root, with a swirl of sparks round the bird and a warm glow behind it.
+- **Body.** A plump, deep-chested teardrop with a round breast of small layered feathers, feathered thighs, and golden shins drawn up under it with three ivory talons forward and one back.
+- **Plumage.** Red-orange, a shade deeper along the back and warmer orange low on the flanks, with a golden cream breast and belly. The wing and tail feathers run from deep red at the quill to golden tips.
+- **Face.** A big round head with round amber eyes on pale golden patches, a soft brow and a small hooked golden beak that can open.
+- **Fire.** A crest of three plumes swept back from the crown, each tipped with flame; flames along the back, burning tips on the longest flight feathers, three streamers of flame for a tail, sparks drifting off it and firelight on its own feathers.
+- **Strike.** It attacks with a diving swoop, raking talons and a fiery swipe. Its ultimate is ranged: it rears in a sunburst of flame and flings a volley of burning feathers at the target.
+- **Rig.** Reworked (roadmap 1.10): wings as arm > forearm > hand chains raised in a ready V, a neck joint carrying the head and crest, a jaw, a 3-joint tail, legs as joint chains.
 
-Cost: 240 parts, 34,060 triangles, built in about 69 ms.
+Cost: 307 parts, 51,005 triangles, built in about 328 ms; 152 meshes once merged.
 
 ## Stormtalon
 

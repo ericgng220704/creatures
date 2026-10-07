@@ -56,7 +56,7 @@ Order: most broken first, so the lessons arrive early.
 | 1.7 ✅ | Tidefang | Water | Attacker | Done: taller (the body rides higher on longer arms, the whole crocodile a size up), a bigger, deeper head, a shorter tail so it fits the slot, darker teal so the crystals pop. Toes are thin tubes now and every crystal shares one pulsing material: 88k triangles down to 65k. Legs, neck and jaw rigged; its attack throws the jaws wide. Fits L; 65 merged meshes. |
 | 1.8 ✅ | Thornstag | Grass | Support | Done: a heavier body and a crown fanned in the side plane that fits class M (4.4 tall down to 3.74), one green accent (the gold emblem, pink blossoms and orange mushrooms gone), friendly fawn coat and round eyes, drifting leaves and seeds instanced, a thorn-ring ultimate. Legs, neck and tail rigged; 110k triangles down to 54k. |
 | 1.9 | Stormtalon | Electric | Speedster | Wingspan down to 6.0; wind ribbons become lightning; a perched or hovering battle stance; storm crest on the top line. |
-| 1.10 | Pyrewing | Fire | Speedster | Wingspan down to 6.0; hover stance; check it reads apart from Emberwolf (both Fire). |
+| 1.10 ✅ | Pyrewing | Fire | Speedster | Done: a hovering firebird that fits class F (length 6.01 to 4.09, lowest point 0.36 to 1.03), friendly red-orange plumage and round eyes so it reads apart from Emberwolf, a flame crest on the top line, wings, neck, tail and legs rigged, a diving-swoop attack and the first ranged ultimate (a volley of burning feathers, travel 0). 51k triangles. |
 
 Each creature: one session or two (**M** each). After each, update `docs/creatures.md`, the README table, and render the full current roster side by side in the battle view.
 

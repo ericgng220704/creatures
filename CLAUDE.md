@@ -150,7 +150,7 @@ A player should be able to tell a creature's role from its outline before readin
 | Thornstag (reworked, rigged) | Grass | fawn `#b98b5c` / `#94693f`, cream `#f1e4c9`, bark `#86684a` | leaf `#4c973a` > `#78c255` > `#c4ff86` | iris `#8a9a35` |
 | Stonemaul (reworked, rigged) | Ground | dark brown `#4f3828` / `#2c1f17`, stone `#5f626d`, iron | amber `#c96a1a` > `#ffb347` > `#ffe0a0` | `#ffad33` |
 | Wardshell (reworked, rigged) | Water | deep-sea shell `#2c4f4c` / `#142826`, slate skin `#4a5548`, gold | water `#0099ff` > `#3fd2ff` > `#c9fbff` | `#ffd75a` |
-| Pyrewing | Fire | crimson `#a31f17` > gold `#ffc233` | ember (same as Emberwolf) | `#fff3b0` |
+| Pyrewing (reworked, rigged) | Fire | red-orange `#cc5a38` / `#a8442e`, cream breast `#f5e0b4` | ember `#ff4510` > `#ff8d1c` > `#ffe885` | iris `#d9781c` |
 | Stormtalon | Electric | brown `#4a3426`, white head | wind `#cfe8ff` | `#ffc933` |
 | Sunmane (reworked, rigged) | Light | tawny `#c99a5c` / `#a87a44`, cream `#f3e4c6`, mane `#66361a` > `#d08a3c` | gold `#ffcf5a`, sunburst `#ffb02e` > `#fff6d0` | iris `#d9861c` |
 | Grandtusk (reworked, rigged) | Ice | dark brown `#4a382d` / `#2b201a`, frost tips `#9fb3c2`, ivory | ice `#4aa8ff` > `#a8e4ff` > `#f2fdff`, crystal `#7fd4ff` | `#bff0ff` |
