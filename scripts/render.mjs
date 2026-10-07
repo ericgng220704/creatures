@@ -30,6 +30,7 @@ const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist']
 });
 const page = await browser.newPage({ viewport: battle ? { width: 1312, height: 1000 } : { width: 1180, height: 1000 } });
+page.setDefaultTimeout(400000);   // software WebGL under load can take minutes
 const problems = [];
 page.on('pageerror', e => problems.push(e.message));
 page.on('console', m => { if (m.type() === 'error') problems.push(m.text()); });
