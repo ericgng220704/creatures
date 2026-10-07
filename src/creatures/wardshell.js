@@ -2,11 +2,11 @@ import * as T from 'three';
 import { C, mix, sstep } from '../kit/math.js';
 import { blob, ttube } from '../kit/geometry.js';
 import { glowMat, halo } from '../kit/materials.js';
-import { band, finish, glow, onLimb, part, plateGeo, shard } from '../kit/parts.js';
+import { band, eye, finish, glow, onLimb, part, plateGeo, shard } from '../kit/parts.js';
 import { hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
-// WARDSHELL: a deep-sea tortoise, its domed shell crested with breaking waves, its wards rising when it is struck
+// WARDSHELL: a sea tortoise, its domed shell crested with breaking waves, its wards rising when it is struck
 // =====================================================================
 // a hexagonal cell grid on the x-z plane: the cell's id, and d, 0 at its centre to 1 at its edge
 function hexCell(x, z, size) {
@@ -20,10 +20,10 @@ function hexCell(x, z, size) {
 }
 export function wardshell() {
   var P = {
-    shell: C('#2c4f4c'), shellDark: C('#142826'), shellLight: C('#4f7a70'), groove: C('#0b1a1a'),
-    gold: C('#d9ab3d'), skin: C('#4a5548'), skinDark: C('#2e382f'), plastron: C('#8f8a70'),
-    stone: C('#56605e'), stoneDark: C('#323a39'), nail: C('#d8d0b8'), beak: C('#3a352a'),
-    eye: '#ffd75a', water: '#0099ff', waterMid: '#3fd2ff', waterCore: '#c9fbff'
+    shell: C('#5a9a84'), shellDark: C('#3f7262'), shellLight: C('#86bca2'), groove: C('#2f5a4c'),
+    gold: C('#d9ab3d'), skin: C('#97a06f'), skinDark: C('#737d52'), plastron: C('#ece0bd'),
+    stone: C('#9a9c92'), stoneDark: C('#74776e'), nail: C('#ece4cf'), beak: C('#86704c'),
+    iris: C('#e0952c'), water: '#0099ff', waterMid: '#3fd2ff', waterCore: '#c9fbff'
   };
   var root = new T.Group(), legs = new T.Group(), body = new T.Group(); root.add(legs, body);
   var SW = 3.1, SH = 2.2, SD = 2.6, SE = .78, CY = 1.2, HEX = .5;
@@ -57,7 +57,7 @@ export function wardshell() {
     if (Math.abs(ck) > .9) continue;
     shard(body, .085, .3, 5, STONE, [ck * 1.58, 1.24, sk * 1.34], [ck, .55, sk], k);
   }
-  // the crest: four breaking waves along the spine of the shell, each a dark fin with a crest of glowing water,
+  // the crest: four breaking waves along the spine of the shell, each a shell-green fin with a crest of glowing water,
   // drawn in the plane the camera sees so the top line says Water
   var WAVE = [[-.32, 0], [-.26, .3], [-.14, .58], [.04, .8], [.24, .86], [.4, .76], [.42, .6], [.3, .54], [.2, .6], [.14, .5], [.24, .3], [.32, 0]];
   var EDGE = [[-.32, 0], [-.26, .3], [-.14, .58], [.04, .8], [.24, .86], [.4, .76], [.42, .6]];
@@ -88,7 +88,7 @@ export function wardshell() {
   // the neck: a chain that can reach out and draw back, with a gold collar at its root
   var neckC = limb(body, [[1.2, 1.05, 0], [1.62, 1.22, 0], [2.02, 1.34, 0]], [[.54, .48], [.48, .44]], SKIN, .9);
   hang(neckC.root, band(body, GOLD, [1.2, 1.05, 0], [1.62, 1.22, 0], .35, .54, .18));
-  // the head: big and heavy, stern brow scutes over amber eyes, a hooked beak with a jaw that snaps, a water gem
+  // the head: big and heavy, soft brows over round honey eyes, a hooked beak with a jaw that snaps, a water gem
   var HEADSKIN = { c: function (p, n) { var c = mix(P.skin, P.skinDark, sstep(.5, .95, n.y) * .3); return mix(c, P.plastron, sstep(-.2, -.8, n.y) * .5); } };
   var head = new T.Group(); head.position.set(.2, .02, 0); head.rotation.z = -.04; neckC.end.add(head);
   part(head, blob(.98, .86, .86, .9), HEADSKIN, 0, .03, 0);
@@ -98,9 +98,8 @@ export function wardshell() {
   part(jaw, blob(.5, .12, .36, .8, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, y, z * (1 - .5 * t)]; }), { c: P.beak, m: 'gloss' }, .34, -.02, 0);
   var eyes = [];
   [.33, -.33].forEach(function (z) {
-    part(head, blob(.42, .16, .26, .6), STONE, .3, .25, z * .95, 0, z > 0 ? -.2 : .2, -.32);
-    eyes.push(glow(head, blob(.2, .1, .07, .8), P.eye, .36, .12, z * 1.04, 0, z > 0 ? -.3 : .3, -.18));
-    halo(head, P.eye, .4, .4, .12, z * 1.1, .45);
+    part(head, blob(.4, .11, .24, .75), HEADSKIN, .29, .31, z * .92, 0, z > 0 ? -.2 : .2, -.06);
+    eyes.push(eye(head, P.iris, .36, .12, z * 1.06, .24, .21, z > 0 ? -.3 : .3, 0));
   });
   part(head, blob(.3, .12, .2, .6), STONE, .1, .42, 0);
   glow(head, new T.IcosahedronGeometry(.08, 1), P.waterMid, .3, .42, 0);

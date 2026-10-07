@@ -21,11 +21,11 @@ Cost: 227 parts, 77,258 triangles, built in about 343 ms; 57 meshes once merged.
 
 `tidefang` · element: Water · `src/creatures/tidefang.js`
 
-A heavy armoured crocodile carrying the sea in crystal, high on its arms, jaws wide.
+A heavy armoured crocodile carrying the sea in crystal, high on its arms, with a toothy grin.
 
 - **Body.** Long, deep and round-bellied, carried high on muscled arms with elbow knuckles, scutes up the back of each limb and a small crystal at every elbow. Webbed feet: five clawed toes in front, four behind.
-- **Armour.** Keeled scutes in rows, a double crest down a shorter tail, dark bands across a deep teal back, a pale belly.
-- **Face.** A big deep head, eye turrets with glowing eyes, a bulb nose, and an interlocking jaw with two long fangs a side.
+- **Armour.** Keeled scutes in rows, a double crest down a shorter tail, soft bands across a teal-blue back, a cream belly that wraps up onto the lower flanks.
+- **Face.** A big deep head, round amber eyes in soft eye turrets under a ridge, a bulb nose, and a nearly closed grin with one pair of fangs above and a small pair below.
 - **Crystal.** Glowing clusters down the spine and a crystal fan at the tail, all pulsing together, and wave lines on each flank.
 - **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.7): legs as joint chains with planted feet, a neck, the jaw; the tail still swims on its own wave. Its attack throws the jaws wide and slams them shut.
 
@@ -65,12 +65,12 @@ Cost: 249 parts, 90,764 triangles, built in about 183 ms; 41 meshes once merged.
 
 `wardshell` · element: Water · `src/creatures/wardshell.js`
 
-A deep-sea tortoise, its domed shell crested with breaking waves, its wards rising when it is struck.
+A sea tortoise, its domed shell crested with breaking waves, its wards rising when it is struck.
 
-- **Shell.** A high dark dome of raised hexagonal plates with sunken seams, a gold rim with stone spikes, and a line of water light rippling round it.
-- **Crest.** Four breaking waves along the spine of the shell, dark fins with crests of glowing water, the shape that says Water from the side.
+- **Shell.** A high green-teal dome of raised hexagonal plates with sunken seams, a gold rim with stone spikes, and a line of water light rippling round it.
+- **Crest.** Four breaking waves along the spine of the shell, shell-green fins with crests of glowing water, the shape that says Water from the side.
 - **Body.** Pillar legs in stone shin plates and gold bands with blunt nails, a short spiked tail, a neck that reaches out from a gold collar.
-- **Face.** A big heavy head, stern brow scutes over amber eyes, a hooked beak that snaps, and a water gem on the crown.
+- **Face.** A big heavy head, soft brows over round honey eyes, a hooked beak that snaps, and a water gem on the crown.
 - **Wards.** Six shields of water light that rise and circle it when it is struck, and swirl round it in its ultimate.
 - **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.6): the orbiting shields only appear when it is hit or calls them (`clipFx`); legs, tail and a two-joint neck as chains, a beak jaw. Its attack draws the neck back and snaps out at the target.
 

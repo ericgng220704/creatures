@@ -146,10 +146,10 @@ A player should be able to tell a creature's role from its outline before readin
 | Creature | Element | Body | Element glow | Eye |
 | --- | --- | --- | --- | --- |
 | Emberwolf (the pilot, fully rigged) | Fire | blue-grey `#8590a8` / `#66718a`, cream `#e8ddcb` | ember `#ff4510` > `#ff8d1c` > `#ffe885` | iris `#e0861c` |
-| Tidefang (reworked, rigged) | Water | deep teal `#163c4b` / `#2a5f70`, pale belly | crystal `#3fd2ff`, `#0099ff` | `#b4fdff` |
+| Tidefang (reworked, rigged) | Water | teal-blue `#5f9db0` / `#467f93`, cream belly `#f3ebd6` | crystal `#3fd2ff`, `#0099ff`, core `#c9fbff` | iris `#e8a23a` |
 | Thornstag (reworked, rigged) | Grass | fawn `#b98b5c` / `#94693f`, cream `#f1e4c9`, bark `#86684a` | leaf `#4c973a` > `#78c255` > `#c4ff86` | iris `#8a9a35` |
 | Stonemaul (reworked, rigged) | Ground | warm brown `#93725a` / `#755a46`, cream `#ecdcc2`, stone `#9a9ca6` / `#767884`, iron | amber `#c96a1a` > `#ffb347` > `#ffe0a0` | iris `#d9861e` |
-| Wardshell (reworked, rigged) | Water | deep-sea shell `#2c4f4c` / `#142826`, slate skin `#4a5548`, gold | water `#0099ff` > `#3fd2ff` > `#c9fbff` | `#ffd75a` |
+| Wardshell (reworked, rigged) | Water | shell `#5a9a84` / `#3f7262`, sage skin `#97a06f`, cream plastron `#ece0bd`, gold | water `#0099ff` > `#3fd2ff` > `#c9fbff` | iris `#e0952c` |
 | Pyrewing (reworked, rigged) | Fire | red-orange `#cc5a38` / `#a8442e`, cream breast `#f5e0b4` | ember `#ff4510` > `#ff8d1c` > `#ffe885` | iris `#d9781c` |
 | Stormtalon (reworked, rigged) | Electric | brown `#8a6446` / `#6a4a33`, buff `#e6d2b0`, white head `#f6f1e6`, yellow beak and feet | lightning `#ffb800` > `#ffe23a` > `#fffbd0`, cold edge `#9fd8ff` | iris `#e8a21e` |
 | Sunmane (reworked, rigged) | Light | tawny `#c99a5c` / `#a87a44`, cream `#f3e4c6`, mane `#66361a` > `#d08a3c` | gold `#ffcf5a`, sunburst `#ffb02e` > `#fff6d0` | iris `#d9861c` |

@@ -2,17 +2,17 @@ import * as T from 'three';
 import { C, mix, sstep } from '../kit/math.js';
 import { blob, crystalGeo, ttube } from '../kit/geometry.js';
 import { crystalMat, halo } from '../kit/materials.js';
-import { UP, finish, glow, part, shard } from '../kit/parts.js';
+import { UP, eye, finish, glow, part, shard } from '../kit/parts.js';
 import { hang, limb, makeRig } from '../kit/rig.js';
 
 // =====================================================================
-// TIDEFANG: a heavy armoured crocodile carrying the sea in crystal, high on its arms, jaws wide
+// TIDEFANG: a heavy armoured crocodile carrying the sea in crystal, high on its arms, a toothy grin
 // =====================================================================
 export function tidefang() {
   var P = {
-    back: C('#163c4b'), flank: C('#2a5f70'), belly: C('#d9e8d6'), scute: C('#28596b'), keel: C('#6fb3c2'),
-    mouth: C('#b25466'), gum: C('#7d2f3d'), tooth: C('#f4f0e6'), claw: C('#e3ece6'), web: C('#5b9fb0'),
-    crystal: '#3fd2ff', crystalGlow: '#0099ff', core: '#c9fbff', eye: '#b4fdff', wave: '#8ff6ff'
+    back: C('#467f93'), flank: C('#5f9db0'), belly: C('#f3ebd6'), scute: C('#3f7488'), keel: C('#9ccbd4'),
+    mouth: C('#d98591'), gum: C('#bc6573'), tooth: C('#f4f0e6'), claw: C('#efe9dc'), web: C('#7fb4c2'), nostril: C('#26434d'),
+    crystal: '#3fd2ff', crystalGlow: '#0099ff', core: '#c9fbff', iris: C('#e8a23a'), wave: '#8ff6ff'
   };
   var root = new T.Group(), legs = new T.Group(), body = new T.Group(); root.add(legs, body);
   // the body rides high on its arms; the tail slopes down to the ground behind it
@@ -22,7 +22,7 @@ export function tidefang() {
   function hide(p, n) {
     var c = mix(P.flank, P.back, sstep(.2, .8, n.y));
     if (n.y > -.25 && Math.sin(p.x * 7.5) > .55) c.multiplyScalar(.82);
-    return mix(c, P.belly, sstep(-.2, -.55, n.y));
+    return mix(c, P.belly, sstep(.05, -.35, n.y));
   }
   var HIDE = { c: hide };
   // body: long, deep and round, with a full belly
@@ -94,27 +94,24 @@ export function tidefang() {
   var HL = 1.96, HX = .62;
   part(head, blob(HL, .5, .84, .78, function (x, y, z, W) { var t = (x / W + 1) / 2; return [x, (y > 0 ? y * .85 : y) * headH(t), z * headW(t)]; }, 40, 20), HIDE, HX, 0, 0);
   function halfW(lx) { var t = (lx - (HX - HL / 2)) / HL; return .42 * headW(t); }
-  [.07, -.07].forEach(function (z) { part(head, blob(.07, .04, .055, .9), { c: '#0d1a20', noOcc: true }, 1.47, .1, z); });
+  [.07, -.07].forEach(function (z) { part(head, blob(.07, .04, .055, .9), { c: P.nostril, noOcc: true }, 1.47, .1, z); });
   for (var b = 0; b < 7; b++) part(head, blob(.06, .045, .06, .9), { c: P.keel, m: 'flat', noOcc: true }, .42 + b * .14, .15 - b * .012, (b % 2 ? .09 : -.09));
   var eyes = [];
   [.25, -.25].forEach(function (z) {
-    part(head, blob(.24, .17, .2, .8), HIDE, .16, .15, z * .92);
-    part(head, blob(.2, .045, .1, .8), { c: P.back, m: 'flat', noOcc: true }, .14, .23, z * .96, 0, 0, -.14);
-    eyes.push(glow(head, blob(.1, .05, .06, .75), P.eye, .22, .18, z * 1.26, 0, z > 0 ? -.3 : .3, -.08));
-    halo(head, P.eye, .24, .24, .18, z * 1.4, .5);
+    part(head, blob(.3, .21, .22, .8), HIDE, .16, .15, z * .92);
+    part(head, blob(.26, .06, .12, .8), HIDE, .15, .245, z * .97, 0, 0, -.05);
+    eyes.push(eye(head, P.iris, .23, .16, z * 1.32, .2, .13, z > 0 ? -.3 : .3, 0));
   });
-  var jaw = new T.Group(); jaw.position.set(-.08, -.12, 0); jaw.rotation.z = -.11; head.add(jaw);
+  var jaw = new T.Group(); jaw.position.set(-.08, -.12, 0); jaw.rotation.z = -.03; head.add(jaw);
   part(jaw, blob(1.78, .32, .78, .8, function (x, y, z, W) { var t = (x / W + 1) / 2, tt = .14 + t * .86; return [x, y, z * headW(tt) * .95]; }, 40, 20), { c: function (p, n) { return mix(P.flank, P.belly, sstep(.1, -.6, n.y)); } }, .9, -.13, 0);
   part(jaw, blob(1.6, .06, .66, .8, function (x, y, z, W) { var t = (x / W + 1) / 2, tt = .18 + t * .78; return [x, y, z * headW(tt) * .9]; }), { c: P.mouth, noOcc: true }, .85, .01, 0);
-  part(head, blob(1.5, .05, .7, .8, function (x, y, z, W) { var t = (x / W + 1) / 2, tt = .2 + t * .76; return [x, y, z * headW(tt) * .92]; }), { c: P.gum, noOcc: true }, .82, -.21, 0);
+  part(head, blob(1.5, .05, .7, .8, function (x, y, z, W) { var t = (x / W + 1) / 2, tt = .2 + t * .76; return [x, y, z * headW(tt) * .92]; }), { c: P.gum, noOcc: true }, .82, -.17, 0);
   var TOOTH = { c: P.tooth, m: 'gloss', noAO: true, noOcc: true };
-  for (var k = 0; k < 13; k++) {
-    var tx2 = .24 + k * .108, half = halfW(tx2) - .03, big = k === 3 || k === 9;
-    [half, -half].forEach(function (z) {
-      shard(head, big ? .036 : .026, big ? .19 : .11 + (k % 2) * .03, 5, TOOTH, [tx2, -.2, z], [0, -1, z * .4]);
-      shard(jaw, .024, .1 + ((k + 1) % 2) * .03, 5, TOOTH, [tx2 + .1, .03, z * .96], [0, 1, z * .4]);
-    });
-  }
+  // a pair of fangs over the lip near the snout, and a smaller pair rising from the jaw
+  [halfW(1.18) - .01, -(halfW(1.18) - .01)].forEach(function (z) {
+    shard(head, .038, .22, 5, TOOTH, [1.18, -.17, z], [0, -1, z * .5]);
+    shard(jaw, .026, .1, 5, TOOTH, [1.0, .03, z * .9], [0, 1, z * .4]);
+  });
   // legs: a muscled shoulder or hip, a long upper arm, an elbow knuckle, a heavy forearm,
   // then a palm with five toes in front (four behind) joined by a web, each toe ending in a claw
   var CLAW = { c: P.claw, m: 'gloss', noAO: true };
@@ -164,7 +161,7 @@ export function tidefang() {
       var br = Math.sin(t * 1.6);
       body.position.y = LIFT + br * .01; body.scale.set(1, 1 + br * .01, 1 + br * .012);
       head.rotation.y = Math.sin(t * .6) * .05; head.rotation.z = -.07 + Math.sin(t * .9) * .02;
-      jaw.rotation.z = -.11 - (Math.sin(t * .9) * .5 + .5) * .07;
+      jaw.rotation.z = -.03 - (Math.sin(t * .9) * .5 + .5) * .03;
       var arr = tp.array;
       for (var i = 0; i < tp.count; i++) arr[i * 3 + 2] = tailBase[i * 3 + 2] + wave(tailBase[i * 3], t);
       tp.needsUpdate = true; tailGeo.computeVertexNormals();
