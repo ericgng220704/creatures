@@ -126,7 +126,14 @@ var PLAN = {
     faint: { 'wings.lift': [[0, 0], [.6, -.5]], 'wings.beat': [[0, .25], [.3, .05], [1, 0]], 'body.y': [[0, 0], [.2, .15], [.9, -1.1, 'in']] },
     victory: { 'wings.lift': [[0, 0], [.3, .7], [.75, .7], [1, 0]], 'wings.beat': [[0, .25], [.3, .45], [1, .25]], 'body.y': [[0, 0], [.3, .4], [.75, .4], [1, 0]] }
   },
-  perched: {}
+  // perched birds stand on two legs and keep their wings folded: they flare them to strike, and leap talons first
+  perched: {
+    attack: { 'wings.lift': [[0, 0], [.28, 1.0], [.45, .3], [.6, .6], [.85, 0]], 'feet.x': [[0, 0], [.3, 0], [.42, .5], [.5, .55], [.6, 0]], 'feet.y': [[0, 0], [.32, .3], [.45, .45], [.55, 0]] },
+    ultimate: { 'wings.lift': [[0, 0], [.35, 1.25], [.6, .4], [.8, 0]], 'feet.x': [[0, 0], [.45, 0], [.56, .6], [.66, 0]], 'feet.y': [[0, 0], [.47, .3], [.58, .5], [.66, 0]] },
+    hit: { 'wings.lift': [[0, 0], [.12, .5], [.6, 0]] },
+    faint: { 'wings.lift': [[0, 0], [.6, -.15]] },
+    victory: { 'wings.lift': [[0, 0], [.3, 1.3], [.75, 1.3], [1, 0]] }
+  }
 };
 export var CLIP_NAMES = ['attack', 'ultimate', 'hit', 'faint', 'victory'];
 

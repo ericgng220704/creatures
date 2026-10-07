@@ -142,11 +142,13 @@ Cost: 80 parts, 52,090 triangles, built in about 71 ms; 40 meshes once merged.
 
 `owl` · element: Dark · `src/creatures/owl.js`
 
-A wise owl on a mossy branch, awake while the world sleeps.
+A horned owl of the night, stern under a V brow, a crest of shadow quills burning violet.
 
-- **Face.** A heart of pale feathers round huge golden eyes, a small hooked beak and two ear tufts, on a head that turns far round.
-- **Plumage.** A chest of barred scale-feathers, wings folded down the sides, a short barred tail.
-- **Perch.** Talons gripping a forked, mossy branch held up by a root.
-- **Night.** A crescent moon behind, stars that drift, and a ring of rune light turning on the ground.
+- **Face.** A pale heart-shaped disc, amber eyes under a stern black V brow, a hooked beak that opens, tall ear tufts tipped with violet; the head rests turned toward the camera, as an owl's does.
+- **Crest.** Shadow quills fanned from crown to nape, violet with pale cores, the shape that says Dark from the side.
+- **Plumage.** Near-black indigo on the back, a muted lavender breast of barred scale-feathers, wings folded down the sides with a violet crescent and rune lines on each, a short dark tail.
+- **Stance.** Upright on short feathered legs, three hooked talons forward and one back, motes of starlight drifting round it.
+- **Rig.** Reworked to the Emberwolf benchmark (roadmap 1.3): the moon, branch and ground ring are gone; legs as joint chains with planted talons, wings on shoulder joints that flare, a neck, and a jaw in the beak. Attacks with a talon-first leap, wings flared (the shared perched clips).
 
-Cost: 159 parts, 25,374 triangles, built in about 41 ms.
+Cost: 139 parts, 21,424 triangles, built in about 44 ms; 28 meshes once merged.
+

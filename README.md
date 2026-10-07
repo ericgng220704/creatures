@@ -33,7 +33,7 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 | Sunmane | `lion` | Light | 238 | 86,050 | 120 |
 | Grandtusk | `elephant` | Ice | 63 | 54,404 | 74 |
 | Ironpaw | `panda` | Neutral | 80 | 52,090 | 71 |
-| Duskseer | `owl` | Dark | 159 | 25,374 | 41 |
+| Duskseer | `owl` | Dark | 139 | 21,424 | 44 |
 
 Cost is measured by `npm run stats` at three r158. Descriptions of each are in [docs/creatures.md](docs/creatures.md).
 
