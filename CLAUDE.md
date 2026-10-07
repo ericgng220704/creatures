@@ -213,17 +213,13 @@ On screen, from front-middle at 720p, a top of 3.5 stands about 128 px tall, 4.0
 
 ### Known weaknesses (from the renders; fix these before making more)
 
-1. **Mixed vibes.** Only Emberwolf fully has the benchmark look. The rest need reworking to it (decided: the owner wants every creature to feel like the wolf).
-2. ~~Balloon limbs.~~ Fixed in 1.1, 1.2 and 1.4: limbs are tapered chains with a knob at the middle joint (and Grandtusk's pillars hide under its shaggy skirt).
-3. ~~Sunmane's mane reads as spikes.~~ Fixed in 1.1: clumps of three locks swept back toward the shoulders, darker at the root. The lesson for any mane or ruff: locks pointing straight out from the head read as petals; sweep them back.
-4. **Sizes are all over the place.** Three of eleven fail their class (Ironpaw, Wardshell and Tidefang fixed in 1.2, 1.6 and 1.7) (`npm run stats`, exact vertex bounds): Thornstag (height 4.4 > 3.75), Stormtalon (length 4.67 > 4.5, span 10.41 > 6, lift 0.71 < 0.8) and Pyrewing (length 6.01 > 4.5, span 6.83 > 6, lift 0.36 < 0.8). (Tidefang now stands higher on longer arms.)
-5. **Action poses are baked in.** Stormtalon is mid-dive (Sunmane and Ironpaw fixed in 1.1 and 1.2: neutral stances, the swipe and the punch are attack clips). They need neutral idles; the action becomes an attack animation.
-6. **FX and scenery bleed out.** Stormtalon's wind ribbons (Duskseer's moon, branch and ring, Stonemaul's rocks and rings, and Wardshell's orbiting shields removed or tamed in 1.3, 1.5 and 1.6). They will cover the neighbours in formation.
-7. ~~One PointLight per creature.~~ Solved in 0.5: `bakeLights()` bakes each creature's light into its own parts, so it no longer spills onto neighbours. Keep giving creatures a `PointLight` for their element glow; it is baked away in battle.
-8. **Weak value contrast.** Thornstag (Sunmane, Grandtusk and Wardshell darkened in 1.1, 1.4 and 1.6) have mid-value bodies, so their element glow does not pop the way Emberwolf's does. Darken or deepen the body before brightening the glow.
-9. **Small faces.** (Grandtusk and Stonemaul fixed in 1.4 and 1.5); Tidefang's and Stormtalon's heads are tiny relative to the body. Faces carry personality and must read.
-10. **Thin or flat silhouettes.** Thornstag is mostly antler on a slim body (Tidefang raised in 1.7).
-11. ~~Off-tone creatures.~~ Fixed: Ironpaw (1.2) and Duskseer (1.3) pulled toward the house tone.
+Phase 1 reworked all eleven to the friendly look (October 2026); every one fits its size class. Fixed along the way: balloon limbs, petal manes, baked action poses (Stormtalon's dive, Sunmane's swipe, Ironpaw's punch are clips now), FX bleeding into neighbours, oversized creatures, tiny faces, glowing slit eyes and snarls. Lessons that still apply are in the SHOULD rules above. What is left:
+
+1. **Pyrewing costs three times the draw calls** of the others (152 merged meshes against about 40 to 60). Trim it before battles get busy.
+2. **Ranged ultimates aim at a fixed point.** `clipFx` is not told where the target stands, so Pyrewing's feather volley lands in front of the same column only. Every ranged creature (A10) needs the target position passed to `clipFx`.
+3. **Small looks:** Tidefang shows a darker band where its teal meets the cream belly; Wardshell's eyes read a little sleepy close up; Sunmane's sun glyphs barely show on the golden coat; Pyrewing's wingtip flames read as separate drops.
+4. **Blink phase:** stills are taken at `t = 0`, so every blink is offset (`(t + 2.5) % period`) to keep the eyes open in them. Keep that in new creatures.
+5. **Wings face the camera edge-on when spread flat.** Both flyers hold their wings raised in a V so the side camera sees them; a flyer whose span matters to its look needs the same thought.
 
 ### Checklist before you call a creature done
 

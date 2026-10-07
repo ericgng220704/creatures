@@ -166,7 +166,7 @@ export function stonemaul() {
       ears[0].rotation.z = Math.sin(t * 3.1) * .08;
       placeMotes(t);
       light.intensity = 2.2 + Math.sin(t * 2.3) * .5;
-      var blink = (t % 5.7) < .13 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
+      var blink = ((t + 2.5) % 5.7) < .13 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
     }
   };
 }

@@ -158,7 +158,7 @@ export function emberwolf() {
       flames.forEach(function (f, i) { var w = Math.sin(t * 13 + i * 1.9) * .5 + Math.sin(t * 7.1 + i * 2.3) * .5; f.scale.set(1 - w * .07, 1 + w * .15, 1 - w * .07); });
       light.intensity = 4 + Math.sin(t * 17) * .6 + Math.sin(t * 9.3) * .5;
       placeEmbers(t);
-      var blink = (t % 4.7) < .12 ? .15 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
+      var blink = ((t + 2.5) % 4.7) < .12 ? .15 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
     }
   };
 }

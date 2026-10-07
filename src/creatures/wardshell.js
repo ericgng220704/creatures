@@ -161,7 +161,7 @@ export function wardshell() {
       wards.visible = false;
       placeBubbles(t);
       light.intensity = 1.8 + Math.sin(t * 2.2) * .4;
-      var blink = (t % 6.3) < .15 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
+      var blink = ((t + 2.5) % 6.3) < .15 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
     }
   };
 }

@@ -23,17 +23,17 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 
 | Creature | Id | Element | Parts | Triangles | Build (ms) |
 | --- | --- | --- | ---: | ---: | ---: |
-| Emberwolf | `emberwolf` | Fire | 227 | 60,386 | 240 |
-| Tidefang | `tidefang` | Water | 317 | 44,754 | 115 |
-| Thornstag | `thornstag` | Grass | 277 | 53,847 | 511 |
-| Stonemaul | `stonemaul` | Ground | 249 | 73,004 | 148 |
-| Wardshell | `wardshell` | Water | 93 | 58,919 | 99 |
-| Pyrewing | `pyrewing` | Fire | 307 | 51,005 | 328 |
-| Stormtalon | `eagle` | Electric | 266 | 38,796 | 140 |
-| Sunmane | `lion` | Light | 238 | 64,738 | 87 |
-| Grandtusk | `elephant` | Ice | 187 | 57,700 | 68 |
-| Ironpaw | `panda` | Neutral | 80 | 42,322 | 48 |
-| Duskseer | `owl` | Dark | 139 | 19,648 | 25 |
+| Emberwolf | `emberwolf` | Fire | 221 | 61,244 | 272 |
+| Tidefang | `tidefang` | Water | 273 | 48,594 | 128 |
+| Thornstag | `thornstag` | Grass | 277 | 53,847 | 168 |
+| Stonemaul | `stonemaul` | Ground | 239 | 75,572 | 185 |
+| Wardshell | `wardshell` | Water | 97 | 59,927 | 99 |
+| Pyrewing | `pyrewing` | Fire | 307 | 51,005 | 73 |
+| Stormtalon | `eagle` | Electric | 266 | 38,796 | 105 |
+| Sunmane | `lion` | Light | 232 | 65,590 | 82 |
+| Grandtusk | `elephant` | Ice | 191 | 60,484 | 77 |
+| Ironpaw | `panda` | Neutral | 77 | 41,614 | 59 |
+| Duskseer | `owl` | Dark | 141 | 21,568 | 29 |
 
 Cost is measured by `npm run stats` at three r158. Descriptions of each are in [docs/creatures.md](docs/creatures.md).
 

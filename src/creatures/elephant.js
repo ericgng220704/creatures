@@ -140,7 +140,7 @@ export function elephant() {
       tj.forEach(function (j, i) { j.g.rotation.z = j.base + Math.sin(t * 1.1 - i * .5) * .05 * (1 + i * .25); });
       placeSnow(t);
       light.intensity = 2 + Math.sin(t * 1.8) * .3;
-      var blink = (t % 6.3) < .14 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
+      var blink = ((t + 2.5) % 6.3) < .14 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
     }
   };
 }

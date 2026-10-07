@@ -174,7 +174,7 @@ export function tidefang() {
       var pulse = .65 + Math.sin(t * 2.2) * .25;
       crystals.forEach(function (c) { c.material.emissiveIntensity = pulse; });
       light.intensity = 2.6 + Math.sin(t * 2.2) * .8;
-      var blink = (t % 5.3) < .14 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
+      var blink = ((t + 2.5) % 5.3) < .14 ? .1 : 1; eyes.forEach(function (e) { e.scale.y = blink; });
     }
   };
 }
