@@ -23,9 +23,11 @@ export function weld(g) {
   return out;
 }
 
-// a superellipsoid: e = 1 is an ellipsoid, smaller is boxier; def(x, y, z) sculpts it
+// a superellipsoid: e = 1 is an ellipsoid, smaller is boxier; def(x, y, z) sculpts it. Tiny blobs (under 0.25 across:
+// eyes, toes, petals, nails) get a coarser grid, which no one can see at battle size and which saves triangles
 export function blob(w, h, d, e, def, ws, hs) {
-  var g = new T.SphereGeometry(1, ws || 30, hs || 20), p = g.attributes.position;
+  var tiny = Math.max(w, h, d) < .25;
+  var g = new T.SphereGeometry(1, ws || (tiny ? 14 : 30), hs || (tiny ? 10 : 20)), p = g.attributes.position;
   function f(v) { return Math.sign(v) * Math.pow(Math.abs(v), e); }
   for (var i = 0; i < p.count; i++) {
     var x = f(p.getX(i)) * w / 2, y = f(p.getY(i)) * h / 2, z = f(p.getZ(i)) * d / 2;

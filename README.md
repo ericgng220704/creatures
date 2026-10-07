@@ -23,17 +23,17 @@ The **battle preview** (`battle.html`) shows creatures as the game will: at true
 
 | Creature | Id | Element | Parts | Triangles | Build (ms) |
 | --- | --- | --- | ---: | ---: | ---: |
-| Emberwolf | `emberwolf` | Fire | 227 | 77,258 | 343 |
-| Tidefang | `tidefang` | Water | 317 | 65,178 | 150 |
-| Thornstag | `thornstag` | Grass | 242 | 110,228 | 261 |
-| Stonemaul | `stonemaul` | Ground | 249 | 90,764 | 183 |
-| Wardshell | `wardshell` | Water | 93 | 60,695 | 102 |
-| Pyrewing | `pyrewing` | Fire | 240 | 34,060 | 69 |
-| Stormtalon | `eagle` | Electric | 178 | 35,686 | 64 |
-| Sunmane | `lion` | Light | 238 | 86,050 | 120 |
-| Grandtusk | `elephant` | Ice | 187 | 73,684 | 115 |
-| Ironpaw | `panda` | Neutral | 80 | 52,090 | 71 |
-| Duskseer | `owl` | Dark | 139 | 21,424 | 44 |
+| Emberwolf | `emberwolf` | Fire | 227 | 60,386 | 240 |
+| Tidefang | `tidefang` | Water | 317 | 44,754 | 115 |
+| Thornstag | `thornstag` | Grass | 242 | 61,388 | 167 |
+| Stonemaul | `stonemaul` | Ground | 249 | 73,004 | 148 |
+| Wardshell | `wardshell` | Water | 93 | 58,919 | 99 |
+| Pyrewing | `pyrewing` | Fire | 240 | 32,284 | 55 |
+| Stormtalon | `eagle` | Electric | 178 | 33,910 | 70 |
+| Sunmane | `lion` | Light | 238 | 64,738 | 87 |
+| Grandtusk | `elephant` | Ice | 187 | 57,700 | 68 |
+| Ironpaw | `panda` | Neutral | 80 | 42,322 | 48 |
+| Duskseer | `owl` | Dark | 139 | 19,648 | 25 |
 
 Cost is measured by `npm run stats` at three r158. Descriptions of each are in [docs/creatures.md](docs/creatures.md).
 
@@ -81,7 +81,7 @@ The creature stands on the ground at `y = 0`, faces `+x`, and is a few units tal
 
 ### Drawing one
 
-- `blob(w, h, d, e, deform)` is the workhorse: an ellipsoid (`e = 1`) that gets boxier as `e` falls. `deform(x, y, z, W, H, D)` sculpts it, which is how chests, haunches and snouts are made.
+- `blob(w, h, d, e, deform, ws, hs)` is the workhorse: an ellipsoid (`e = 1`) that gets boxier as `e` falls. `deform(x, y, z, W, H, D)` sculpts it, which is how chests, haunches and snouts are made. Small blobs (under 0.25 across: eyes, toes, knuckles, buttons) get a coarser sphere, 14 x 10 instead of 30 x 20, unless `ws`, `hs` say otherwise.
 - `part(parent, geometry, look, x, y, z, rx, ry, rz)` adds a mesh. `look` says how it is coloured: `c` is a colour or a function `(worldPosition, worldNormal) => Color` (spots, stripes, hexagonal shell plates, belly gradients are all colour functions), `m` picks a material (`matte`, `flat`, `gloss`, `metal`, `leaf`, `plume`, `feather`), and `noAO` / `noOcc` switch contact shading off for a part.
 - `seg` is a limb segment between two points, `shard` a cone, `ttube` a tube that tapers along a path, `lock` a lock of fur, `feather` a feather, `wingKit` a three-part wing with rows of feathers, `band` a ring round a limb, `plateGeo` a flat plate cut from an outline.
 - `limb(parent, points, radii, look)` builds a leg, arm, neck or tail as a **chain of joints** (see "Rigs").
@@ -149,7 +149,7 @@ This repo makes creatures; it does not yet make a game. The obvious next steps:
 
 - **Share one renderer and one scene**, build each creature kind once, and clone it for each instance.
 - **Pose by state, not by time.** `update(t)` loops an idle. Attacks, hits and walks need the joint groups exposed (for example `joints: { jaw, tail, wings }`) so a state machine can drive them.
-- **Budget the triangles.** Creatures run from about 25,000 to 110,000 triangles and 60 to 340 parts. That is fine for a handful on screen; for crowds, bake each to a sprite sheet or an impostor, and keep full models for close-ups.
+- **Budget the triangles.** Creatures run from about 20,000 to 75,000 triangles and 60 to 340 parts. That is fine for a handful on screen; for crowds, bake each to a sprite sheet or an impostor, and keep full models for close-ups.
 - **Pick a licence.** None has been chosen. three.js is MIT; the sheet's fonts (Fredoka, Nunito) are loaded from Google Fonts under the SIL Open Font License.
 
 ## Rendering without a GPU
